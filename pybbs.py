@@ -35,7 +35,7 @@ class IndexHandler(tornado.web.RequestHandler):
         params = self.application.db['params'].find_one()  
         i = params['count']      
         na = self.get_cookie('username')
-        pos = self.application.gpos(page)
+        pos = self.application.gpos(dbname,page)
         col = self.application.db[dbname]
         rec = col.find()
         rec.sort('number')
@@ -77,28 +77,33 @@ class RegistHandler(tornado.web.RequestHandler):
         if self.application.collection(dbname) == False:
             self.render('regist.htm',content='urlが存在しません')
             return 
+        words = ['<link','<script','<style','<img']
+        out = ['ばか','死ね','あほ']
         na = self.get_argument('name')
         sub = self.get_argument('title')
         com = self.get_argument('comment')
         text = ''
         i = 0
+        error = ''
         for line in com.splitlines(True):
+            for word in words:
+                if word in line:
+                    error = error + u'タグ違反.('+word+')'       
             text = text+'<p>'+line
             i += len(line)
+        for word in out:
+            if word in text:
+                error = error + u'禁止ワード.'
+                break
         pw = self.get_argument('password')
         if na == '':
             na = u'誰かさん'
         if sub == '':
             sub = u'タイトルなし.'
-        error = ''
         if i == 0:
             error = error + u'本文がありません.'
         elif i > 1000:
             error = error +u'文字数が1,000をこえました.'
-        words = ['<link','<script','<style']
-        for word in words:
-            if word == com:
-                error = error + u'タグ違反.'
         article = self.application.db[dbname]
         rec = article.find()
         rec.sort('number',-1)
@@ -128,7 +133,7 @@ class AdminHandler(BaseHandler):
         rec = coll.find()                   
         param = self.application.db['params']
         mente = param.find_one()
-        pos = self.application.gpos(page)
+        pos = self.application.gpos(dbname,page)
         self.render('modules/admin.htm',position=pos,records=rec,mente=mente['mentenance'],password=mente['password'],db=dbname)
 
 class AdminConfHandler(BaseHandler):
@@ -149,28 +154,34 @@ class AdminConfHandler(BaseHandler):
         self.redirect('/'+dbname+'/admin/0/')
           
 class UserHandler(tornado.web.RequestHandler):
-    def post(self):
-        num = self.get_argument('number')
+    def post(self,dbname):
+        num = int(self.get_argument('number'))
         pas = self.get_argument('password')
-        coll = self.application.db['records']
-        if pas != '':
-            coll.remove({'number':num,'password':pas})
-        self.redirect('/')
+        coll = self.application.db[dbname]
+        obj = coll.find_one({'number':num})
+        if obj and(obj['password'] == pas):
+            coll.remove({'number':num})
+        self.redirect('/'+dbname)
       
 class SearchHandler(tornado.web.RequestHandler):       
     def post(self,dbname):
-        word = self.get_argument('word1')
-        radiobox = self.get_argument('filter')
-        rec = self.application.db['records']
-        if radiobox == 'name': 
-            searchrec = rec.find({'name':word})
-        elif radiobox == 'com':
-            searchrec = rec.find({'comment':word})
-        self.render('modules/search.htm',records=searchrec,word1=word,db=dbname)
+        self.word = self.get_argument('word1')
+        self.radiobox = self.get_argument('filter')
+        rec = self.application.db[dbname]
+        self.render('modules/search.htm',records=self.mylist(rec),word1=self.word,db=dbname)
     
     def get(self,dbname):
         word = self.get_cookie('search')
         self.render('modules/search.htm',records={},word1=word,db=dbname)
+        
+    def mylist(self,rec):
+        for searchrec in rec.find():       
+            if self.radiobox == 'name':
+                if searchrec['name'].find(self.word) == True:
+                    yield searchrec
+            else:
+                if searchrec['comment'].find(self.word) == True:
+                    yield searchrec
         
 class FooterModule(tornado.web.UIModule):
     def render(self,number,url,link):
@@ -181,25 +192,25 @@ class Applications(tornado.web.Application):
         client = pymongo.MongoClient()
         self.db = client['mydatabase']
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/([a-z]+)',IndexHandler),(r'/([a-z]+)/([0-9]+)/',IndexHandler),
-                    (r'/([a-z]+)/admin/([0-9]+)/',AdminHandler),(r'/([a-z]+)/admin/([a-z]+)/',AdminConfHandler),(r'/userdel',UserHandler),
+                    (r'/([a-z]+)/admin/([0-9]+)/',AdminHandler),(r'/([a-z]+)/admin/([a-z]+)/',AdminConfHandler),(r'/([a-z]+)/userdel',UserHandler),
                     (r'/([a-z]+)/search',SearchHandler),(r'/([a-z]+)/regist',RegistHandler)]
         settings = {'template_path':os.path.join(os.path.dirname(__file__),'pybbs'),
                         'static_path':os.path.join(os.path.dirname(__file__),'static'),
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
-                       # 'xsrf_cookies':True,
+                        'xsrf_cookies':True,
                         'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
  
-    def gpos(self,page):
+    def gpos(self,dbname,page):
         coll = self.db['params']
         params = coll.find_one()
         pos = int(page)
         if pos <= 0:
             pos = 0
-        elif (pos-1)*params['count'] >= self.db['records'].count():
+        elif (pos-1)*params['count'] >= self.db[dbname].count():
             pos = 0
         return pos
     
