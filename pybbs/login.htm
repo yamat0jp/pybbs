@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+
+<html>
+  <head>
+    <meta charset=utf-8>
+    <title>ログイン</title>
+  </head>
+
+  <body>
+    <p style=text-align:center>
+</p>
+    <p style=text-align:center>管理者様ログイン画面
+</p>
+    <br>
+    <form action=/{{db}}/login method="post">
+    {% module xsrf_form_html() %}
+    <p style=text-align:center>
+      <input type=text name=record>
+    	  <input style=height:25px type="password" name="password">
+      <input type="submit" value="ログイン">
+    </p>
+    </form>
+  </body>
+</html>

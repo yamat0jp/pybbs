@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset=utf-8>
+    <title>
+    	{% block title %}
+    		{{data['title']}}
+    	{% end %}
+    </title>
+    {% block style %}
+    <link rel="stylesheet" href={{static_url('css/main.css')}}>
+	{% end %}
+  </head> 
+  <body>
+  {% block header %}
+    {% raw data['title2'] %}
+    <header>
+    <a name=top></a>
+    <form action=/{{db}}/regist method="post">
+    {% module xsrf_form_html() %}
+      <table>
+        <tr><td>
+          <label><p>お名前</p><input name="name" value="{{username}}"></label>
+          <label><p>タイトル</p><input name="title"></label>
+          <input type="submit" value="送信">
+        </td></tr>
+        <tr><td>
+          <label><p>本文<span>必須</span><br></p>
+            <textarea name="comment" cols=30 required placeholder="コメントなどを入力してください."></textarea></label>
+        </td></tr>
+        <tr><td>
+          <label><p>パスワード</p><input name="password" type="password" placeholder="削除用"></label>
+        </td></tr>
+      </table>
+    </form>
+    </header>
+    <hr size="1" width="100%">
+    <form action="/userdel" method="post" id=search>
+      {% module xsrf_form_html() %}
+      <label><p>記事No</p><input name="number"></label>
+      <label><p>Pass</p><input type="password" name="password"></label>
+      <input type="submit" value="削除">
+      <p><a href=/{{db}}/search>検索ページ</a></p>
+    </form>
+    <p style=text-align:center>{{db}}</p>
+  {% module Footer(position,'/'+db,'#article') %}
+  {% end %}
+  {% block body %}
+    {% for record in records %}
+    <hr size=1>
+	<section id=number>[{{record['number']}}]</section>
+	<section id=title>{{record['title']}}</section>
+	<section id=name>  Name:<h1>{{record['name']}}</h1></section>
+	<section id=date>  Date:<h1>{{record['date']}}</h1></section>
+	<section id=comment>{% raw record['comment'] %}</section>
+	{% end %}
+	<a name=article></a>
+	<p style=text-align:right><a href=#top>Topへ移動</a></p>
+  {% end %}
+  {% block footer %}
+    {% module Footer(position,'/'+db,'#article') %}
+    <p style=text-align:center><a href="/{{db}}/admin/0/">管理者用ログイン</a></p>
+  {% end %}
+  </body>
+</html>
