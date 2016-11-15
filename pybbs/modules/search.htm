@@ -1,0 +1,30 @@
+{% extends 'index.htm' %}
+
+{% block title %}
+	検索ページ
+{% end %}
+
+{% block header %}
+    <form action=/{{db}}/search method="post">
+    {% module xsrf_form_html() %}   
+    <p style=font-weight:bold;text-align:center>検索ページ
+    </p>
+      <p style=text-align:center>AND検索。半角カンマ(,)で区切ってください。
+      </p>
+      <p><br></p><p><br></p><p><br></p>
+        <p>検索ワード</p>
+        <input name=word1 type=search value={{word1}}>
+    <p><label><input type="radio" name="filter" value="name">名前から検索 </label>
+         <label><input type="radio" checked="true" name="filter" value="com">本文から検索</label>
+    </p>
+      <p>
+    <input type="submit" value="検索"></p>
+    </form>
+      <p><a href=/{{db}}>掲示板へ戻る
+</a></p>   
+{% end %}
+
+{% block footer %}
+<hr>
+    <p style=text-align:center><a href="/{{db}}">掲示板へ戻る</a></p>	
+{% end %}
