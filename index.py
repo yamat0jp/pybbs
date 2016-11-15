@@ -1,8 +1,4 @@
-#!/usr/local/bin/python
-#-*- coding: utf-8 -*-
 
-import sys
-sys.path.append('/home/kainushi/.pyenv/versions/2.7/lib/python2.7/site-packages')
 import os.path
 import tornado.auth
 import tornado.escape
