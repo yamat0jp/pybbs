@@ -227,6 +227,30 @@ class Applications(tornado.web.Application):
 if __name__ == '__main__':
     tornado.options.parse_command_line()
     wsgi_app = tornado.wsgi.WSGIAdapter(Applications())
-    server = wsgiref.simple_server.make_server('',5000,wsgi_app)
+    server = wsgiref.simple_server.make_server('',8888,wsgi_app)
     server.serve_forever()
     
+[2016-11-16 18:46:45 +0900] [6063] [INFO] Starting gunicorn 19.6.0
+[2016-11-16 18:46:45 +0900] [6063] [INFO] Listening at: http://0.0.0.0:5000 (6063)
+[2016-11-16 18:46:45 +0900] [6063] [INFO] Using worker: sync
+[2016-11-16 18:46:45 +0900] [6066] [INFO] Booting worker with pid: 6066
+[2016-11-16 18:46:45 +0900] [6066] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/fukemasashi/.virtualenvs/heroku/lib/python3.5/site-packages/gunicorn/arbiter.py", line 557, in spawn_worker
+    worker.init_process()
+  File "/Users/fukemasashi/.virtualenvs/heroku/lib/python3.5/site-packages/gunicorn/workers/base.py", line 126, in init_process
+    self.load_wsgi()
+  File "/Users/fukemasashi/.virtualenvs/heroku/lib/python3.5/site-packages/gunicorn/workers/base.py", line 136, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/fukemasashi/.virtualenvs/heroku/lib/python3.5/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/fukemasashi/.virtualenvs/heroku/lib/python3.5/site-packages/gunicorn/app/wsgiapp.py", line 65, in load
+    return self.load_wsgiapp()
+  File "/Users/fukemasashi/.virtualenvs/heroku/lib/python3.5/site-packages/gunicorn/app/wsgiapp.py", line 52, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/fukemasashi/.virtualenvs/heroku/lib/python3.5/site-packages/gunicorn/util.py", line 357, in import_app
+    __import__(module)
+ImportError: No module named 'gettingstarted'
+[2016-11-16 18:46:45 +0900] [6066] [INFO] Worker exiting (pid: 6066)
+[2016-11-16 18:46:45 +0900] [6063] [INFO] Shutting down: Master
+[2016-11-16 18:46:45 +0900] [6063] [INFO] Reason: Worker failed to boot.
