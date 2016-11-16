@@ -1,1 +1,1 @@
-web: python index.py $PORT
+web: gunicorn index:wsgi_app 
