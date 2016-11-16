@@ -68,14 +68,12 @@ class LogoutHandler(BaseHandler):
         
 class NaviHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render('top.htm',coll=self.name())
+        self.render('top.htm',coll=sorted(self.name()))
         
     def name(self):
-        y = []
         for x in self.application.db.tables():
             if x != '_default':
-                y.append(x)
-        return sorted(y)
+                yield x
 
 class RegistHandler(tornado.web.RequestHandler):
     def post(self,dbname):
