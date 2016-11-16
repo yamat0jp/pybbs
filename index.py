@@ -226,7 +226,7 @@ class Applications(tornado.web.Application):
         
 if __name__ == '__main__':
     tornado.options.parse_command_line()
-    wsgi_app = tornado.wsgi.WSGIAdapter(Application())
+    wsgi_app = tornado.wsgi.WSGIAdapter(Applications())
     server = wsgiref.simple_server.make_server('',8888,wsgi_app)
-    server.server_forever()
+    server.serve_forever()
     
