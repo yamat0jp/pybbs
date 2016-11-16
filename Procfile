@@ -1,1 +1,1 @@
-web: python$PYTHON_VERSION index.py
+web: gunicorn -k tornado index:app

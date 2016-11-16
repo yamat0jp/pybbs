@@ -1,1 +1,1 @@
-{"bbs2": {}, "bbs3": {}, "bbs": {}, "bbs1": {}, "_default": {"5": {"title2": "pybbs", "mentenance": false, "count": 30, "title": "pybbs", "password": "admin", "kinds": "conf"}}}
+{"_default": {"5": {"title": "pybbs", "kinds": "conf", "password": "admin", "count": 30, "mentenance": false, "title2": "pybbs"}}, "bbs3": {}, "bbs1": {"1": {"title": "\u30bf\u30a4\u30c8\u30eb\u306a\u3057.", "password": "", "date": 1, "number": 1, "name": "taro", "comment": "<p>test"}}, "bbs2": {}, "bbs": {}}
