@@ -1,4 +1,6 @@
 
+import tornado.wsgi
+import wsgiref.simple_server
 import os.path
 import tornado.auth
 import tornado.escape
@@ -224,6 +226,7 @@ class Applications(tornado.web.Application):
         
 if __name__ == '__main__':
     tornado.options.parse_command_line()
-    http_server = tornado.httpserver.HTTPServer(Applications())
-    http_server.listen(options.port)
-    tornado.ioloop.IOLoop.instance().start()
+    wsgi_app = tornado.wsgi.WSGIAdapter(Application())
+    server = wsgiref.simple_server.make_server('',8888,wsgi_app)
+    server.server_forever()
+    
