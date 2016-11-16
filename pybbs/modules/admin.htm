@@ -37,7 +37,7 @@
 </th></tr>
     {% for record in records %}
     <tr>
-	<th><input type=checkbox name=item value="{{record['number']}}"></th>
+	<th><input type=checkbox name=item value={{record['number']}}></th>
 	<th>{{record['number']}}</th>
 	<th style=size:-1>{{record['date']}}</th>
 	<th style=size:-1;color:#D01166;bold>{{record['title']}}</th>
