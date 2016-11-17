@@ -76,6 +76,33 @@ class NaviHandler(tornado.web.RequestHandler):
                 return True
         return False
 
+class TitleHandler(NaviHandler):
+    def get(self):
+        self.render('title.htm',coll=self.name(),full=self.full,
+                    count=self.count,title=self.title,update=self.update)
+
+    def count(self,dbname):
+        if dbname in self.application.db.tables():
+            return len(self.application.db.table(dbname))
+        else:
+            return ''
+
+    def title(self,dbname):
+        if dbname in self.application.db.tables():
+            table = self.application.db.table(dbname)
+            if len(table) == 0:
+                return ''
+            else:
+                return table.all()[0]['title']
+
+    def update(self,dbname):
+        if dbname in self.application.db.tables():
+            table = self.application.db.table(dbname)
+            if len(table) == 0:
+                return ''
+            else:
+                return table.all()[len(table)-1]['date']
+        
 class RegistHandler(tornado.web.RequestHandler):
     def post(self,dbname):
         if self.application.collection(dbname) == False:
@@ -111,10 +138,10 @@ class RegistHandler(tornado.web.RequestHandler):
         if len(article) == 0:
             no = 1
         else:
-            item = article.get(where('number') == len(article))
+            item = article.all()[len(article)-1]
             no = item['number']+1
         if error == '':
-            reg = {'number':no,'name':na,'title':sub,'comment':text,'password':pw,'date':1}#datetime.today()}
+            reg = {'number':no,'name':na,'title':sub,'comment':text,'password':pw,'date':datetime.now().strftime('%Y/%D:%M')}
             article.insert(reg)
             self.set_cookie('username',na)
             self.redirect('/'+dbname+'#article')
@@ -196,7 +223,8 @@ class FooterModule(tornado.web.UIModule):
 class Application(tornado.web.Application):    
     def __init__(self):
         self.db = TinyDB('static/db/db.json')
-        handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
+        handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
+                    (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
         settings = {'template_path':os.path.join(os.path.dirname(__file__),'pybbs'),
@@ -204,7 +232,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        'debug':True,
+                        #'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
