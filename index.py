@@ -1,19 +1,12 @@
 
-import tornado.wsgi
-import wsgiref.simple_server
 import os.path
 import tornado.auth
 import tornado.escape
-import tornado.httpserver
-import tornado.ioloop
 import tornado.options
 import tornado.web
-from tornado.options import define,options
 from tinydb import TinyDB,Query,where
 from tinydb.operations import delete
 from datetime import datetime
-
-define('port',default=8000,help='run on the given port.',type=int)
 
 class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
@@ -68,12 +61,20 @@ class LogoutHandler(BaseHandler):
         
 class NaviHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render('top.htm',coll=sorted(self.name()))
+        self.render('top.htm',coll=sorted(self.name()),full=self.full)
         
     def name(self):
         for x in self.application.db.tables():
             if x != '_default':
                 yield x
+                
+    def full(self,dbname):
+        if dbname in self.application.db.tables():
+            i = 10*self.application.db.get(where('kinds') == 'conf')['count']
+            table = self.application.db.table(dbname)
+            if len(table) >= i:
+                return True
+        return False
 
 class RegistHandler(tornado.web.RequestHandler):
     def post(self,dbname):
@@ -203,7 +204,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        #'debug':True,
+                        'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
