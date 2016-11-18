@@ -63,3 +63,8 @@ form#search input {
 span {
     color:#ff0000
 }
+
+p {
+	text-indent:0;
+	margin:0
+}

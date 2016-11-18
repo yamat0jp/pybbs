@@ -29,7 +29,7 @@ class IndexHandler(BaseHandler):
             else:
                 self.render('regist.htm',content='urlが見つかりません')
         i = params['count']      
-        na = self.get_cookie('username')
+        na = tornado.escape.url_unescape(self.get_cookie('username'))
         pos = self.application.gpos(dbname,page)
         table = self.application.db.table(dbname)
         start = (pos-1)*i
@@ -78,7 +78,7 @@ class NaviHandler(tornado.web.RequestHandler):
 class TitleHandler(NaviHandler):
     def get(self):
         self.render('title.htm',coll=self.name(),full=self.full,
-                    count=self.count,title=self.title,update=self.update)
+                    count=self.count,title=self.title,update=self.update)            
 
     def count(self,dbname):
         if dbname in self.application.db.tables():
@@ -89,18 +89,21 @@ class TitleHandler(NaviHandler):
     def title(self,dbname):
         if dbname in self.application.db.tables():
             table = self.application.db.table(dbname)
-            if len(table) == 0:
-                return ''
+            if table.contains(where('number') == 1) == True:
+                dic = table.get(where('number') == 1)
+                return dic['title']
             else:
-                return table.all()[0]['title']
-
+                return ''
+            
     def update(self,dbname):
         if dbname in self.application.db.tables():
             table = self.application.db.table(dbname)
-            if len(table) == 0:
+            i = len(table)
+            if i == 0:
                 return ''
             else:
-                return table.all()[len(table)-1]['date']
+                rec = sorted(table.all(),key=lambda x: x['number'])
+                return rec[i-1]['date']
         
 class RegistHandler(tornado.web.RequestHandler):
     def post(self,dbname):
@@ -142,7 +145,7 @@ class RegistHandler(tornado.web.RequestHandler):
         if error == '':
             reg = {'number':no,'name':na,'title':sub,'comment':text,'password':pw,'date':datetime.now().strftime('%Y/%D:%M')}
             article.insert(reg)
-            self.set_cookie('username',na)
+            self.set_cookie('username',tornado.escape.url_escape(na))
             self.redirect('/'+dbname+'#article')
         else:
             self.render('regist.htm',content=error)
@@ -155,7 +158,7 @@ class AdminHandler(BaseHandler):
         if self.application.collection(dbname) == False:
             self.render('regist.htm',content='urlが見つかりません')
         table = self.application.db.table(dbname) 
-        rec = table.all()                   
+        rec = sorted(table.all(),key=lambda x: x['number'])                   
         mente = self.application.db.get(where('kinds') == 'conf')
         if mente['mentenance'] == True:
             check = 'checked=checked'
