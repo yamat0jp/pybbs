@@ -2,7 +2,6 @@
 import os.path
 import tornado.auth
 import tornado.escape
-import tornado.options
 import tornado.web
 from tinydb import TinyDB,Query,where
 from tinydb.operations import delete
@@ -197,24 +196,15 @@ class UserHandler(tornado.web.RequestHandler):
       
 class SearchHandler(tornado.web.RequestHandler):       
     def post(self,dbname):
-        self.word = self.get_argument('word1')
-        self.radiobox = self.get_argument('filter')
-        self.set_cookie('search',self.word)
-        table = self.application.db.table(dbname)
-        self.render('modules/search.htm',records=self.mylist(table.all()),word1=self.word,db=dbname)
+        word = self.get_argument('word1')
+        radiobox = self.get_argument('filter')
+        self.set_cookie('search',word)
+        table = self.application.db.table(dbname)            
+        self.render('modules/search.htm',records=table.search(where(radiobox).matches(word)),word1=word,db=dbname)
     
     def get(self,dbname):
         word = self.get_cookie('search')
         self.render('modules/search.htm',records={},word1=word,db=dbname)
-        
-    def mylist(self,rec):
-        for searchrec in rec:       
-            if self.radiobox == 'name':
-                if searchrec['name'].find(self.word) == True:
-                    yield searchrec
-            else:
-                if searchrec['comment'].find(self.word) == True:
-                    yield searchrec
         
 class FooterModule(tornado.web.UIModule):
     def render(self,number,url,link):
