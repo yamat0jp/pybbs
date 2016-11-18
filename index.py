@@ -29,7 +29,7 @@ class IndexHandler(BaseHandler):
             else:
                 self.render('regist.htm',content='urlが見つかりません')
         i = params['count']      
-        na = tornado.escape.url_unescape(self.get_cookie('username'))
+        na = tornado.escape.url_unescape(self.get_cookie("username",u"誰かさん"))
         pos = self.application.gpos(dbname,page)
         table = self.application.db.table(dbname)
         start = (pos-1)*i
@@ -128,8 +128,6 @@ class RegistHandler(tornado.web.RequestHandler):
                 error = error + u'禁止ワード.'
                 break
         pw = self.get_argument('password')
-        if na == '':
-            na = u'誰かさん'
         if sub == '':
             sub = u'タイトルなし.'
         if i == 0:
