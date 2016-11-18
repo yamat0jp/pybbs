@@ -37,7 +37,7 @@ class IndexHandler(BaseHandler):
             start = len(table)-i
             if start < 0:
                 start = 0
-        rec = table.all()[start:start+i]
+        rec = sorted(table.all(),key=lambda x: x['number'])[start:start+i]
         if len(table) >= 10*i:
             self.render('modules/full.htm',position=pos,records=rec,data=params,db=dbname)  
         self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname)
