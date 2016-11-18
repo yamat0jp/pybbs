@@ -66,5 +66,9 @@ span {
 
 p {
 	text-indent:0;
-	margin:3px
+	margin:0
+}
+
+body {
+	line-height:1.5
 }
