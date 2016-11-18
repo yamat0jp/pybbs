@@ -21,7 +21,7 @@
     {% module xsrf_form_html() %}
       <table>
         <tr><td>
-          <label><p>お名前</p><input name="name" value="{{username}}"></label>
+          <label><p>お名前</p><input name="name" value={% raw username %}></label>
           <label><p>タイトル</p><input name="title"></label>
           <input type="submit" value="送信">
         </td></tr>
