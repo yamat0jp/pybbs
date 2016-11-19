@@ -5,7 +5,7 @@
     <meta charset=utf-8>
     <title>
     	{% block title %}
-    		{{data['title']}}
+		{{data['title']}}
     	{% end %}
     </title>
     {% block style %}
@@ -14,7 +14,7 @@
   </head> 
   <body>
   {% block header %}
-    {% raw data['title2'] %}
+    <a href=/ style=text-decoration:none>{% raw data['title2'] %}</a>
     <header>
     <a name=top></a>
     <form action=/{{db}}/regist method="post">

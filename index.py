@@ -110,9 +110,10 @@ class TitleHandler(NaviHandler):
 class RegistHandler(tornado.web.RequestHandler):
     def post(self,dbname):
         if self.application.collection(dbname) == False:
-            self.render('regist.htm',content='urlが存在しません')
-        words = ['<link','<script','<style','<img']
-        out = ['ばか','死ね','あほ']
+            raise tornado.web.HTTPError(404)
+        rec = self.application.db.get(where('kinds') == 'conf')
+        words = rec['bad_words']
+        out = rec['out_words']
         na = self.get_argument('name')
         sub = self.get_argument('title')
         com = self.get_argument('comment')
@@ -143,7 +144,7 @@ class RegistHandler(tornado.web.RequestHandler):
             item = article.all()[len(article)-1]
             no = item['number']+1
         if error == '':
-            reg = {'number':no,'name':na,'title':sub,'comment':text,'password':pw,'date':datetime.now().strftime('%Y/%D:%M')}
+            reg = {'number':no,'name':na,'title':sub,'comment':text,'password':pw,'date':datetime.now().strftime('%Y/%m/%d %H:%M')}
             article.insert(reg)
             self.set_cookie('username',tornado.escape.url_escape(na))
             self.redirect('/'+dbname+'#article')
@@ -226,7 +227,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        #'debug':True,
+                        'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
