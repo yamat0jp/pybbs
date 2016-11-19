@@ -122,16 +122,16 @@ class RegistHandler(tornado.web.RequestHandler):
         text = ''
         i = 0
         error = ''
+        for word in out:
+            if word in com:
+                error = error + u'禁止ワード.'
+                break
         for line in com.splitlines(True):
             for word in words:
                 if word in line:
                     error = error + u'タグ違反.('+word+')'       
             i += len(line)
-            text = text+'<p>'+self.link(line)
-        for word in out:
-            if word in text:
-                error = error + u'禁止ワード.'
-                break
+            text = text+'<p>'+self.link(line)+'<br></p>'
         pw = self.get_argument('password')
         if sub == '':
             sub = u'タイトルなし.'
@@ -164,6 +164,7 @@ class RegistHandler(tornado.web.RequestHandler):
                 while -1 < command.find(x,i):
                     j = command.find(x,i)
                     tmp = command[i:j]
+                    i = j+len(x)
                     k = tmp.rsplit(None,1)
                     if ((len(k) > 1)and(k[1] == y))or(k[0] == y):
                         text = text+tmp+s                                                                       
