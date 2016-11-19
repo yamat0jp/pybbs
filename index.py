@@ -112,6 +112,7 @@ class RegistHandler(tornado.web.RequestHandler):
     def post(self,dbname):
         if self.application.collection(dbname) == False:
             raise tornado.web.HTTPError(404)
+            return
         rec = self.application.db.get(where('kinds') == 'conf')
         words = rec['bad_words']
         out = rec['out_words']
@@ -147,6 +148,7 @@ class RegistHandler(tornado.web.RequestHandler):
         if error == '':
             reg = {'number':no,'name':na,'title':sub,'comment':text,'password':pw,'date':datetime.now().strftime('%Y/%m/%d %H:%M')}
             article.insert(reg)
+            self.application.db.close()
             self.set_cookie('username',tornado.escape.url_escape(na))
             self.redirect('/'+dbname+'#article')
         else:
@@ -161,17 +163,13 @@ class RegistHandler(tornado.web.RequestHandler):
                 s = '<a href=#'+x+'>'+x+'</a>'
                 while -1 < command.find(x,i):
                     j = command.find(x,i)
-                    tmp = list(copy.deepcopy(command))
-                    del tmp[j:]
-                    del tmp[:i]
-                    t = ''.join(tmp)
-                    i = j+len(x)
-                    k = t.rsplit(None,1)
+                    tmp = command[i:j]
+                    k = tmp.rsplit(None,1)
                     if ((len(k) > 1)and(k[1] == y))or(k[0] == y):
-                        text = text+t+s                                                                       
+                        text = text+tmp+s                                                                       
                         break
                     else:
-                        text = text+t+x                        
+                        text = text+tmp+x                        
             y = x    
         if text == '':
             return command
@@ -197,6 +195,7 @@ class AdminHandler(BaseHandler):
         else:
             check = ''
         pos = self.application.gpos(dbname,page)
+        self.application.db.close()
         self.render('modules/admin.htm',position=pos,records=rec,mente=check,password=mente['password'],db=dbname)
 
 class AdminConfHandler(BaseHandler):
@@ -221,6 +220,7 @@ class AdminConfHandler(BaseHandler):
             table = self.application.db.table(dbname)
             for x in self.get_arguments('item'):
                 table.remove(where('number') == int(x))
+        self.application.db.close()
         self.redirect('/'+dbname+'/admin/0/')
         
     def store(self):
@@ -281,10 +281,6 @@ class Application(tornado.web.Application):
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
-    
-    def __delattr__(self, *args, **kwargs):
-        self.db.close()
-        return tornado.web.Application.__delattr__(self, *args, **kwargs)
  
     def gpos(self,dbname,page):
         params = self.db.get(where('kinds') == 'conf')
