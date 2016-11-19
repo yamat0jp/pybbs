@@ -27,7 +27,8 @@ class IndexHandler(BaseHandler):
             if self.current_user == b'admin':
                 self.application.db.table(dbname)
             else:
-                self.render('regist.htm',content='urlが見つかりません')
+                raise tornado.web.HTTPError(404)
+                return
         i = params['count']      
         na = tornado.escape.url_unescape(self.get_cookie("username",u"誰かさん"))
         pos = self.application.gpos(dbname,page)
@@ -39,7 +40,8 @@ class IndexHandler(BaseHandler):
                 start = 0
         rec = sorted(table.all(),key=lambda x: x['number'])[start:start+i]
         if len(table) >= 10*i:
-            self.render('modules/full.htm',position=pos,records=rec,data=params,db=dbname)  
+            self.render('modules/full.htm',position=pos,records=rec,data=params,db=dbname)
+            return
         self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname)
         
 class LoginHandler(BaseHandler):
@@ -154,7 +156,8 @@ class AdminHandler(BaseHandler):
         if dbname == '':
             dbname = self.get_argument('record','')
         if self.application.collection(dbname) == False:
-            self.render('regist.htm',content='urlが見つかりません')
+            raise tornado.web.HTTPError(404)
+            return
         table = self.application.db.table(dbname) 
         rec = sorted(table.all(),key=lambda x: x['number'])                   
         mente = self.application.db.get(where('kinds') == 'conf')
