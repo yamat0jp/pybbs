@@ -1,6 +1,6 @@
 
 import os.path
-import shutil
+import shutil,copy
 import tornado.auth
 import tornado.escape
 import tornado.web
@@ -125,8 +125,8 @@ class RegistHandler(tornado.web.RequestHandler):
             for word in words:
                 if word in line:
                     error = error + u'タグ違反.('+word+')'       
-            text = text+'<p>'+line
             i += len(line)
+            text = text+'<p>'+self.link(line)
         for word in out:
             if word in text:
                 error = error + u'禁止ワード.'
@@ -151,7 +151,36 @@ class RegistHandler(tornado.web.RequestHandler):
             self.redirect('/'+dbname+'#article')
         else:
             self.render('regist.htm',content=error)
-
+    
+    def link(self,command):
+        y = ''
+        i = 0
+        text = ''
+        for x in command.split():
+            if (y == '>>')and(x.isdecimal() == True):
+                s = '<a href=#'+x+'>'+x+'</a>'
+                while -1 < command.find(x,i):
+                    j = command.find(x,i)
+                    tmp = list(copy.deepcopy(command))
+                    del tmp[j:]
+                    del tmp[:i]
+                    t = ''.join(tmp)
+                    i = j+len(x)
+                    k = t.rsplit(None,1)
+                    if ((len(k) > 1)and(k[1] == y))or(k[0] == y):
+                        text = text+t+s                                                                       
+                        break
+                    else:
+                        text = text+t+x                        
+            y = x    
+        if text == '':
+            return command
+        else:
+            if len(command) > i:
+                return text+command[i:]
+            else:
+                return text
+    
 class AdminHandler(BaseHandler):
     @tornado.web.authenticated               
     def get(self,dbname,page='0'):
@@ -248,7 +277,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        #'debug':True,
+                        'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
