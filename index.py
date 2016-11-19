@@ -148,7 +148,7 @@ class RegistHandler(tornado.web.RequestHandler):
         if error == '':
             reg = {'number':no,'name':na,'title':sub,'comment':text,'password':pw,'date':datetime.now().strftime('%Y/%m/%d %H:%M')}
             article.insert(reg)
-            self.application.db.close()
+            restart()
             self.set_cookie('username',tornado.escape.url_escape(na))
             self.redirect('/'+dbname+'#article')
         else:
@@ -195,7 +195,8 @@ class AdminHandler(BaseHandler):
         else:
             check = ''
         pos = self.application.gpos(dbname,page)
-        self.application.db.close()
+        restart()
+        self.application.db = TinyDB(json)
         self.render('modules/admin.htm',position=pos,records=rec,mente=check,password=mente['password'],db=dbname)
 
 class AdminConfHandler(BaseHandler):
@@ -220,13 +221,13 @@ class AdminConfHandler(BaseHandler):
             table = self.application.db.table(dbname)
             for x in self.get_arguments('item'):
                 table.remove(where('number') == int(x))
-        self.application.db.close()
+        restart()
         self.redirect('/'+dbname+'/admin/0/')
         
     def store(self):
         self.application.db.close()
         shutil.copy('static/db/db.json','static/db/bak.json')
-        self.application.db = TinyDB('static/db/db.json')
+        self.application.db = TinyDB(json)
         
     def restore(self):
         database = self.application.db
@@ -267,7 +268,7 @@ class FooterModule(tornado.web.UIModule):
     
 class Application(tornado.web.Application):    
     def __init__(self):
-        self.db = TinyDB('static/db/db.json')
+        self.db = TinyDB(json)
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
@@ -297,6 +298,10 @@ class Application(tornado.web.Application):
                 return True
         else:
             return False
-        
+
+json = 'static/db/db.json'
 app = Application()
-    
+
+def restart():
+    app.db.close()
+    app.db = TinyDB(json)    
