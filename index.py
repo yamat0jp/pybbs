@@ -1,5 +1,6 @@
 
 import os.path
+import shutil
 import tornado.auth
 import tornado.escape
 import tornado.web
@@ -173,10 +174,15 @@ class AdminConfHandler(BaseHandler):
     @tornado.web.authenticated
     def post(self,dbname,func):
         if func == 'set':
+            param = self.application.db.get(where('kinds') == 'conf')['mentenance']
             if self.get_argument('mente','') == 'on':
                 mente = True
+                if param != mente:
+                    self.store()
             else:
                 mente = False  
+                if param != mente:
+                    self.restore()
             word = self.get_argument('pass','')
             if word == '':
                 self.render('regist.htm',content='パスワードを設定してください')
@@ -187,6 +193,21 @@ class AdminConfHandler(BaseHandler):
             for x in self.get_arguments('item'):
                 table.remove(where('number') == int(x))
         self.redirect('/'+dbname+'/admin/0/')
+        
+    def store(self):
+        self.application.db.close()
+        shutil.copy('static/db/db.json','static/db/bak.json')
+        self.application.db = TinyDB('static/db/db.json')
+        
+    def restore(self):
+        database = self.application.db
+        bak = TinyDB('static/db/bak.json')
+        for x in database.tables():
+            if self.application.collection(x) == True:
+                database.purge_table(x)
+                if x in bak.tables():
+                    table = database.table(x)
+                    table.insert_multiple(bak.table(x).all())
           
 class UserHandler(tornado.web.RequestHandler):
     def post(self,dbname):
@@ -227,7 +248,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        'debug':True,
+                        #'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
