@@ -197,7 +197,7 @@ class AdminHandler(BaseHandler):
             check = ''
         pos = self.application.gpos(dbname,page)
         restart()
-        self.application.db = TinyDB(json)
+        self.application.db = TinyDB(st.json)
         self.render('modules/admin.htm',position=pos,records=rec,mente=check,password=mente['password'],db=dbname)
 
 class AdminConfHandler(BaseHandler):
@@ -216,8 +216,9 @@ class AdminConfHandler(BaseHandler):
             word = self.get_argument('pass','')
             if word == '':
                 self.render('regist.htm',content='パスワードを設定してください')
+                return
             else:
-                self.application.db.update({'mentenance':mente,'password':word},where('kinds') == 'conf')     
+                self.application.db.update({'mentenance':mente,'password':word},where('kinds') == 'conf')  
         elif func == 'del':
             table = self.application.db.table(dbname)
             for x in self.get_arguments('item'):
@@ -227,12 +228,12 @@ class AdminConfHandler(BaseHandler):
         
     def store(self):
         self.application.db.close()
-        shutil.copy(json,bak)
-        self.application.db = TinyDB(json)
+        shutil.copy(st.json,st.bak)
+        self.application.db = TinyDB(st.json)
         
     def restore(self):
         database = self.application.db
-        bak = TinyDB(bak)
+        bak = TinyDB(st.bak)
         for x in database.tables():
             if self.application.collection(x) == True:
                 database.purge_table(x)
@@ -270,7 +271,7 @@ class FooterModule(tornado.web.UIModule):
     
 class Application(tornado.web.Application):    
     def __init__(self):
-        self.db = TinyDB(json)
+        self.db = TinyDB(st.json)
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
@@ -301,10 +302,13 @@ class Application(tornado.web.Application):
         else:
             return False
 
-json = 'static/db/db.json'
-bak = 'static/db/bak.json'
+class static():
+    json = 'static/db/db.json'
+    bak = 'static/db/bak.json'
+
+st = static()
 app = Application()
 
 def restart():
     app.db.close()
-    app.db = TinyDB(json)    
+    app.db = TinyDB(st.json)    
