@@ -227,18 +227,19 @@ class AdminConfHandler(BaseHandler):
         
     def store(self):
         self.application.db.close()
-        shutil.copy('static/db/db.json','static/db/bak.json')
+        shutil.copy(json,bak)
         self.application.db = TinyDB(json)
         
     def restore(self):
         database = self.application.db
-        bak = TinyDB('static/db/bak.json')
+        bak = TinyDB(bak)
         for x in database.tables():
             if self.application.collection(x) == True:
                 database.purge_table(x)
                 if x in bak.tables():
                     table = database.table(x)
                     table.insert_multiple(bak.table(x).all())
+        restart()
           
 class UserHandler(tornado.web.RequestHandler):
     def post(self,dbname):
@@ -301,6 +302,7 @@ class Application(tornado.web.Application):
             return False
 
 json = 'static/db/db.json'
+bak = 'static/db/bak.json'
 app = Application()
 
 def restart():
