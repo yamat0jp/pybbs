@@ -143,7 +143,7 @@ class RegistHandler(tornado.web.RequestHandler):
         if len(article) == 0:
             no = 1
         else:
-            item = article.all()[len(article)-1]
+            item = sorted(article.all(),key=lambda x: x['number'])[len(article)-1]
             no = item['number']+1
         if error == '':
             reg = {'number':no,'name':na,'title':sub,'comment':text,'password':pw,'date':datetime.now().strftime('%Y/%m/%d %H:%M')}
@@ -196,9 +196,15 @@ class AdminHandler(BaseHandler):
         else:
             check = ''
         pos = self.application.gpos(dbname,page)
+        i = mente['count']
+        start = (pos-1)*i
+        if start < 0:
+            start = len(table)-i
+            if start < 0:
+                start = 0
         restart()
         self.application.db = TinyDB(st.json)
-        self.render('modules/admin.htm',position=pos,records=rec,mente=check,password=mente['password'],db=dbname)
+        self.render('modules/admin.htm',position=pos,records=rec[start:start+i],mente=check,password=mente['password'],db=dbname)
 
 class AdminConfHandler(BaseHandler):
     @tornado.web.authenticated
@@ -310,5 +316,6 @@ st = static()
 app = Application()
 
 def restart():
-    app.db.close()
-    app.db = TinyDB(st.json)    
+    pass
+    #app.db.close()
+    #app.db = TinyDB(st.json)    
