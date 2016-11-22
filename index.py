@@ -5,6 +5,7 @@ import tornado.auth
 import tornado.escape
 import tornado.web
 from tinydb import TinyDB,Query,where
+from tinydb.storages import MemoryStorage
 from tinydb.operations import delete
 from datetime import datetime
 
@@ -40,6 +41,9 @@ class IndexHandler(BaseHandler):
             if start < 0:
                 start = 0
         rec = sorted(table.all(),key=lambda x: x['number'])[start:start+i]
+        for x in rec:
+            for y in x['comment'].splitlines(True):
+                y = '<p>'+y+'<br></p>'
         if len(table) >= 10*i:
             self.render('modules/full.htm',position=pos,records=rec,data=params,db=dbname)
             return
@@ -131,7 +135,7 @@ class RegistHandler(tornado.web.RequestHandler):
                 if word in line:
                     error = error + u'タグ違反.('+word+')'       
             i += len(line)
-            text = text+'<p>'+self.link(line)+'<br></p>'
+            text = text+self.link(line)
         pw = self.get_argument('password')
         if sub == '':
             sub = u'タイトルなし.'
@@ -261,16 +265,44 @@ class UserHandler(tornado.web.RequestHandler):
       
 class SearchHandler(tornado.web.RequestHandler):       
     def post(self,dbname):
-        word = self.get_argument('word1')
-        radiobox = self.get_argument('filter')
-        self.set_cookie('search',word)
-        table = self.application.db.table(dbname)            
-        self.render('modules/search.htm',records=table.search(where(radiobox).matches(word)),word1=word,db=dbname)
+        self.word = tornado.escape.url_unescape(self.get_argument('word1'))
+        self.radiobox = self.get_argument('filter')
+        self.set_cookie('search',tornado.escape.url_escape(self.word))         
+        table = self.application.db.table(dbname)
+        #rec = table.search(where(radiobox).search(word))
+        #rec = sorted(rec,key=lambda x: x['number'])
+        rec = self.search(dbname)
+        self.render('modules/search.htm',records=rec,word1=self.word,db=dbname)
     
     def get(self,dbname):
+        if self.application.collection(dbname) == False:
+            raise tornado.web.HTTPError(404)
+            return
         word = self.get_cookie('search')
-        self.render('modules/search.htm',records={},word1=word,db=dbname)
+        self.render('modules/search.htm',records=[],word1=word,db=dbname)
         
+    def search(self,name):
+        table = self.application.db.table(name)
+        mem = TinyDB(storage=MemoryStorage)
+        for word in self.word.split():
+            for x in table.search(where('comment').search(word)):
+                if self.radiobox == 'comment':
+                    result = ''
+                    for text in x['comment'].splitlines(True):                  
+                        if text.find(word) > -1:
+                            result = result+'<p style=background-color:yellow>'+text+'</p>'                            
+                        else:
+                            result = result+'<p>'+text+'</p>'
+                    if mem.get(where('number') == x['number']) == None:
+                        i = mem.insert(x)
+                        mem.update({'comment':result},eids=[i])   
+                else:
+                    rec = table.search(where('name').search(word))
+                    return sorted(rec,key=lambda x: x['number'])     
+        rec = sorted(mem.all(),key=lambda x: x['number'])
+        mem.close()
+        return rec
+                                            
 class FooterModule(tornado.web.UIModule):
     def render(self,number,url,link):
         return self.render_string('modules/footer.htm',index=number,url=url,link=link)
@@ -287,7 +319,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        #'debug':True,
+                        'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
