@@ -41,9 +41,6 @@ class IndexHandler(BaseHandler):
             if start < 0:
                 start = 0
         rec = sorted(table.all(),key=lambda x: x['number'])[start:start+i]
-        for x in rec:
-            for y in x['comment'].splitlines(True):
-                y = '<p>'+y+'<br></p>'
         if len(table) >= 10*i:
             self.render('modules/full.htm',position=pos,records=rec,data=params,db=dbname)
             return
@@ -135,7 +132,7 @@ class RegistHandler(tornado.web.RequestHandler):
                 if word in line:
                     error = error + u'タグ違反.('+word+')'       
             i += len(line)
-            text = text+self.link(line)
+            text = text+'<p>'+self.link(line)+'<br></p>'
         pw = self.get_argument('password')
         if sub == '':
             sub = u'タイトルなし.'
@@ -150,7 +147,7 @@ class RegistHandler(tornado.web.RequestHandler):
             item = sorted(article.all(),key=lambda x: x['number'])[len(article)-1]
             no = item['number']+1
         if error == '':
-            reg = {'number':no,'name':na,'title':sub,'comment':text,'password':pw,'date':datetime.now().strftime('%Y/%m/%d %H:%M')}
+            reg = {'number':no,'name':na,'title':sub,'comment':text,'raw':com,'password':pw,'date':datetime.now().strftime('%Y/%m/%d %H:%M')}
             article.insert(reg)
             restart()
             self.set_cookie('username',tornado.escape.url_escape(na))
@@ -268,9 +265,6 @@ class SearchHandler(tornado.web.RequestHandler):
         self.word = tornado.escape.url_unescape(self.get_argument('word1'))
         self.radiobox = self.get_argument('filter')
         self.set_cookie('search',tornado.escape.url_escape(self.word))         
-        table = self.application.db.table(dbname)
-        #rec = table.search(where(radiobox).search(word))
-        #rec = sorted(rec,key=lambda x: x['number'])
         rec = self.search(dbname)
         self.render('modules/search.htm',records=rec,word1=self.word,db=dbname)
     
@@ -288,7 +282,7 @@ class SearchHandler(tornado.web.RequestHandler):
             for x in table.search(where('comment').search(word)):
                 if self.radiobox == 'comment':
                     result = ''
-                    for text in x['comment'].splitlines(True):                  
+                    for text in x['raw'].splitlines(True):                  
                         if text.find(word) > -1:
                             result = result+'<p style=background-color:yellow>'+text+'</p>'                            
                         else:
