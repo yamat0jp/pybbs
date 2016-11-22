@@ -276,27 +276,37 @@ class SearchHandler(tornado.web.RequestHandler):
         self.render('modules/search.htm',records=[],word1=word,db=dbname)
         
     def search(self,name):
-        table = self.application.db.table(name)
-        mem = TinyDB(storage=MemoryStorage)
-        for word in self.word.split():
-            for x in table.search(where('comment').search(word)):
-                if self.radiobox == 'comment':
-                    result = ''
-                    for text in x['raw'].splitlines(True):                  
+        table = self.application.db.table(name)    
+        element = self.word.split()
+        if len(element) == 0:
+            element = ['']
+        while len(element) < 3:
+            element.append(element[0])
+        if self.radiobox == 'comment':
+            query = (Query()[self.radiobox].search(element[0])) | (Query()[self.radiobox].search(element[1])) | (Query()[self.radiobox].search(element[2]))
+        else:
+            query = (Query()[self.radiobox] == element[0]) | (Query()[self.radiobox] == element[1]) | (Query()[self.radiobox] == element[2])
+        if self.radiobox == 'comment':
+            rec = []
+            mem = TinyDB(storage=MemoryStorage)            
+            for x in table.search(query):
+                result = ''
+                for text in x['raw'].splitlines(True):                  
+                    for word in self.word.split():                        
                         if text.find(word) > -1:
-                            result = result+'<p style=background-color:yellow>'+text+'</p>'                            
-                        else:
-                            result = result+'<p>'+text+'</p>'
-                    if mem.get(where('number') == x['number']) == None:
-                        i = mem.insert(x)
-                        mem.update({'comment':result},eids=[i])   
-                else:
-                    rec = table.search(where('name').search(word))
-                    return sorted(rec,key=lambda x: x['number'])     
-        rec = sorted(mem.all(),key=lambda x: x['number'])
-        mem.close()
-        return rec
-                                            
+                            result = result+'<p style=background-color:yellow>'+text+'<br></p>'  
+                            break                          
+                    else:
+                        result = result+'<p>'+text+'<br></p>'
+                i = mem.insert(x)
+                mem.update({'comment':result},eids=[i])   
+                rec = sorted(mem.all(),key=lambda x: x['number'])
+            mem.close()
+            return rec        
+        else:
+            rec = table.search(query)
+            return sorted(rec,key=lambda x: x['number'])   
+                                        
 class FooterModule(tornado.web.UIModule):
     def render(self,number,url,link):
         return self.render_string('modules/footer.htm',index=number,url=url,link=link)
