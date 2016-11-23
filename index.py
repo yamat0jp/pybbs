@@ -283,9 +283,9 @@ class SearchHandler(tornado.web.RequestHandler):
         while len(element) < 3:
             element.append(element[0])
         if self.radiobox == 'comment':
-            query = (Query()[self.radiobox].search(element[0])) | (Query()[self.radiobox].search(element[1])) | (Query()[self.radiobox].search(element[2]))
+            query = (Query().raw.search(element[0])) | (Query().raw.search(element[1])) | (Query().raw.search(element[2]))
         else:
-            query = (Query()[self.radiobox] == element[0]) | (Query()[self.radiobox] == element[1]) | (Query()[self.radiobox] == element[2])
+            query = (Query().name == element[0]) | (Query().name == element[1]) | (Query().name == element[2])
         if self.radiobox == 'comment':
             rec = []
             mem = TinyDB(storage=MemoryStorage)            
