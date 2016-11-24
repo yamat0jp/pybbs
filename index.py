@@ -270,11 +270,8 @@ class SearchHandler(tornado.web.RequestHandler):
         if self.application.collection(dbname) == False:
             raise tornado.web.HTTPError(404)
             return
-        word = self.get_cookie('search')
-        if word == None:
-            word = ''
-        else:
-            word = tornado.escape.url_unescape(word)
+        word = self.get_cookie('search','')
+        word = tornado.escape.url_unescape(word)
         self.render('modules/search.htm',records=[],word1=word,db=dbname)
         
     def search(self,name):
