@@ -81,33 +81,30 @@ class NaviHandler(tornado.web.RequestHandler):
 
 class TitleHandler(NaviHandler):
     def get(self):
-        self.render('title.htm',coll=self.name(),full=self.full,
-                    count=self.count,title=self.title,update=self.update)            
-
-    def count(self,dbname):
-        if dbname in self.application.db.tables():
-            return len(self.application.db.table(dbname))
-        else:
-            return ''
-
-    def title(self,dbname):
-        if dbname in self.application.db.tables():
-            table = self.application.db.table(dbname)
-            if table.contains(where('number') == 1) == True:
-                dic = table.get(where('number') == 1)
-                return dic['title']
-            else:
-                return ''
-            
-    def update(self,dbname):
-        if dbname in self.application.db.tables():
-            table = self.application.db.table(dbname)
+        rec = sorted(self.title(),key=lambda x: x['date2'])
+        self.render('title.htm',coll=rec,full=self.full)  
+        
+    def title(self):
+        for x in self.name():
+            item = {}
+            item['name'] = x
+            table = self.application.db.table(x)
             i = len(table)
-            if i == 0:
-                return ''
+            item['count'] = i            
+            if table.contains(where('number') == 1) == True:
+                s = table.get(where('number') == 1)['title']
             else:
-                rec = sorted(table.all(),key=lambda x: x['number'])
-                return rec[i-1]['date']
+                s = ''
+            item['title'] = s   
+            if i == 0:
+                item['date'] = ''
+                item['date2'] = 0
+            else:
+                rec = sorted(table.all(),key=lambda k: k['number'])
+                s = rec[i-1]['date']
+                item['date'] = s
+                item['date2'] = datetime.strptime(s,'%Y/%m/%d %H:%M').day
+            yield item
         
 class RegistHandler(tornado.web.RequestHandler):
     def post(self,dbname):
@@ -147,7 +144,8 @@ class RegistHandler(tornado.web.RequestHandler):
             item = sorted(article.all(),key=lambda x: x['number'])[len(article)-1]
             no = item['number']+1
         if error == '':
-            reg = {'number':no,'name':na,'title':sub,'comment':text,'raw':com,'password':pw,'date':datetime.now().strftime('%Y/%m/%d %H:%M')}
+            s = datetime.now()
+            reg = {'number':no,'name':na,'title':sub,'comment':text,'raw':com,'password':pw,'date':s.strftime('%Y/%m/%d %H:%M')}
             article.insert(reg)
             restart()
             self.set_cookie('username',tornado.escape.url_escape(na))

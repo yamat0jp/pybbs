@@ -4,12 +4,12 @@
 </head>
 <body>
 {% for x in coll %}
-	{% if full(x) == True %}
-	<p><a href=/{{x}}> style=color:red>{{x}}</a>
+	{% if full(x['name']) == True %}
+	<p><a href=/{{x['name']}}> style=color:red>{{x['name']}}</a>
 	{% else %}
-	<p><a href=/{{x}}>{{x}}</a>
+	<p><a href=/{{x['name']}}>{{x['name']}}</a>
 	{% end %}
-	タイトル	:{{title(x)}},記事数:{{count(x)}},更新時刻:{{update(x)}}
+	タイトル	:{{x['title']}},記事数:{{x['count']}},更新時刻:{{x['date']}}
 {% end %}
 <p><a href=/>もどる</a>
 <footer>PR リンク
