@@ -103,7 +103,8 @@ class TitleHandler(NaviHandler):
                 rec = sorted(table.all(),key=lambda k: k['number'])
                 s = rec[i-1]['date']
                 item['date'] = s
-                item['date2'] = datetime.strptime(s,'%Y/%m/%d %H:%M').day
+                i = datetime.strptime(s,'%Y/%m/%d %H:%M')
+                item['date2'] = 31*i.month+i.day
             yield item
         
 class RegistHandler(tornado.web.RequestHandler):
