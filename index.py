@@ -4,6 +4,7 @@ import shutil,copy
 import tornado.auth
 import tornado.escape
 import tornado.web
+import tornado.wsgi
 from tinydb import TinyDB,Query,where
 from tinydb.storages import MemoryStorage
 from tinydb.operations import delete
@@ -104,7 +105,14 @@ class TitleHandler(NaviHandler):
                 s = rec[i-1]['date']
                 item['date'] = s
                 i = datetime.strptime(s,'%Y/%m/%d %H:%M')
-                item['date2'] = 31*i.month+i.day
+                year = datetime.now().year-i.year
+                if year == 0:
+                    j = 800
+                elif year == 1:
+                    j = 400
+                else:
+                    j = 0
+                item['date2'] = j+31*(i.month-1)+i.day
             yield item
         
 class RegistHandler(tornado.web.RequestHandler):
@@ -203,7 +211,6 @@ class AdminHandler(BaseHandler):
             if start < 0:
                 start = 0
         restart()
-        self.application.db = TinyDB(st.json)
         self.render('modules/admin.htm',position=pos,records=rec[start:start+i],mente=check,password=mente['password'],db=dbname)
 
 class AdminConfHandler(BaseHandler):
@@ -250,13 +257,14 @@ class AdminConfHandler(BaseHandler):
           
 class UserHandler(tornado.web.RequestHandler):
     def post(self,dbname):
-        num = int(self.get_argument('number'))
-        pas = self.get_argument('password')
-        table = self.application.db.table(dbname)
-        qwr = Query()
-        obj = table.get(qwr.number == num)
-        if obj and(obj['password'] == pas):
-            table.remove(qwr.number == num)
+        num = self.get_argument('number')
+        if num.isdigit() == True:
+            pas = self.get_argument('password')
+            table = self.application.db.table(dbname)
+            qwr = Query()
+            obj = table.get(qwr.number == num)
+            if obj and(obj['password'] == pas):
+                table.remove(qwr.number == num)
         self.redirect('/'+dbname)
       
 class SearchHandler(tornado.web.RequestHandler):       
@@ -264,7 +272,7 @@ class SearchHandler(tornado.web.RequestHandler):
         self.word = tornado.escape.url_unescape(self.get_argument('word1'))
         self.radiobox = self.get_argument('filter')
         self.set_cookie('search',tornado.escape.url_escape(self.word))         
-        rec = self.search(dbname)
+        rec = sorted(self.search(dbname),key=lambda x: x['number'])
         self.render('modules/search.htm',records=rec,word1=self.word,db=dbname)
     
     def get(self,dbname):
@@ -275,8 +283,8 @@ class SearchHandler(tornado.web.RequestHandler):
         word = tornado.escape.url_unescape(word)
         self.render('modules/search.htm',records=[],word1=word,db=dbname)
         
-    def search(self,name):
-        table = self.application.db.table(name)    
+    def search(self,dbname):
+        table = self.application.db.table(dbname)    
         element = self.word.split()
         if len(element) == 0:
             element = ['']
@@ -286,26 +294,21 @@ class SearchHandler(tornado.web.RequestHandler):
             query = (Query().raw.search(element[0])) | (Query().raw.search(element[1])) | (Query().raw.search(element[2]))
         else:
             query = (Query().name == element[0]) | (Query().name == element[1]) | (Query().name == element[2])
-        if self.radiobox == 'comment':
-            rec = []
-            mem = TinyDB(storage=MemoryStorage)            
+        if self.radiobox == 'comment':    
             for x in table.search(query):
-                result = ''
+                com = ''
                 for text in x['raw'].splitlines(True):                  
                     for word in self.word.split():                        
                         if text.find(word) > -1:
-                            result = result+'<p style=background-color:yellow>'+text+'<br></p>'  
+                            com = com +'<p style=background-color:yellow>'+text+'<br></p>'  
                             break                          
                     else:
-                        result = result+'<p>'+text+'<br></p>'
-                i = mem.insert(x)
-                mem.update({'comment':result},eids=[i])   
-                rec = sorted(mem.all(),key=lambda x: x['number'])
-            mem.close()
-            return rec        
+                        com = com+'<p>'+text+'<br></p>'
+                x['comment'] = com
+                yield x       
         else:
-            rec = table.search(query)
-            return sorted(rec,key=lambda x: x['number'])   
+            for x in table.search(query):
+                yield x
                                         
 class FooterModule(tornado.web.UIModule):
     def render(self,number,url,link):
@@ -349,7 +352,7 @@ class static():
     bak = 'static/db/bak.json'
 
 st = static()
-app = Application()
+app = tornado.wsgi.WSGIAdapter(Application())
 
 def restart():
     pass
