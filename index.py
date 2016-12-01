@@ -135,7 +135,7 @@ class RegistHandler(tornado.web.RequestHandler):
                 break
         for line in com.splitlines(True):
             for word in words:
-                if word in line:
+                if word in line.lower():
                     error = error + u'タグ違反.('+word+')'       
             i += len(line)
             text = text+'<p>'+self.link(line)+'<br></p>'
