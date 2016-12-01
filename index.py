@@ -341,9 +341,8 @@ class Application(tornado.web.Application):
         return pos
     
     def collection(self,name):
-        for x in self.db.tables():
-            if x == name:
-                return True
+        if name in self.db.tables():
+            return True
         else:
             return False
 
