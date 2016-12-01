@@ -156,7 +156,6 @@ class RegistHandler(tornado.web.RequestHandler):
             s = datetime.now()
             reg = {'number':no,'name':na,'title':sub,'comment':text,'raw':com,'password':pw,'date':s.strftime('%Y/%m/%d %H:%M')}
             article.insert(reg)
-            restart()
             self.set_cookie('username',tornado.escape.url_escape(na))
             self.redirect('/'+dbname+'#article')
         else:
@@ -210,7 +209,6 @@ class AdminHandler(BaseHandler):
             start = len(table)-i
             if start < 0:
                 start = 0
-        restart()
         self.render('modules/admin.htm',position=pos,records=rec[start:start+i],mente=check,password=mente['password'],db=dbname)
 
 class AdminConfHandler(BaseHandler):
@@ -236,7 +234,6 @@ class AdminConfHandler(BaseHandler):
             table = self.application.db.table(dbname)
             for x in self.get_arguments('item'):
                 table.remove(where('number') == int(x))
-        restart()
         self.redirect('/'+dbname+'/admin/0/')
         
     def store(self):
@@ -253,7 +250,6 @@ class AdminConfHandler(BaseHandler):
                 if x in bak.tables():
                     table = database.table(x)
                     table.insert_multiple(bak.table(x).all())
-        restart()
           
 class UserHandler(tornado.web.RequestHandler):
     def post(self,dbname):
@@ -352,8 +348,3 @@ class static():
 
 st = static()
 app = tornado.wsgi.WSGIAdapter(Application())
-
-def restart():
-    pass
-    #app.db.close()
-    #app.db = TinyDB(st.json)    
