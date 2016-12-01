@@ -285,8 +285,6 @@ class FooterModule(tornado.web.UIModule):
     
 class Application(tornado.web.Application):    
     def __init__(self):
-        client = pymongo.MongoClient()
-        self.db = client['collection']
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
@@ -317,4 +315,10 @@ class Application(tornado.web.Application):
             return False
 
 app = Application()
-
+MONGOLAB_URI = os.environ.get('mongodb://heroku_n905jfw2:heroku_n905jfw2@ds113678.mlab.com:13678/heroku_n905jfw2')
+if MONGOLAB_URI:
+    conn = pymongo.MongoClient(MONGOLAB_URI)
+    app.db=conn.heroku_n905jfw2
+else:
+    conn = pymongo.MongoClient()
+    app.db = conn.mydatabase
