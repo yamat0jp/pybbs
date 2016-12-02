@@ -294,7 +294,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        'debug':True,
+                        #'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
@@ -315,10 +315,11 @@ class Application(tornado.web.Application):
             return False
 
 app = Application()
-MONGOLAB_URI = os.environ.get('mongodb://heroku_n905jfw2:heroku_n905jfw2@ds113678.mlab.com:13678/heroku_n905jfw2')
+MONGOLAB_URI = os.environ.get('mongodb://kainushi:yamat0jp@yahoo.co.jp@ds113678.mlab.com:13678/heroku_n905jfw2')
 if MONGOLAB_URI:
     conn = pymongo.MongoClient(MONGOLAB_URI)
-    app.db=conn.heroku_n905jfw2
+    app.db = conn.heroku_n905jfw2
 else:
     conn = pymongo.MongoClient()
     app.db = conn.mydatabase
+    
