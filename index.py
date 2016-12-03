@@ -24,7 +24,9 @@ class IndexHandler(BaseHandler):
             self.render('mentenance.htm',title=params['title'],db=dbname)
         if self.application.collection(dbname) == False:
             if self.current_user == b'admin':
-                self.application.db[dbname]
+                coll = self.application.db[dbname]
+                coll.insert({})
+                coll.remove({})
             else:
                 raise tornado.web.HTTPError(404)
                 return
