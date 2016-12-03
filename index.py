@@ -6,7 +6,6 @@ import tornado.escape
 import tornado.web
 import tornado.wsgi
 from tinydb import TinyDB,Query,where
-from tinydb.storages import MemoryStorage
 from tinydb.operations import delete
 from datetime import datetime
 
@@ -255,6 +254,7 @@ class UserHandler(tornado.web.RequestHandler):
     def post(self,dbname):
         num = self.get_argument('number')
         if num.isdigit() == True:
+            num = int(num)
             pas = self.get_argument('password')
             table = self.application.db.table(dbname)
             qwr = Query()
