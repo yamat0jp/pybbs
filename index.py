@@ -120,7 +120,7 @@ class RegistHandler(tornado.web.RequestHandler):
         if self.application.collection(dbname) == False:
             raise tornado.web.HTTPError(404)
             return
-        rec = self.application.db[dbname].find_one()
+        rec = self.application.db['params'].find_one()
         words = rec['bad_words']
         out = rec['out_words']
         na = self.get_argument('name')
