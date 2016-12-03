@@ -64,10 +64,8 @@ class LogoutHandler(BaseHandler):
         self.redirect('/login')
         
 class NaviHandler(tornado.web.RequestHandler):
-    def get(self):
-        coll = self.application.db.collection_names()
-        del coll[0:3]           
-        coll.remove('params')                 
+    def get(self):                  
+        coll = sorted(self.application.coll(),key=str.lower)                
         self.render('top.htm',coll=coll,full=self.full)
                       
     def full(self,dbname):
@@ -84,9 +82,7 @@ class TitleHandler(NaviHandler):
         self.render('title.htm',coll=rec,full=self.full)  
         
     def title(self):
-        name = self.application.db.collection_names()
-        del name[0:3]
-        name.remove('params')
+        name = self.application.coll()
         for x in name:
             item = {}
             item['name'] = x
@@ -321,6 +317,13 @@ class Application(tornado.web.Application):
             return True
         else:
             return False
+
+    def coll(self):
+        name = self.db.collection_names()
+        for x in ['params','objectlabs-system.admin.collections','objectlabs-system','system.indexes']:
+            if x in name:
+                name.remove(x)
+        return name
 
 app = Application()
 MONGOLAB_URI = 'mongodb://kainushi:1234abcd@ds113678.mlab.com:13678/heroku_n905jfw2'
