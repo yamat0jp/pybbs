@@ -1,5 +1,5 @@
 
-import os.path
+import os
 import re
 import tornado.escape
 import tornado.web
@@ -63,11 +63,13 @@ class LogoutHandler(BaseHandler):
         
 class NaviHandler(tornado.web.RequestHandler):
     def get(self):
-        coll = self.application.db.collection_names(include_system_collections=False)
+        coll = self.application.db.collection_names()
+        del coll[0:3]           
+        coll.remove('params')                 
         self.render('top.htm',coll=coll,full=self.full)
                       
     def full(self,dbname):
-        if dbname in self.application.db.collection_names(include_system_collections=False):
+        if dbname in self.application.db.collection_names():
             i = 10*self.application.db['params'].find_one()['count']
             table = self.application.db[dbname]
             if table.count() >= i:
@@ -80,11 +82,14 @@ class TitleHandler(NaviHandler):
         self.render('title.htm',coll=rec,full=self.full)  
         
     def title(self):
-        for x in self.application.db.collection_names(include_system_collections=False):
+        name = self.application.db.collection_names()
+        del name[0:3]
+        name.remove('params')
+        for x in name:
             item = {}
             item['name'] = x
             table = self.application.db[x]
-            i = len(table)
+            i = table.count()
             item['count'] = i            
             tmp = table.find_one({'number':1})
             if tmp:
@@ -222,8 +227,9 @@ class AdminConfHandler(BaseHandler):
                 self.render('regist.htm',content='パスワードを設定してください')
                 return
             else:
-                param.update({'mentenance':mente,'password':word})  
-                param.save(param)
+                param['mentenance']=mente
+                param['password']=word  
+                self.application.db['params'].save(param)
         elif func == 'del':
             table = self.application.db[dbname]
             for x in self.get_arguments('item'):
@@ -315,11 +321,6 @@ class Application(tornado.web.Application):
             return False
 
 app = Application()
-MONGOLAB_URI = os.environ.get('mongodb://kainushi:1234abcd@ds113678.mlab.com:13678/heroku_n905jfw2')
-if MONGOLAB_URI:
-    conn = pymongo.MongoClient(MONGOLAB_URI)
-    app.db = conn.heroku_n905jfw2
-else:
-    conn = pymongo.MongoClient()
-    app.db = conn.mydatabase
-    
+MONGOLAB_URI = 'mongodb://kainushi:1234abcd@ds113678.mlab.com:13678/heroku_n905jfw2'
+conn = pymongo.MongoClient(MONGOLAB_URI,13678)
+app.db = conn.heroku_n905jfw2
