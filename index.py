@@ -270,7 +270,7 @@ class SearchHandler(tornado.web.RequestHandler):
         while len(element) < 3:
             element.append(element[0])
         if self.radiobox == 'comment':    
-            for x in table.find({'$or':[{'name':re.compile(element[0])},{'name':re.compile(element[1])},{'name':re.compile(element[2])}]}):
+            for x in table.find({'$or':[{'raw':re.compile(element[0])},{'raw':re.compile(element[1])},{'raw':re.compile(element[2])}]}):
                 com = ''
                 for text in x['raw'].splitlines(True):                  
                     for word in self.word.split():                        
