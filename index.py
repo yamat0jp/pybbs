@@ -236,12 +236,14 @@ class AdminConfHandler(BaseHandler):
           
 class UserHandler(tornado.web.RequestHandler):
     def post(self,dbname):
-        num = int(self.get_argument('number'))
-        pas = self.get_argument('password')
-        table = self.application.db[dbname]
-        obj = table.find_one({'number':num})
-        if obj and(obj['password'] == pas):
-            table.remove({'number':num})
+        num = self.get_argument('number')
+        if num.isdigit() == True:
+            num = int(num)
+            pas = self.get_argument('password')
+            table = self.application.db[dbname]
+            obj = table.find_one({'number':num})
+            if obj and(obj['password'] == pas):
+                table.remove({'number':num})
         self.redirect('/'+dbname)
       
 class SearchHandler(tornado.web.RequestHandler):       
