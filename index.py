@@ -5,6 +5,7 @@ import tornado.auth
 import tornado.escape
 import tornado.web
 import tornado.wsgi
+import wsgiref.simple_server
 from tinydb import TinyDB,Query,where
 from tinydb.operations import delete
 from datetime import datetime
@@ -348,3 +349,6 @@ class static():
 
 st = static()
 app = tornado.wsgi.WSGIAdapter(Application())
+if __name__ == '__main__':
+    server = wsgiref.simple_server.make_server('',8888,app)
+    server.serve_forever()
