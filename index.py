@@ -1,14 +1,17 @@
 
 import os.path
-import shutil,copy
-import tornado.auth
+import shutil
 import tornado.escape
 import tornado.web
-import tornado.wsgi
-import wsgiref.simple_server
+import tornado.httpserver
+import tornado.ioloop
+import tornado.options
+from tornado.options import define,options
 from tinydb import TinyDB,Query,where
 from tinydb.operations import delete
 from datetime import datetime
+
+define('port',default=8000,help='run on the given port',type=int)
 
 class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
@@ -346,7 +349,8 @@ class static():
     bak = 'static/db/bak.json'
 
 st = static()
-app = tornado.wsgi.WSGIAdapter(Application())
 if __name__ == '__main__':
-    server = wsgiref.simple_server.make_server('',8888,app)
-    server.serve_forever()
+    tornado.options.parse_command_line()
+    http_server = tornado.httpserver.HTTPServer(Application())
+    http_server.listen(options.port)
+    tornado.ioloop.IOLoop.instance().start()
