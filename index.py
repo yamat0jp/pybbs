@@ -123,8 +123,8 @@ class RegistHandler(tornado.web.RequestHandler):
         rec = self.application.db.get(where('kinds') == 'conf')
         words = rec['bad_words']
         out = rec['out_words']
-        na = self.get_argument('name',u'誰かさん')
-        sub = self.get_argument('title',u'タイトルなし')
+        na = self.get_argument('name')
+        sub = self.get_argument('title')
         com = self.get_argument('comment')
         text = ''
         i = 0
@@ -144,6 +144,10 @@ class RegistHandler(tornado.web.RequestHandler):
             error = error + u'本文がありません.'
         elif i > 1000:
             error = error +u'文字数が1,000をこえました.'
+        if na == '':
+            na = u'誰かさん'
+        if sub == '':
+            sub = u'タイトルなし.'
         article = self.application.db.table(dbname)
         if len(article) == 0:
             no = 1
