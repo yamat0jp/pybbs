@@ -1,6 +1,12 @@
 <!doctype html>
 <html>
 <head><meta charset=utf-8><title>Titles</title>
+<style type=text/css>
+span.g1 {
+	color:gray;
+	display:inline
+}
+</style>
 </head>
 <body>
 {% for x in coll %}
@@ -9,7 +15,7 @@
 	{% else %}
 	<p><a href=/{{x['name']}}>{{x['name']}}</a>
 	{% end %}
-	タイトル	:{{x['title']}},記事数:{{x['count']}},更新時刻:{{x['date']}}
+	<span class=g1>タイトル:</span>{{x['title']}}<span class=g1>,記事数:</span>{{x['count']}}<span class=g1>,更新時刻:</span>{{x['date']}}
 {% end %}
 <p><a href=/>もどる</a>
 <footer>PR リンク
