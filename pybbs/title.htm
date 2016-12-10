@@ -27,6 +27,9 @@
 	$(function(){
 		$('#{{x['name']}}').on('click',function(){
 			$(this).css(arg);
+		})
+		.on('mouseout',function(){
+			$(this).css('font-size','1em');
 		});
 	});
 	</script></article>
