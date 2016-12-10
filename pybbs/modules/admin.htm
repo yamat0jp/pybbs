@@ -12,9 +12,8 @@
 {% end %}
 
 {% block body %}
-    <form method="post" action=/admin/set/ style=text-align:center>
+    <form method="post" action=/{{db}}/admin/set/ style=text-align:center>
     {% module xsrf_form_html() %}   
-    <input type=hidden name=db value={{db}}>
     <p>削除したい記事のチェックボックスにチェックを入れ、削除ボタンを押して下さい</p>
     <p><br></p>
     <label><p>パスワードの変更
@@ -26,7 +25,7 @@
     <p><input type="submit" value="変更"></p>
     <p><a href="/logout">ログアウト</a></p>
     </form>
-    <form style=text-align:center method="post" action=/admin/del/>
+    <form style=text-align:center method="post" action=/{{db}}/admin/del/>
     {% module xsrf_form_html() %}   
     <table style=margin:auto border="0" cellspacing="0">
     <tr bgcolor="#bbbbbb"><th>削除
@@ -38,7 +37,7 @@
 </th></tr>
     {% for record in records %}
     <tr>
-	<th><input type=checkbox name="{{record['number']}}" value="{{record['number']}}"></th>
+	<th><input type=checkbox name=item value={{record['number']}}></th>
 	<th>{{record['number']}}</th>
 	<th style=size:-1>{{record['date']}}</th>
 	<th style=size:-1;color:#D01166;bold>{{record['title']}}</th>
@@ -48,10 +47,9 @@
     </table>
     <input type="submit" value="削除する">&nbsp; <input type="reset" value="リセット">
       </form>
-    {% module Footer({{position}},'/admin','') %}
+    {% module Footer(position,'/'+db+'/admin','') %}
 {% end %}
 
 {% block footer %}
-	{% module Footer(position,'/admin','') %}
-    <p style=text-align:center><a href="/admin/del/">掲示板へ戻る</a></p>	
+    <p style=text-align:center><a href=/{{db}}>掲示板へ戻る</a></p>	
 {% end %}

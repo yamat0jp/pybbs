@@ -1,18 +1,17 @@
 <!doctype html>
 <html>
-<head><meta charset=utf-8 name="google-site-verification"  content="5KOTJTKv1HgTtIt0zVGzuyAkADCwXRme-RiiKJ03l3s" />
-	<title>Top Page</title>
+<head><meta charset=utf-8><title>Titles</title>
 </head>
 <body>
-<header><h1 style=text-align:center>無料電子掲示板へようこそ</h1></header>
 {% for x in coll %}
-	{% if full(x) == True %}
-	<p><a href=/{{x}} style=color:red>{{x}}</a>
+	{% if full(x['name']) == True %}
+	<p><a href=/{{x['name']}}> style=color:red>{{x['name']}}</a>
 	{% else %}
-	<p><a href=/{{x}}>{{x}}</a>
+	<p><a href=/{{x['name']}}>{{x['name']}}</a>
 	{% end %}
+	タイトル	:{{x['title']}},記事数:{{x['count']}},更新時刻:{{x['date']}}
 {% end %}
-<p><a href=/title>タイトル一覧で表示する</a>
+<p><a href=/>もどる</a>
 <footer>PR リンク
 <p><a href=https://www.amazon.co.jp/%E9%AB%98%E6%A0%A1%E5%8D%92%E6%A5%AD%E3%81%BE%E3%81%A7%E3%81%AE%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%E6%88%A6%E8%A1%93-sanuki_kainushi-ebook/dp/B00AXBM08Q/ref=sr_1_7?ie=UTF8&qid=1479369992&sr=8-7&keywords=sanuki_kainushi>高校卒業までのサッカー戦術</a><br>
 amazon kindle</p>

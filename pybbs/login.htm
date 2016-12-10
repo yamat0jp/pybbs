@@ -9,10 +9,10 @@
   <body>
     <p style=text-align:center>
 </p>
-    <p style=text-align:center>管理者様ログイン画面
+    <p style=text-align:center>管理者用ログイン画面
 </p>
     <br>
-    <form action=/{{db}}/login method="post">
+    <form action=/login method="post">
     {% module xsrf_form_html() %}
     <p style=text-align:center>
       <input type=text name=record>
