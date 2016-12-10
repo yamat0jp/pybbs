@@ -2,20 +2,35 @@
 <html>
 <head><meta charset=utf-8><title>Titles</title>
 <style type=text/css>
-span.g1 {
+.g1 {
 	color:gray;
-	display:inline
+	font-style:italic
 }
 </style>
+<script src=static/js/jquery-1.10.2.min.js></script>
+<script src=static/js/jquery-ui-1.10.3.custom.min.js></script>
+<script>var arg = {
+	'font-size':'2em',
+	'transform':'rotate(10deg)'
+};</script>
 </head>
 <body>
 {% for x in coll %}
+	<article>
 	{% if full(x['name']) == True %}
-	<p><a href=/{{x['name']}}> style=color:red>{{x['name']}}</a>
+	<a href=/{{x['name']}}> style=color:red>{{x['name']}}</a>
 	{% else %}
-	<p><a href=/{{x['name']}}>{{x['name']}}</a>
+	<a href=/{{x['name']}}>{{x['name']}}</a>
 	{% end %}
-	<span class=g1>タイトル:</span>{{x['title']}}<span class=g1>,記事数:</span>{{x['count']}}<span class=g1>,更新時刻:</span>{{x['date']}}
+	<span id={{x['name']}}><span class=g1>タイトル:</span>{{x['title']}}<span class=g1>,記事数:</span>{{x['count']}}<span class=g1>,更新時刻:</span>{{x['date']}}</span>
+	<script>
+	$(function(){
+		$('#{{x['name']}}').on('click',function(){
+			$(this).css(arg);
+		});
+	});
+	</script></article>
+	<p>
 {% end %}
 <p><a href=/>もどる</a>
 <footer>PR リンク
