@@ -2,7 +2,7 @@ var
 arg = {
 	'font-size':'2em',
 	'transform':'rotate(5deg)'
-};
+},
 narg = {
 	'font-size':'initial',
 	'transform':'initial'
