@@ -14,5 +14,8 @@ $(function(){
 	})
 	.on('mouseout',function(){
 		$(this).css(narg);
+	})
+	.on('mousemove',function(){
+		$(this).css(narg);
 	});
 });
