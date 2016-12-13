@@ -1,6 +1,6 @@
 
 import os.path
-import shutil
+import shutil,re
 import tornado.escape
 import tornado.web
 import tornado.httpserver
@@ -131,17 +131,26 @@ class RegistHandler(tornado.web.RequestHandler):
         com = self.get_argument('comment')
         text = ''
         i = 0
+        url = ''
         error = ''
         for word in out:
             if word in com:
                 error = error + u'禁止ワード.'
                 break
         for line in com.splitlines(True):
+            if error != '':
+                break
             for word in words:
                 if word in line.lower():
                     error = error + u'タグ違反.('+word+')'       
             i += len(line)
+            if not url:
+                url = re.search('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line).group(0)
+            if re.match(' ',line):
+                line = line.replace(' ','&nbsp;',1)
             text = text+'<p>'+self.link(line)+'<br></p>'
+        if url:
+            text = text+'<a href={0}>{0}</a>'.format(url)
         pw = self.get_argument('password')
         if i == 0:
             error = error + u'本文がありません.'
