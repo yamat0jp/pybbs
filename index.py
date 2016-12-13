@@ -141,8 +141,8 @@ class RegistHandler(tornado.web.RequestHandler):
             i += len(line)
             if not url:
                 url = re.search('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line).group(0)
-            if re.match(' ',link):
-                link = link.replace(' ','&nbsp;',1)
+            if re.match(' ',line):
+                line = line.replace(' ','&nbsp;',1)
             text = text+'<p>'+self.link(line)+'<br></p>'
         if url:
            text = text+'検出url:<a href={0}>{0}</a>'.format(url) 
