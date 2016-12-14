@@ -11,8 +11,14 @@
     {% block style %}
     <link rel="stylesheet" href={{static_url('css/main.css')}}>
 	{% end %}
-	<script type=text/javascript src={{static_url('js/jqyery-1.10.2.min.js')}}></script>
-	<script type=text/javascript src={{static_url('js/jquery-live-preview.min.js')}}></script>
+	<script type=text/javascript src=http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js></script>
+	<script type=text/javascript src={{static_url('js/jquery-live-preview.js')}}></script>
+	<link rel=stylesheet href={{static_url('css/livepreview-demo.css')}}>
+	<script type=text/javascript>
+	$(document).ready(function(){
+		$('.livepreview').livePreview({position:'top'});
+	});
+	</script>
   </head> 
   <body>
   {% block header %}
