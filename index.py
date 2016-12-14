@@ -133,7 +133,7 @@ class RegistHandler(tornado.web.RequestHandler):
                 error = error + u'禁止ワード.'
                 break
         for line in com.splitlines(True):
-            if not error:
+            if error:
                 break
             for word in words:
                 if word in line.lower():
@@ -145,7 +145,7 @@ class RegistHandler(tornado.web.RequestHandler):
                 line = line.replace(' ','&nbsp;',1)
             text = text+'<p>'+self.link(line)+'<br></p>'
         if url:
-           text = text+'検出url:<a href={0}>{0}</a>'.format(url) 
+           text = text+'検出url:<a href={0} class=livepreview>{0}</a>'.format(url) 
         pw = self.get_argument('password')
         if i == 0:
             error = error + u'本文がありません.'
