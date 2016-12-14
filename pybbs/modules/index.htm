@@ -12,13 +12,13 @@
     <link rel="stylesheet" href={{static_url('css/main.css')}}>
 	{% end %}
 	<script src=http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js></script>
-	<script src={{static_url('js/jquery-live-preview.min.js')}}></script>
+	<script src={{static_url('js/jquery-live-preview.js')}}></script>
+	<link href={{static_url('css/livepreview-demo.css')}} rel=stylesheet type=text/css>
 	<script type=text/javascript>
 	$(function(){
-		$(.livepreview).livePreview({position:'top'});
+		$('.livepreview').livePreview({position:'top'});
 	});
 	</script>
-	<link href={{static_url('css/livepreview-demo.css')}} rel=stylesheet type=text/css>
   </head> 
   <body>
   {% block header %}
