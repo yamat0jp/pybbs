@@ -1,6 +1,5 @@
 
-import os
-import re
+import os,re
 import tornado.escape
 import tornado.web
 import pymongo
@@ -126,7 +125,7 @@ class RegistHandler(tornado.web.RequestHandler):
         com = self.get_argument('comment')
         text = ''
         i = 0
-        url = ''
+        url = []
         error = ''
         for word in out:
             if word in com:
@@ -139,13 +138,18 @@ class RegistHandler(tornado.web.RequestHandler):
                 if word in line.lower():
                     error = error + u'タグ違反.('+word+')'       
             i += len(line)
-            if not url:
-                url = re.search('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line).group(0)
+            obj = re.finditer('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
+            for x in obj:
+                if x.group() not in url:
+                    url.append(x.group())
             if re.match(' ',line):
                 line = line.replace(' ','&nbsp;',1)
             text = text+'<p>'+self.link(line)+'<br></p>'
-        if url:
-           text = text+'検出url:<a href={0} class=livepreview target=_blank>{0}</a>'.format(url) 
+        s = ''
+        for x in url:
+            s = s+'<tr><td><a href={0} class=livepreview target=_blank>{0}</a></td></tr>'.format(x)
+        else:         
+            text = text+'<table><tr><td>検出url:</td></tr>'+s+'</table>';
         pw = self.get_argument('password')
         if i == 0:
             error = error + u'本文がありません.'
@@ -311,7 +315,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        #'debug':True,
+                        'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
