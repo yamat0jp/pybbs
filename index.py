@@ -131,7 +131,7 @@ class RegistHandler(tornado.web.RequestHandler):
         com = self.get_argument('comment')
         text = ''
         i = 0
-        url = ''
+        url = []
         error = ''
         for word in out:
             if word in com:
@@ -143,14 +143,19 @@ class RegistHandler(tornado.web.RequestHandler):
             for word in words:
                 if word in line.lower():
                     error = error + u'タグ違反.('+word+')'       
-            i += len(line)
-            if not url:
-                url = re.search('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line).group(0)
+            i += len(line)   
+            obj = re.finditer('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
+            for x in obj:
+                if x.group() not in url:
+                    url.append(x.group())
             if re.match(' ',line):
                 line = line.replace(' ','&nbsp;',1)
             text = text+'<p>'+self.link(line)+'<br></p>'
-        if url:
-            text = text+'検出されたurl:<a class=livepreview target=_blank href={0}>{0}</a>'.format(url)
+        s = ''
+        for x in url:
+            s = s+'<tr><td><a class=livepreview target=_blank href={0}>{0}</a></td></tr>'.format(x)
+        if s:
+            text = text+'<table><tr><td>検出URL:</td></tr>'+s+'</table>'
         pw = self.get_argument('password')
         if i == 0:
             error = error + u'本文がありません.'
