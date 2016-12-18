@@ -122,7 +122,7 @@ class RegistHandler(tornado.web.RequestHandler):
         out = rec['out_words']
         na = self.get_argument('name')
         sub = self.get_argument('title')
-        com = self.get_argument('comment')
+        com = self.get_argument('comment',None,False)
         text = ''
         i = 0
         url = []
