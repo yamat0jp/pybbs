@@ -126,8 +126,8 @@ class RegistHandler(tornado.web.RequestHandler):
         rec = self.application.db.get(where('kinds') == 'conf')
         words = rec['bad_words']
         out = rec['out_words']
-        na = self.get_argument('name',u'誰かさん')
-        sub = self.get_argument('title',u'タイトルなし')
+        na = self.get_argument('name')
+        sub = self.get_argument('title')
         com = self.get_argument('comment',None,False)
         text = ''
         i = 0
@@ -168,6 +168,8 @@ class RegistHandler(tornado.web.RequestHandler):
             item = sorted(article.all(),key=lambda x: x['number'])[len(article)-1]
             no = item['number']+1
         if error == '':
+            if not na:
+                na = u'誰かさん'
             s = datetime.now()
             reg = {'number':no,'name':na,'title':sub,'comment':text,'raw':com,'password':pw,'date':s.strftime('%Y/%m/%d %H:%M')}
             article.insert(reg)
@@ -177,30 +179,18 @@ class RegistHandler(tornado.web.RequestHandler):
             self.render('regist.htm',content=error)
     
     def link(self,command):
-        y = ''
         i = 0
         text = ''
         for x in command.split():
-            if (y == '>>')and(x.isdecimal() == True):
-                s = '<a href=#'+x+'>'+x+'</a>'
-                while -1 < command.find(x,i):
-                    j = command.find(x,i)
-                    tmp = command[i:j]
-                    i = j+len(x)
-                    k = tmp.rsplit(None,1)
-                    if ((len(k) > 1)and(k[1] == y))or(k[0] == y):
-                        text = text+tmp+s                                                                       
-                        break
-                    else:
-                        text = text+tmp+x                        
-            y = x    
-        if text == '':
-            return command
-        else:
-            if len(command) > i:
-                return text+command[i:]
+            if re.match('>>',x) and x[2:].isdecimal():
+                s = '<a href=#'+x[2:]+'>'+x+'</a>'
+                j = command.find(x,i)
+                text = text+command[i:j]+s
+                i = j+len(x)
             else:
-                return text
+                text = text+x
+                i += len(x)
+        return text
     
 class AdminHandler(BaseHandler):
     @tornado.web.authenticated               
