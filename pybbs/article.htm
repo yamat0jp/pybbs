@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+<head><meta charset=utf-8>
+<link rel=stylesheet href={{static_url('css/main.css')}}>
+</head>
+<body>
+	<section id=number>[{{record['number']}}]</section>
+	<section id=title>{{record['title']}}</section>
+	<section id=name>　Name:<h1>{{record['name']}}</h1></section>
+	<section id=date>　Date:<h1>{{record['date']}}</h1></section>
+	<p>▽▲▽▲▽▲▽
+	<section id=comment>{% raw record['comment'] %}</section>
+	<p>△▼△▼△▼△
+</body>
+</html>
