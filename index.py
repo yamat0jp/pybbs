@@ -120,8 +120,8 @@ class RegistHandler(tornado.web.RequestHandler):
         rec = self.application.db['params'].find_one()
         words = rec['bad_words']
         out = rec['out_words']
-        na = self.get_argument('name')
-        sub = self.get_argument('title')
+        na = self.get_argument('name',u'誰かさん')
+        sub = self.get_argument('title'u'タイトルなし.')
         com = self.get_argument('comment',None,False)
         text = ''
         i = 0
