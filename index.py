@@ -29,6 +29,12 @@ class IndexHandler(BaseHandler):
             else:
                 raise tornado.web.HTTPError(404)
                 return
+        key = self.get_argument('key')
+        if key:
+            table = self.application.db[dbname]
+            rec = table.find_one({'number':key})
+            self.render('article.htm',record=rec)
+            return
         i = params['count']      
         na = tornado.escape.url_unescape(self.get_cookie("username",u"誰かさん"))
         pos = self.application.gpos(dbname,page)
@@ -120,8 +126,8 @@ class RegistHandler(tornado.web.RequestHandler):
         rec = self.application.db['params'].find_one()
         words = rec['bad_words']
         out = rec['out_words']
-        na = self.get_argument('name',u'誰かさん')
-        sub = self.get_argument('title',u'タイトルなし.')
+        na = self.get_argument('name')
+        sub = self.get_argument('title')
         com = self.get_argument('comment',None,False)
         text = ''
         i = 0
@@ -176,30 +182,18 @@ class RegistHandler(tornado.web.RequestHandler):
             self.render('regist.htm',content=error)
     
     def link(self,command):
-        y = ''
         i = 0
         text = ''
         for x in command.split():
-            if (y == '>>')and(x.isdecimal() == True):
-                s = '<a href=#'+x+'>'+x+'</a>'
-                while -1 < command.find(x,i):
-                    j = command.find(x,i)
-                    tmp = command[i:j]
-                    i = j+len(x)
-                    k = tmp.rsplit(None,1)
-                    if ((len(k) > 1)and(k[1] == y))or(k[0] == y):
-                        text = text+tmp+s                                                                       
-                        break
-                    else:
-                        text = text+tmp+x                        
-            y = x    
-        if text == '':
-            return command
-        else:
-            if len(command) > i:
-                return text+command[i:]
+            if re.match('>>',x) and x[2:].isdecimal():
+                s = '<a href=#'+x[2:]+'>'+x+'</a>'
+                j = command.find(x,i)
+                text = text+x[i:j]+s
+                i = j+len(x)
             else:
-                return text
+                text = text+x
+                i += len(x)
+        return text
     
 class AdminHandler(BaseHandler):
     @tornado.web.authenticated               
