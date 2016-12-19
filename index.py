@@ -194,7 +194,7 @@ class RegistHandler(tornado.web.RequestHandler):
         text = ''
         for x in command.split():
             if re.match('>>',x) and x[2:].isdecimal():
-                s = '<a class=livepreview target=_blank data-position=right href=/'+self.database+'?key='+x[2:]+'>'+x+'</a>'
+                s = '<a class=minpreview data-preview-url=/{0}?key={1} href=/{0}#{1}>>>{1}</a>'.format(self.database,x[2:])
                 j = command.find(x,i)
                 text = text+command[i:j]+s
                 i = j+len(x)

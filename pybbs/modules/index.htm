@@ -15,8 +15,9 @@
 	<script type=text/javascript src={{static_url('js/jquery-live-preview.js')}}></script>
 	<link rel=stylesheet href={{static_url('css/livepreview-demo.css')}}>
 	<script type=text/javascript>
-	$(document).ready(function(){
+	$(function(){
 		$('.livepreview').livePreview({position:'top'});
+		$('.minpreview').livePreview({scale:1});
 	});
 	</script>
   </head> 
