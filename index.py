@@ -29,12 +29,16 @@ class IndexHandler(BaseHandler):
             else:
                 raise tornado.web.HTTPError(404)
                 return
-        key = self.get_argument('key')
+        key = self.get_argument('key','')
         if key:
             table = self.application.db[dbname]
-            rec = table.find_one({'number':key})
-            self.render('article.htm',record=rec)
-            return
+            rec = table.find_one({'number':int(key)})
+            if rec:
+                self.render('article.htm',record=rec)
+                return
+            else:
+                tornado.web.HTTPError(404)
+                return
         i = params['count']      
         na = tornado.escape.url_unescape(self.get_cookie("username",u"誰かさん"))
         pos = self.application.gpos(dbname,page)
@@ -123,6 +127,7 @@ class RegistHandler(tornado.web.RequestHandler):
         if self.application.collection(dbname) == False:
             raise tornado.web.HTTPError(404)
             return
+        self.database = dbname
         rec = self.application.db['params'].find_one()
         words = rec['bad_words']
         out = rec['out_words']
@@ -186,13 +191,15 @@ class RegistHandler(tornado.web.RequestHandler):
         text = ''
         for x in command.split():
             if re.match('>>',x) and x[2:].isdecimal():
-                s = '<a href=#'+x[2:]+'>'+x+'</a>'
+                s = '<a class=minpreview target=_blank data-preview-url=/{0}?key={1} href=/{0}#{1}>>>{1}</a>'.format(self.database,x[2:])
                 j = command.find(x,i)
-                text = text+x[i:j]+s
+                text = text+command[i:j]+s
                 i = j+len(x)
             else:
-                text = text+x
-                i += len(x)
+                j = command.find(x,i)
+                j += len(x)
+                text = text+command[i:j]
+                i = j
         return text
     
 class AdminHandler(BaseHandler):
@@ -309,7 +316,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        #'debug':True,
+                        'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
