@@ -1,15 +1,10 @@
-var
-arg = {
-	'font-size':'2em',
-	'transform':'rotate(5deg)'
-};
 
 $(function(){
 	$('div').on('click',function(){
 		var $title = $(this),
 			span1 = 1500,
 			span2 = 200;
-		$title.css(arg);
+		$title.css('font-size','2em');
 		$({deg:5}).animate({deg:365},{
 			duration:500,
 			progress:function(){
