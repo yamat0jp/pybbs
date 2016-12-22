@@ -27,11 +27,6 @@ $(function(){
 	$headerCloneContainer.appendTo('body');
 	$headerCloneContainer
 		.css({'opacity':0})
-		.on('animate',function(){			
-			$clonebutton.css({
-				top:x+headerHeight
-			});
-		},300)
 		.find('button').on('click',function(){			
 			var wintop = $window.scrollTop();
 
