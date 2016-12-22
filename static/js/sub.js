@@ -6,59 +6,55 @@ $(function(){
 	var $window = $(window),
 		$header = $('header'),
 		$button = $header.find('button'),
-		$headerClone = $header.contents().clone(),
-		$headerCloneContainer = $('<div class=clone style=position:fixed></div>'),
+		$headerClone = $header.clone(),
+		$headerCloneContainer = $('<div class=clone style=position:fixed;width:100%></div>'),
 		$clonebutton = $headerCloneContainer.find('button'),
 		headerOffsetTop = $header.offset().top,
 		headerHeight = $header.outerHeight();
 	
 	$button.on('click',function(){
-		$headerCloneContainer
-			.css({
-				'opacity':1,
-				'top':-$window.scrollTop()
-			})
-			.animate({top:0},300);
-		$header.addClass('open');
+		if ($window.scrollTop() > headerOffsetTop){
+			$headerCloneContainer
+				.css({
+					opacity:1,
+					top:-$window.scrollTop()+headerOffsetTop
+				})
+				.animate({top:0},300);
+			$header.addClass('open');
+		};
 	});
 	$headerCloneContainer.append($headerClone);
 	$headerCloneContainer.appendTo('body');
 	$headerCloneContainer
 		.css({'opacity':0})
-		.on('animate',function(){
+		.on('animate',function(){			
 			$clonebutton.css({
-				top:$headerCloneContainer.attr('top')+headerHeight
+				top:x+headerHeight
 			});
-		});
-	$headerCloneContainer.find('button')	
-		.on('click',function(){			
+		},300)
+		.find('button').on('click',function(){			
 			var wintop = $window.scrollTop();
-		
-			if ($header.hasClass('open')){			
-				if (wintop < headerOffsetTop+headerHeight){
-					$headerCloneContainer
-						.animate({top:-wintop+headerOffsetTop},300)
-						.animate({opacity:0},0);
-				}
-			}else{				
-				$headerCloneContainer
-					.css({top:-wintop+headerOffsetTop})
-					.animate({top:0},300);
-			};
-			$header.toggleClass('open');
+
+			$headerCloneContainer
+				.animate({top:-wintop+headerOffsetTop},300)
+				.animate({opacity:0,top:-headerHeight},0);
+			$header.removeClass('open');
 		});
 	$window.on('scroll',function(){
 		var wintop = $window.scrollTop();
-			
-		if (wintop > headerOffsetTop+headerHeight){
-			$headerCloneContainer.css({opacity:1});
-			$clonebutton.css({top:0});
-			if ($headerCloneContainer.hasClass('open') && (wintop < headerOffsetTop)){
-
+		
+		if ($header.hasClass('open')){
+			if (wintop < headerOffsetTop){
+				$headerCloneContainer.css({opacity:0,top:-headerHeight});
+				$header.removeClass('open');
+				$window.trigger('scroll');
 			};
 		}else{
-			$clonebutton.css({'opacity':0});
+			if (wintop < headerOffsetTop+headerHeight){
+				$button.css({top:-wintop+headerOffsetTop+headerHeight});
+			}else{
+				$button.css({top:0});
+			};
 		};
-		$button.css({'top':-wintop+headerOffsetTop+headerHeight});
 	});
 });
