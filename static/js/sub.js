@@ -18,19 +18,20 @@ $(function(){
 				.css({
 					opacity:1,
 					top:-$window.scrollTop()+headerOffsetTop
-				})
-				.animate({top:0},300);
+				})				
+				.animate({top:0},300)
+				.find('textarea').val($header.find('textarea').valu());
 			$header.addClass('open');
 		};
 	}).css({top:headerOffsetTop+headerHeight});
-	$clonebutton.css({top:headerOffsetTop+headerHeight});
 	$headerCloneContainer.append($headerClone);
 	$headerCloneContainer.appendTo('body');
 	$headerCloneContainer
 		.css({'opacity':0})
-		.find('button').on('click',function(){			
+		.find('button').text('close').on('click',function(){			
 			var wintop = $window.scrollTop();
 
+			$header.find('textarea').val($headerCloneContainer.find('textarea').val());
 			$headerCloneContainer
 				.animate({top:-wintop+headerOffsetTop},300)
 				.animate({opacity:0,top:-headerHeight},0);
