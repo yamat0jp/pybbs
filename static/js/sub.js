@@ -13,13 +13,14 @@ $(function(){
 		headerHeight = $header.outerHeight();
 	
 	$button.on('click',function(){
-		if ($window.scrollTop() > headerOffsetTop){
+		if ($window.scrollTop() > headerOffsetTop){			
 			$headerCloneContainer
 				.css({
 					opacity:1,
 					top:-$window.scrollTop()+headerOffsetTop
 				})
 				.animate({top:0},300);
+			$headerCloneContainer.find('textarea').val($header.find('textarea').val());
 			$header.addClass('open');
 		};
 	}).css({top:headerOffsetTop+headerHeight});
@@ -31,6 +32,7 @@ $(function(){
 		.find('button').on('click',function(){			
 			var wintop = $window.scrollTop();
 
+			$header.find('textarea').val($headerCloneContainer.find('textarea').val());
 			$headerCloneContainer
 				.animate({top:-wintop+headerOffsetTop},300)
 				.animate({opacity:0,top:-headerHeight},0);

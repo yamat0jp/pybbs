@@ -14,16 +14,7 @@
 	<script src=http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js></script>
 	<script src={{static_url('js/jquery-live-preview.js')}}></script>
 	<link href={{static_url('css/livepreview-demo.css')}} rel=stylesheet type=text/css>
-	<script type=text/javascript>
-	$(function(){
-		$('.livepreview').livePreview({position:'top'});
-		$('.minpreview').livePreview({
-			scale:1,
-			viewWidth:600,
-			viewHeight:300
-		});
-	});
-	</script>
+	<script src={{static_url('js/sub.js')}}></script>
   </head> 
   <body>
   {% block header %}
@@ -47,6 +38,7 @@
         </td></tr>
       </table>
     </form>
+    <button></button>
     </header>
     <hr size="1" width="100%">
     <form action=/{{db}}/userdel method="post" id=search>
