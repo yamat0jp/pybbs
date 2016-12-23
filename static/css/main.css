@@ -53,9 +53,14 @@ header textarea {
 }
 
 button {
-	position:fixed;
+	position:relative;
 	width:80px;
 	height:30px
+}
+
+button.sticky {
+	position:fixed;
+	top:0
 }
 
 input[type=password] {

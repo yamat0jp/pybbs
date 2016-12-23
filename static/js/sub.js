@@ -38,18 +38,15 @@ $(function(){
 	$window.on('scroll',function(){
 		var wintop = $window.scrollTop();
 		
-		if ($header.hasClass('open')){
-			if (wintop < headerOffsetTop){
-				$headerCloneContainer.css({opacity:0,top:-headerHeight});
-				$header.removeClass('open');
-				$window.trigger('scroll');
-			};
+		if ($header.hasClass('open')&&(wintop < headerOffsetTop)){
+			$headerCloneContainer.css({opacity:0,top:-headerHeight});
+			$header.removeClass('open');
+			$window.trigger('scroll');
+		};
+		if (wintop > headerOffsetTop+headerHeight){
+			$button.addClass('sticky');
 		}else{
-			if (wintop < headerOffsetTop+headerHeight){
-				$button.css({top:-wintop+headerOffsetTop+headerHeight});
-			}else{
-				$button.css({top:0});
-			};
+			$button.removeClass('sticky');
 		};
 	});
 });
