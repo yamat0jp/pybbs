@@ -29,7 +29,7 @@ $(function(){
 	$headerCloneContainer.appendTo('body');
 	$headerCloneContainer
 		.css({'opacity':0})
-		.find('button').on('click',function(){			
+		.find('button').text('close').on('click',function(){			
 			var wintop = $window.scrollTop();
 
 			$header.find('textarea').val($headerCloneContainer.find('textarea').val());
