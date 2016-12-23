@@ -22,7 +22,8 @@ $(function(){
 				.animate({top:0},300);
 			$header.addClass('open');
 		};
-	});
+	}).css({top:headerOffsetTop+headerHeight});
+	$clonebutton.css({top:headerOffsetTop+headerHeight});
 	$headerCloneContainer.append($headerClone);
 	$headerCloneContainer.appendTo('body');
 	$headerCloneContainer
@@ -44,9 +45,9 @@ $(function(){
 			$window.trigger('scroll');
 		};
 		if (wintop > headerOffsetTop+headerHeight){
-			$button.addClass('sticky');
+			$button.addClass('sticky').css({top:0});
 		}else{
-			$button.removeClass('sticky');
+			$button.removeClass('sticky').css({top:headerOffsetTop+headerHeight});
 		};
 	});
 });
