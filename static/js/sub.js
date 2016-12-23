@@ -21,6 +21,8 @@ $(function(){
 				})
 				.animate({top:0},300);
 			$headerCloneContainer.find('textarea').val($header.find('textarea').val());
+			$headerCloneContainer.find('.name').val($header.find('.name').val());
+			$headerCloneContainer.find('.title').val($header.find('.title').val());
 			$header.addClass('open');
 		};
 	}).css({top:headerOffsetTop+headerHeight});
@@ -36,6 +38,8 @@ $(function(){
 			$headerCloneContainer
 				.animate({top:-wintop+headerOffsetTop},300)
 				.animate({opacity:0,top:-headerHeight},0);
+			$header.find('.name').val($headerCloneContainer.find('.name').val());
+			$header.find('.title').val($headerCloneContainer.find('.title').val());
 			$header.removeClass('open');
 		});
 	$window.on('scroll',function(){
