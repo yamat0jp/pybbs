@@ -189,17 +189,13 @@ class RegistHandler(tornado.web.RequestHandler):
     def link(self,command):
         i = 0
         text = ''
-        for x in command.split():
-            if re.match('>>',x) and x[2:].isdecimal():
-                s = '<a class=minpreview data-preview-url=/{0}?key={1} href=/{0}#{1}>>>{1}</a>'.format(self.database,x[2:])
-                j = command.find(x,i)
-                text = text+command[i:j]+s
-                i = j+len(x)
-            else:
-                j = command.find(x,i)
-                j += len(x)
-                text = text+command[i:j]
-                i = j
+        obj = re.finditer('>>[0-9]+',command)
+        for x in obj:
+            s = '<a class=minpreview data-preview-url=/{0}?key={1} href=/{0}#{1}>>>{1}</a>'.format(self.database,x.group()[2:])
+            text = text+command[i:x.start()]+s
+            i = x.end()
+        else:
+            text = text+command[i:]
         return text
     
 class AdminHandler(BaseHandler):
