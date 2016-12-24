@@ -23,6 +23,7 @@ $(function(){
 			$headerCloneContainer.find('textarea').val($header.find('textarea').val());
 			$headerCloneContainer.find('.name').val($header.find('.name').val());
 			$headerCloneContainer.find('.title').val($header.find('.title').val());
+			$headerCloneContainer.find('.password').val($header.find('.password').val());
 			$header.addClass('open');
 		};
 	}).css({top:headerOffsetTop+headerHeight});
@@ -40,6 +41,7 @@ $(function(){
 				.animate({opacity:0,top:-headerHeight},0);
 			$header.find('.name').val($headerCloneContainer.find('.name').val());
 			$header.find('.title').val($headerCloneContainer.find('.title').val());
+			$header.find('.password').val($headerCloneContainer.find('.password').val());
 			$header.removeClass('open');
 		});
 	$window.on('scroll',function(){
