@@ -325,10 +325,25 @@ class FooterModule(tornado.web.UIModule):
     def render(self,number,url,link):
         return self.render_string('modules/footer.htm',index=number,url=url,link=link)
     
+class HeadlineApi(tornado.web.RequestHandler):
+    def get(self):
+        response = {}
+        self.write(response)
+        
+class ArticleApi(tornado.web.RequestHandler):
+    def get(self):
+        response = {}
+        self.write(response)
+        
+class WriteApi(tornado.web.RequestHandler):
+    def get(self):
+        
+
 class Application(tornado.web.Application):    
     def __init__(self):
         self.db = TinyDB(st.json)
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
+                    (r'/headline/api',HeadlineApi),(r'/article/api',ArticleApi),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
