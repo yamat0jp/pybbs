@@ -301,9 +301,27 @@ class FooterModule(tornado.web.UIModule):
     def render(self,number,url,link):
         return self.render_string('modules/footer.htm',index=number,url=url,link=link)
     
+class HeadlineApi(tornado.web.RequestHandler):
+    def get(self):
+        response = {}
+        self.write(response)
+        
+class ArticleApi(tornado.web.RequestHandler):
+    def get(self,dbname):
+        coll = self.application.db[dbname]
+        i = coll.count()
+        text = coll.find().sort('number')[i-1]
+        response = {'name':text['name'],'title':text['title'],'comment':text['comment']}
+        self.write(response)
+        
+    def post(self,dbname,name,title,article):
+        coll = self.application.db[dbname] 
+        coll.insert({'name':name,'title':title,'comment':article})
+           
 class Application(tornado.web.Application):    
     def __init__(self):
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
+                    (r'/headline/api',HeadlineApi),(r'/read/api/[a-zA-Z0-9_]+',ArticleApi),(r'/write/api/[a-zA-Z0-9_/]+',ArticleApi),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
@@ -312,7 +330,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        #'debug':True,
+                        'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
