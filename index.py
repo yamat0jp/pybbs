@@ -328,22 +328,41 @@ class FooterModule(tornado.web.UIModule):
 class HeadlineApi(tornado.web.RequestHandler):
     def get(self):
         response = {}
+        for x in self.application.db.tables():
+            if x != '_default':
+                response.update({x:self.get_data(x)})            
         self.write(response)
+    
+    def get_data(self,dbname):
+        table = self.application.db.table(dbname)
+        i = len(table)
+        if i > 0:
+            rec = sorted(table.all(),key=lambda x: x['number'])[i-1]
+            return {'title':rec['title'],'name':rec['name'],'comment':rec['raw'][1:10]}
         
 class ArticleApi(tornado.web.RequestHandler):
-    def get(self):
-        response = {}
-        self.write(response)
+    def get(self,dbname):
+        if self.application.collection(dbname) == True:
+            table = self.application.db.table(dbname)
+            if len(table) == 0:
+                self.write({})
+            else:
+                self.write(table.all()[0])
+        else:
+            tornado.web.HTTPError(404)
+    
+    def post(self,dbname):
+        name = self.get_argument('name',u'誰かさん')
+        title = self.get_argument('title',u'タイトルなし')
+        comment = self.get_argument('comment')
+        table = self.application.db.table(dbname)
+        table.insert({'name':name,'title':title,'comment':comment})
         
-class WriteApi(tornado.web.RequestHandler):
-    def get(self):
-        
-
 class Application(tornado.web.Application):    
     def __init__(self):
         self.db = TinyDB(st.json)
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
-                    (r'/headline/api',HeadlineApi),(r'/article/api',ArticleApi),
+                    (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)',ArticleApi),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
