@@ -303,17 +303,20 @@ class FooterModule(tornado.web.UIModule):
     
 class HeadlineApi(tornado.web.RequestHandler):
     def get(self):
-        response = {}
-        self.write(response)
+        for coll in self.application.coll():
+            table = self.application.db[coll]
+            if table.count() == 0:
+                continue
+            text = table.find().sort('number')[table.count()-1]
+            #response = {'name':text['name'],'title':text['title'],'comment':text['comment']}
+            del text['_id']
+            self.write(text)
+            return
         
 class ArticleApi(tornado.web.RequestHandler):
     def get(self,dbname):
-        coll = self.application.db[dbname]
-        i = coll.count()
-        text = coll.find().sort('number')[i-1]
-        response = {'name':text['name'],'title':text['title'],'comment':text['comment']}
-        self.write(response)
-        
+        pass
+    
     def post(self,dbname,name,title,article):
         coll = self.application.db[dbname] 
         coll.insert({'name':name,'title':title,'comment':article})
@@ -321,7 +324,7 @@ class ArticleApi(tornado.web.RequestHandler):
 class Application(tornado.web.Application):    
     def __init__(self):
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
-                    (r'/headline/api',HeadlineApi),(r'/read/api/[a-zA-Z0-9_]+',ArticleApi),(r'/write/api/[a-zA-Z0-9_/]+',ArticleApi),
+                    (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)/()/()/()',ArticleApi),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
