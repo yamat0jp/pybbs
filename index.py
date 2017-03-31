@@ -306,12 +306,11 @@ class HeadlineApi(tornado.web.RequestHandler):
         for coll in self.application.coll():
             table = self.application.db[coll]
             if table.count() == 0:
+                response = {coll:{}}
                 continue
             text = table.find().sort('number')[table.count()-1]
-            #response = {'name':text['name'],'title':text['title'],'comment':text['comment']}
-            del text['_id']
-            self.write(text)
-            return
+            response = {coll:{'name':text['name'],'title':text['title'],'comment':text['raw'][1:20]}}
+            self.write(response)
         
 class ArticleApi(tornado.web.RequestHandler):
     def get(self,dbname):
