@@ -304,14 +304,16 @@ class FooterModule(tornado.web.UIModule):
     
 class HeadlineApi(tornado.web.RequestHandler):
     def get(self):
+        response = {}
         for coll in self.application.coll():
             table = self.application.db[coll]
             if table.count() == 0:
-                response = {coll:{}}
-                continue
-            text = table.find().sort('number')[table.count()-1]
-            response = {coll:json.dumps({'name':text['name'],'title':text['title'],'comment':text['raw'][1:20]},ensure_ascii=False)}
-            self.write(json.dumps(response,ensure_ascii=False))
+                mydict = {}
+            else:
+                text = table.find().sort('number')[table.count()-1]
+                mydict = {'name':text['name'],'title':text['title'],'comment':text['raw'][0:20]}
+            response[coll] = json.dumps(mydict,ensure_ascii=False)                        
+        self.write(json.dumps(response,ensure_ascii=False))
         
 class ArticleApi(tornado.web.RequestHandler):
     def get(self,dbname):
