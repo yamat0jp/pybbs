@@ -4,6 +4,7 @@ import tornado.escape
 import tornado.web
 import pymongo
 from datetime import datetime
+import json
 
 class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
@@ -310,7 +311,7 @@ class HeadlineApi(tornado.web.RequestHandler):
                 continue
             text = table.find().sort('number')[table.count()-1]
             response = {coll:{'name':text['name'],'title':text['title'],'comment':text['raw'][1:20]}}
-            self.write(response)
+            self.write(json.dumps(response))
         
 class ArticleApi(tornado.web.RequestHandler):
     def get(self,dbname):
