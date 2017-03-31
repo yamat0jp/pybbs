@@ -10,6 +10,7 @@ from tornado.options import define,options
 from tinydb import TinyDB,Query,where
 from tinydb.operations import delete
 from datetime import datetime
+import json
 
 define('port',default=8000,help='run on the given port',type=int)
 
@@ -330,15 +331,17 @@ class HeadlineApi(tornado.web.RequestHandler):
         response = {}
         for x in self.application.db.tables():
             if x != '_default':
-                response.update({x:self.get_data(x)})            
-        self.write(response)
+                response[x] = self.get_data(x)           
+        self.write(json.dumps(response,ensure_ascii=False))
     
     def get_data(self,dbname):
         table = self.application.db.table(dbname)
         i = len(table)
-        if i > 0:
+        if i == 0:
+            return {}
+        else:
             rec = sorted(table.all(),key=lambda x: x['number'])[i-1]
-            return {'title':rec['title'],'name':rec['name'],'comment':rec['raw'][1:10]}
+            return {'title':rec['title'],'name':rec['name'],'comment':rec['raw'][0:19]}
         
 class ArticleApi(tornado.web.RequestHandler):
     def get(self,dbname):
