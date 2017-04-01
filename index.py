@@ -344,13 +344,15 @@ class HeadlineApi(tornado.web.RequestHandler):
             return {'title':rec['title'],'name':rec['name'],'comment':rec['raw'][0:19]}
         
 class ArticleApi(tornado.web.RequestHandler):
-    def get(self,dbname):
+    def get(self,dbname,number):
         if self.application.collection(dbname) == True:
             table = self.application.db.table(dbname)
-            if len(table) == 0:
-                self.write({})
+            response = table.get(where('number') == int(number))
+            if response == None:
+                response = {}
             else:
-                self.write(table.all()[0])
+                del response['raw']
+            self.write(json.dumps(response,ensure_ascii=False))
         else:
             tornado.web.HTTPError(404)
     
@@ -365,7 +367,7 @@ class Application(tornado.web.Application):
     def __init__(self):
         self.db = TinyDB(st.json)
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
-                    (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)',ArticleApi),
+                    (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)',ArticleApi),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
