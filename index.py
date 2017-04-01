@@ -311,7 +311,7 @@ class HeadlineApi(tornado.web.RequestHandler):
                 mydict = {}
             else:
                 text = table.find().sort('number')[table.count()-1]
-                mydict = {'name':text['name'],'title':text['title'],'comment':text['raw'][0:20]}
+                mydict = {'number':text['number'],'name':text['name'],'title':text['title'],'comment':text['raw'][0:20]}
             response[coll] = mydict                 
         self.write(json.dumps(response,ensure_ascii=False))
         
@@ -324,7 +324,7 @@ class ArticleApi(tornado.web.RequestHandler):
            response = {}
         else:
             del response['_id']
-            del response['raw']
+            del response['comment']
         self.write(json.dumps(response,ensure_ascii=False))      
             
     def post(self,dbname,name,title,article):
