@@ -316,9 +316,17 @@ class HeadlineApi(tornado.web.RequestHandler):
         self.write(json.dumps(response,ensure_ascii=False))
         
 class ArticleApi(tornado.web.RequestHandler):
-    def get(self,dbname):
-        pass
-    
+    def get(self,dbname,number):
+        if self.application.collection(dbname) == True:
+            table = self.application.db[dbname]
+            response = table.find_one({'number':int(number)})      
+        if response == None:
+           response = {}
+        else:
+            del response['_id']
+            del response['raw']
+        self.write(json.dumps(response,ensure_ascii=False))      
+            
     def post(self,dbname,name,title,article):
         coll = self.application.db[dbname] 
         coll.insert({'name':name,'title':title,'comment':article})
@@ -326,7 +334,7 @@ class ArticleApi(tornado.web.RequestHandler):
 class Application(tornado.web.Application):    
     def __init__(self):
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
-                    (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)/()/()/()',ArticleApi),
+                    (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)/()/()/()',ArticleApi),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
