@@ -341,7 +341,7 @@ class HeadlineApi(tornado.web.RequestHandler):
             return {}
         else:
             rec = sorted(table.all(),key=lambda x: x['number'])[i-1]
-            return {'title':rec['title'],'name':rec['name'],'comment':rec['raw'][0:19]}
+            return {'number':rec['number'],'title':rec['title'],'name':rec['name'],'comment':rec['raw'][0:19]}
         
 class ArticleApi(tornado.web.RequestHandler):
     def get(self,dbname,number):
@@ -351,7 +351,7 @@ class ArticleApi(tornado.web.RequestHandler):
             if response == None:
                 response = {}
             else:
-                del response['raw']
+                del response['comment']
             self.write(json.dumps(response,ensure_ascii=False))
         else:
             tornado.web.HTTPError(404)
