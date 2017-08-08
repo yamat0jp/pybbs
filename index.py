@@ -22,6 +22,7 @@ class IndexHandler(BaseHandler):
         params = self.application.db['params'].find_one()
         if params['mentenance'] == True:
             self.render('mentenance.htm',title=params['title'],db=dbname)
+            return
         if self.application.collection(dbname) == False:
             if self.current_user == b'admin':
                 coll = self.application.db[dbname]
