@@ -42,7 +42,7 @@ class IndexHandler(BaseHandler):
                 tornado.web.HTTPError(404)
                 return
         i = params['count']      
-        rule = self.get_cookie('aikotoba','')
+        rule = tornado.escape.url_escape(self.get_cookie('aikotoba',''))
         na = tornado.escape.url_unescape(self.get_cookie("username",u"誰かさん"))
         pos = self.application.gpos(dbname,page)
         table = self.application.db[dbname]
@@ -182,7 +182,7 @@ class RegistHandler(tornado.web.RequestHandler):
             item = items.sort('number')[article.count()-1]
             no = item['number']+1
         if error == '':
-            self.set_cookie('aikotoba',rule)
+            self.set_cookie('aikotoba',tornado.escape.url_escape(rule))
             s = datetime.now()
             reg = {'number':no,'name':na,'title':sub,'comment':text,'raw':com,'password':pw,'date':s.strftime('%Y/%m/%d %H:%M')}
             article.insert(reg)
