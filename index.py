@@ -48,6 +48,7 @@ class IndexHandler(BaseHandler):
                 raise tornado.web.HTTPError(404)
                 return
         i = params['count']      
+        rule = tornado.escape.url_unescape(self.get_cookie('aikotoba',''))
         na = tornado.escape.url_unescape(self.get_cookie("username",u"誰かさん"))
         pos = self.application.gpos(dbname,page)
         table = self.application.db.table(dbname)
