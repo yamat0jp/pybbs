@@ -42,6 +42,7 @@ class IndexHandler(BaseHandler):
                 tornado.web.HTTPError(404)
                 return
         i = params['count']      
+        rule = self.get_cookie('aikotoba','')
         na = tornado.escape.url_unescape(self.get_cookie("username",u"誰かさん"))
         pos = self.application.gpos(dbname,page)
         table = self.application.db[dbname]
@@ -56,7 +57,7 @@ class IndexHandler(BaseHandler):
         if table.count() >= 10*i:
             self.render('modules/full.htm',position=pos,records=rec,data=params,db=dbname)
             return
-        self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname)
+        self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname,aikotoba=rule)
         
 class LoginHandler(BaseHandler):
     def get(self):
@@ -133,6 +134,7 @@ class RegistHandler(tornado.web.RequestHandler):
         rec = self.application.db['params'].find_one()
         words = rec['bad_words']
         out = rec['out_words']
+        rule = self.get_argument('aikotoba')
         na = self.get_argument('name')
         sub = self.get_argument('title')
         com = self.get_argument('comment',None,False)
@@ -140,16 +142,18 @@ class RegistHandler(tornado.web.RequestHandler):
         i = 0
         url = []
         error = ''
+        if rule != u'げんき':
+            error = u'合言葉未入力.'
         for word in out:
             if word in com:
-                error = error + u'禁止ワード.'
+                error += u'禁止ワード.'
                 break
         for line in com.splitlines(True):
             if error:
                 break
             for word in words:
                 if word in line.lower():
-                    error = error + u'タグ違反.('+word+')'       
+                    error += u'タグ違反.('+word+')'       
             i += len(line)
             obj = re.finditer('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
             for x in obj:
@@ -164,10 +168,8 @@ class RegistHandler(tornado.web.RequestHandler):
         if s:         
             text = text+'<table><tr><td>検出url:</td></tr>'+s+'</table>';
         pw = self.get_argument('password')
-        if i == 0:
-            error = error + u'本文がありません.'
-        elif i > 1000:
-            error = error +u'文字数が1,000をこえました.'
+        if i > 1000:
+            error += +u'文字数が1,000をこえました.'
         if na == '':
             na = u'誰かさん'
         if sub == '':
@@ -180,6 +182,7 @@ class RegistHandler(tornado.web.RequestHandler):
             item = items.sort('number')[article.count()-1]
             no = item['number']+1
         if error == '':
+            self.set_cookie('aikotoba',rule)
             s = datetime.now()
             reg = {'number':no,'name':na,'title':sub,'comment':text,'raw':com,'password':pw,'date':s.strftime('%Y/%m/%d %H:%M')}
             article.insert(reg)
