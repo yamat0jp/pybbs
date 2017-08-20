@@ -61,7 +61,7 @@ class IndexHandler(BaseHandler):
         if len(table) >= 10*i:
             self.render('modules/full.htm',position=pos,records=rec,data=params,db=dbname)
             return
-        self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname)
+        self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname,aikotoba=rule)
         
 class LoginHandler(BaseHandler):
     def get(self):
@@ -278,7 +278,7 @@ class UserHandler(tornado.web.RequestHandler):
             qwr = Query()
             obj = table.get(qwr.number == num)
             if obj and(obj['password'] == pas):
-                table.remove(qwr.number == num)
+                table.update({'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</i></b>'},qwr.number == num)
         self.redirect('/'+dbname)
       
 class SearchHandler(tornado.web.RequestHandler):       
