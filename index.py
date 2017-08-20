@@ -253,15 +253,17 @@ class AdminConfHandler(BaseHandler):
           
 class UserHandler(tornado.web.RequestHandler):
     def post(self,dbname):
-        num = self.get_argument('number')
-        if num.isdigit() == True:
-            num = int(num)
+        number = self.get_argument('number')
+        if number.isdigit() == True:
+            num = int(number)
             pas = self.get_argument('password')
             table = self.application.db[dbname]
             obj = table.find_one({'number':num})
             if obj and(obj['password'] == pas):
-                table.remove({'number':num})
-        self.redirect('/'+dbname)
+                table.update({'number':num},{'$set':{'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</i></b>','raw':''}})
+                self.redirect('/'+dbname+'#'+number)
+            else:
+                self.redirect('/'+dbname)
       
 class SearchHandler(tornado.web.RequestHandler):       
     def post(self,dbname):
@@ -359,7 +361,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        #'debug':True,
+                        'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
