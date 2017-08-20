@@ -197,7 +197,7 @@ class RegistHandler(tornado.web.RequestHandler):
         text = ''
         obj = re.finditer('>>[0-9]+',command)
         for x in obj:
-            s = '<a class=minpreview data-preview-url=/{0}?key={1} href=/{0}#{1}>>>{1}</a>'.format(self.database,x.group()[2:])
+            s = '<a class=minpreview data-preview-url=/{0}?key={1} href=/{0}/userdel?job={1}>>>{1}</a>'.format(self.database,x.group()[2:])
             text = text+command[i:x.start()]+s
             i = x.end()
         else:
@@ -269,6 +269,16 @@ class AdminConfHandler(BaseHandler):
                     table.insert_multiple(bak.table(x).all())
           
 class UserHandler(tornado.web.RequestHandler):
+    table = None
+    def get(self,dbname):
+        self.table = self.application.db.table(dbname)
+        q = self.get_query_argument('job','0',strip=True)
+        num = self.page(int(q))        
+        if num == '':
+            self.redirect('/{0}#{1}'.format(dbname,q))           
+        else:
+            self.redirect('/{0}{1}#{2}'.format(dbname,num,q))
+        
     def post(self,dbname):
         number = self.get_argument('number')
         if number.isdigit() == True:
@@ -279,7 +289,7 @@ class UserHandler(tornado.web.RequestHandler):
             obj = self.table.get(qwr.number == num)
             if obj and(obj['password'] == pas):
                 self.table.update({'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</i></b>'},qwr.number == num)
-                self.redirect('/'+dbname+self.page(num)+'#'+number)
+                self.redirect('/{0}{1}#{2}'.format(dbname,self.page(num),number))
             else:
                 self.redirect('/'+dbname)
                 
