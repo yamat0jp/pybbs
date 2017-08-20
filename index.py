@@ -257,13 +257,22 @@ class UserHandler(tornado.web.RequestHandler):
         if number.isdigit() == True:
             num = int(number)
             pas = self.get_argument('password')
-            table = self.application.db[dbname]
-            obj = table.find_one({'number':num})
+            self.table = self.application.db[dbname]
+            obj = self.table.find_one({'number':num})
             if obj and(obj['password'] == pas):
-                table.update({'number':num},{'$set':{'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</i></b>','raw':''}})
-                self.redirect('/'+dbname+'#'+number)
+                self.table.update({'number':num},{'$set':{'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</i></b>','raw':''}})
+                self.redirect('/'+dbname+self.page(num)+'#'+number)
             else:
                 self.redirect('/'+dbname)
+                
+    def page(self,number):
+        if self.table != None:
+            rec = self.table.find({'number':{'$lte':number}}).count()
+            conf = self.application.db['params'].find_one()
+            if self.table.find().count()-rec >= conf['count']:
+                return '/'+str(1+rec//conf['count'])+'/'
+            else:
+                return ''
       
 class SearchHandler(tornado.web.RequestHandler):       
     def post(self,dbname):
@@ -361,7 +370,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        'debug':True,
+                        #'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
