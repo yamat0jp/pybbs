@@ -196,7 +196,7 @@ class RegistHandler(tornado.web.RequestHandler):
         text = ''
         obj = re.finditer('>>[0-9]+',command)
         for x in obj:
-            s = '<a class=minpreview data-preview-url=/{0}?key={1} href=/{0}#{1}>>>{1}</a>'.format(self.database,x.group()[2:])
+            s = '<a class=minpreview data-preview-url=/{0}?key={1} href=/{0}/userdel?job={1}>>>{1}</a>'.format(self.database,x.group()[2:])
             text = text+command[i:x.start()]+s
             i = x.end()
         else:
@@ -252,6 +252,16 @@ class AdminConfHandler(BaseHandler):
         self.redirect('/'+dbname+'/admin/0/')
           
 class UserHandler(tornado.web.RequestHandler):
+    table = None
+    def get(self,dbname):
+        self.table = self.application.db[dbname]
+        q = self.get_query_argument('job','0',strip=True)
+        num = self.page(int(q))
+        if num == '':
+            self.redirect('/{0}#{1}'.format(dbname,q))
+        else:
+            self.redirect('/{0}{1}#{2}'.format(dbname,num,q))
+        
     def post(self,dbname):
         number = self.get_argument('number')
         if number.isdigit() == True:
