@@ -270,16 +270,27 @@ class AdminConfHandler(BaseHandler):
           
 class UserHandler(tornado.web.RequestHandler):
     def post(self,dbname):
-        num = self.get_argument('number')
-        if num.isdigit() == True:
-            num = int(num)
+        number = self.get_argument('number')
+        if number.isdigit() == True:
+            num = int(number)
             pas = self.get_argument('password')
-            table = self.application.db.table(dbname)
+            self.table = self.application.db.table(dbname)
             qwr = Query()
-            obj = table.get(qwr.number == num)
+            obj = self.table.get(qwr.number == num)
             if obj and(obj['password'] == pas):
-                table.update({'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</i></b>'},qwr.number == num)
-        self.redirect('/'+dbname)
+                self.table.update({'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</i></b>'},qwr.number == num)
+                self.redirect('/'+dbname+self.page(num)+'#'+number)
+            else:
+                self.redirect('/'+dbname)
+                
+    def page(self,number):
+        if self.table != None:
+            rec = self.table.count(where('number') <= number)
+            conf = self.application.db.get(where('kinds') == 'conf')
+            if len(self.table)-rec >= conf['count']:
+                return '/'+str(1+rec//conf['count'])+'/'
+            else:
+                return ''
       
 class SearchHandler(tornado.web.RequestHandler):       
     def post(self,dbname):
