@@ -61,7 +61,10 @@ class IndexHandler(BaseHandler):
         if len(table) >= 10*i:
             self.render('modules/full.htm',position=pos,records=rec,data=params,db=dbname)
             return
-        self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname,aikotoba=rule)
+        if (dbname == params['info name'])and(self.current_user != b'admin'):
+            self.render('modules/info.htm',position=pos,records=rec,data=params,db=dbname)
+        else:
+            self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname,aikotoba=rule)
         
 class LoginHandler(BaseHandler):
     def get(self):
@@ -82,9 +85,7 @@ class LogoutHandler(BaseHandler):
 class NaviHandler(tornado.web.RequestHandler):              
     def get(self):
         col,na = self.name()
-        if na in self.application.db.tables():
-            col.append(na)
-        self.render('top.htm',coll=col,full=self.full)
+        self.render('top.htm',coll=col,name=na,full=self.full)
         
     def name(self):
         names = self.application.db.tables()
@@ -92,6 +93,8 @@ class NaviHandler(tornado.web.RequestHandler):
         na = self.application.db.get(where('kinds') == 'conf')['info name']
         if na in names:
             names.remove(na)
+        else:
+            na = ''
         return sorted(names),na
                 
     def full(self,dbname):
