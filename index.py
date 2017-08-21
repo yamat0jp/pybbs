@@ -375,7 +375,7 @@ class Application(tornado.web.Application):
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
-        settings = {'template_path':os.path.join(os.path.dirname(__file__),'pybbs'),
+        settings = {'template_path':os.path.join(os.path.dirname(__file__),'templates'),
                         'static_path':os.path.join(os.path.dirname(__file__),'static'),
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
