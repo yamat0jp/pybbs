@@ -57,7 +57,10 @@ class IndexHandler(BaseHandler):
         if table.count() >= 10*i:
             self.render('modules/full.htm',position=pos,records=rec,data=params,db=dbname)
             return
-        self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname,aikotoba=rule)
+        if (dbname == params['info name'])and(self.current_user != b'admin'):
+            self.render('modules/info.htm',position=pos,records=rec,data=params,db=dbname)
+        else:
+            self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname,aikotoba=rule)
         
 class LoginHandler(BaseHandler):
     def get(self):
@@ -76,10 +79,19 @@ class LogoutHandler(BaseHandler):
         self.redirect('/login')
         
 class NaviHandler(tornado.web.RequestHandler):
-    def get(self):                  
-        coll = sorted(self.application.coll(),key=str.lower)                
-        self.render('top.htm',coll=coll,full=self.full)
-                      
+    def get(self):  
+        coll,na = self.name()                
+        self.render('top.htm',coll=coll,name=na,full=self.full)
+                  
+    def name(self):
+        coll = sorted(self.application.coll(),key=str.lower)
+        na = self.application.db['params'].find_one()['info name']
+        if na in coll:
+            coll.remove(na)
+        else:
+            na = ''
+        return coll,na
+            
     def full(self,dbname):
         if dbname in self.application.db.collection_names():
             i = 10*self.application.db['params'].find_one()['count']
