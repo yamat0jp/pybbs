@@ -79,14 +79,20 @@ class LogoutHandler(BaseHandler):
         self.clear_current_user()
         self.redirect('/login')
         
-class NaviHandler(tornado.web.RequestHandler):
+class NaviHandler(tornado.web.RequestHandler):              
     def get(self):
-        self.render('top.htm',coll=sorted(self.name()),full=self.full)
+        col,na = self.name()
+        if na in self.application.db.tables():
+            col.append(na)
+        self.render('top.htm',coll=col,full=self.full)
         
     def name(self):
-        for x in self.application.db.tables():
-            if x != '_default':
-                yield x
+        names = self.application.db.tables()
+        names.remove('_default')
+        na = self.application.db.get(where('kinds') == 'conf')['info name']
+        if na in names:
+            names.remove(na)
+        return sorted(names),na
                 
     def full(self,dbname):
         if dbname in self.application.db.tables():
@@ -102,7 +108,9 @@ class TitleHandler(NaviHandler):
         self.render('title.htm',coll=rec,full=self.full)  
         
     def title(self):
-        for x in self.name():
+        names = self.application.db.tables()
+        names.remove('_default')
+        for x in names:
             item = {}
             item['name'] = x
             table = self.application.db.table(x)
@@ -388,7 +396,7 @@ class ArticleApi(tornado.web.RequestHandler):
         
 class Application(tornado.web.Application):    
     def __init__(self):
-        self.db = TinyDB(st.json)
+        self.db = TinyDB(st.json)             
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)',ArticleApi),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
