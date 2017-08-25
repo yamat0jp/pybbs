@@ -1,10 +1,14 @@
-
+#!/usr/bin/env python
 import os,re
 import tornado.escape
 import tornado.web
 import pymongo
 from datetime import datetime
 import json
+from tornado.options import define, options, parse_command_line
+
+define("port", default=8888, help="run on the given port", type=int)
+define("debug", default=False, help="run in debug mode")
 
 class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
@@ -419,7 +423,14 @@ class Application(tornado.web.Application):
                 name.remove(x)
         return name
 
-app = Application()
-MONGOLAB_URI = 'mongodb://kainushi:1234abcd@ds113678.mlab.com:13678/heroku_n905jfw2'
-conn = pymongo.MongoClient(MONGOLAB_URI,13678)
-app.db = conn.heroku_n905jfw2
+def main():
+    parse_command_line()
+    app = Application()
+    MONGOLAB_URI = 'mongodb://kainushi:1234abcd@ds113678.mlab.com:13678/heroku_n905jfw2'
+    conn = pymongo.MongoClient(MONGOLAB_URI,13678)
+    app.db = conn.heroku_n905jfw2
+    app.listen(options.port)
+    tornado.ioloop.IOLoop.current().start()
+
+if __name__ =='__main__':
+    main()
