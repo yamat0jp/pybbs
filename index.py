@@ -317,7 +317,7 @@ class SearchHandler(tornado.web.RequestHandler):
     def post(self,dbname):
         self.word = tornado.escape.url_unescape(self.get_argument('word1'))
         self.radiobox = self.get_argument('filter')
-        self.set_cookie('search',tornado.escape.url_escape(self.word))         
+        self.set_cookie('search',tornado.escape.url_escape(self.word,False))         
         rec = sorted(self.search(dbname),key=lambda x: x['number'])
         self.render('modules/search.htm',records=rec,word1=self.word,db=dbname)
     
@@ -344,7 +344,7 @@ class SearchHandler(tornado.web.RequestHandler):
             for x in table.search(query):
                 com = ''
                 for text in x['raw'].splitlines(True):                  
-                    for word in self.word.split():                        
+                    for word in element:                        
                         if text.find(word) > -1:
                             com = com +'<p style=background-color:yellow>'+text+'<br></p>'  
                             break                          
