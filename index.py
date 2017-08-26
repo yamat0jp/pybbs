@@ -313,10 +313,12 @@ class SearchHandler(tornado.web.RequestHandler):
     def search(self,dbname):
         table = self.application.db[dbname]    
         element = self.word.split()
+        if len(element) == 0:
+            element = ['']
         while len(element) < 3:
-            element.append('')
+            element.append(element[0])
         if self.radiobox == 'comment':    
-            for x in table.find({'$or':[{'raw':re.compile(element[0])},
+            for x in table.find({'$or':[{'raw':re.compile(repr(element[0]))},
                                         {'raw':re.compile(element[1])},
                                         {'raw':re.compile(element[2])}
                                         ]}):
