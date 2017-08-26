@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import os,re
 import tornado.escape
 import tornado.web
@@ -397,7 +396,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        #'debug':True,
+                        'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
@@ -436,3 +435,4 @@ def main():
     
 if __name__ =='__main__':
     main()
+    
