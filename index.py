@@ -313,16 +313,17 @@ class SearchHandler(tornado.web.RequestHandler):
     def search(self,dbname):
         table = self.application.db[dbname]    
         element = self.word.split()
-        if len(element) == 0:
-            element = ['']
         while len(element) < 3:
-            element.append(element[0])
+            element.append('')
         if self.radiobox == 'comment':    
-            for x in table.find({'$or':[{'raw':re.compile(element[0])},{'raw':re.compile(element[1])},{'raw':re.compile(element[2])}]}):
+            for x in table.find({'$or':[{'raw':re.compile(element[0])},
+                                        {'raw':re.compile(element[1])},
+                                        {'raw':re.compile(element[2])}
+                                        ]}):
                 com = ''
                 for text in x['raw'].splitlines(True):                  
-                    for word in element:                        
-                        if text.find(word) > -1:
+                    for y in range(3):                        
+                        if text.find(element[y]) > -1:
                             com = com +'<p style=background-color:yellow>'+text+'<br></p>'  
                             break                          
                     else:
@@ -390,7 +391,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        #'debug':True,
+                        'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
