@@ -318,14 +318,14 @@ class SearchHandler(tornado.web.RequestHandler):
         while len(element) < 3:
             element.append(element[0])
         if self.radiobox == 'comment':    
-            for x in table.find({'$or':[{'raw':re.compile(repr(element[0]))},
+            for x in table.find({'$or':[{'raw':re.compile(element[0])},
                                         {'raw':re.compile(element[1])},
                                         {'raw':re.compile(element[2])}
                                         ]}):
                 com = ''
                 for text in x['raw'].splitlines(True):                  
                     for y in range(3):                        
-                        if text.find(element[y]) > -1:
+                        if (len(element[y]) > 0)and(text.find(element[y]) > -1):
                             com = com +'<p style=background-color:yellow>'+text+'<br></p>'  
                             break                          
                     else:
