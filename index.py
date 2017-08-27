@@ -326,7 +326,9 @@ class SearchHandler(tornado.web.RequestHandler):
                                         {'raw':re.compile(elm[2],re.IGNORECASE)}
                                         ]}):
                 com = ''
-                for text in x['raw'].splitlines(True):                  
+                for text in x['raw'].splitlines(True):
+                    if re.match(' ',text):
+                        text = text.replace(' ','&nbsp;',1)                  
                     for i in range(3):                        
                         if element[i].lower() in text.lower():
                             com = com +'<p style=background-color:yellow>'+text+'<br></p>'  
