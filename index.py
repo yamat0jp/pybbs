@@ -332,7 +332,7 @@ class SearchHandler(tornado.web.RequestHandler):
                 com = ''
                 for text in x['raw'].splitlines(True):                  
                     for y in elm:                        
-                        if text.lower().find(y.lower()) > -1:
+                        if y.lower() in text.lower():
                             com = com +'<p style=background-color:yellow>'+text+'<br></p>'  
                             break                          
                     else:
