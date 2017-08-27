@@ -319,11 +319,7 @@ class SearchHandler(tornado.web.RequestHandler):
             element.append(element[0])
         elm = []
         for i in range(3):
-            s = element[i]
-            for x in s:
-                if x in '?()[]+*':
-                    s.replace(x,'\\'+x)
-            elm.append(s)
+            elm.append(re.escape(element[i]))
         if self.radiobox == 'comment':    
             for x in table.find({'$or':[{'raw':re.compile(elm[0],re.IGNORECASE)},
                                         {'raw':re.compile(elm[1],re.IGNORECASE)},
@@ -331,8 +327,8 @@ class SearchHandler(tornado.web.RequestHandler):
                                         ]}):
                 com = ''
                 for text in x['raw'].splitlines(True):                  
-                    for y in elm:                        
-                        if y.lower() in text.lower():
+                    for i in range(3):                        
+                        if element[i].lower() in text.lower():
                             com = com +'<p style=background-color:yellow>'+text+'<br></p>'  
                             break                          
                     else:
