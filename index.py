@@ -330,14 +330,14 @@ class SearchHandler(tornado.web.RequestHandler):
             for x in table.find({'$or':[{'raw':re.compile(elm[0])},{'raw':re.compile(elm[1])},{'raw':re.compile(elm[2])}]}):
                 com = ''
                 for text in x['raw'].splitlines(True):
+                    if re.match(' ',text):
+                        text = text.replace(' ','&nbsp;',1)
                     for i in range(3):
                         if element[i] in text:  
                             com = com +'<p style=background-color:yellow>'+text+'<br></p>'  
                             break                          
                     else:
                         com = com+'<p>'+text+'<br></p>'
-                if re.match(' ',com):
-                    com = com.replace(' ','&nbsp;',1)
                 x['comment'] = com
                 yield x       
         else:
