@@ -64,20 +64,10 @@ class IndexHandler(BaseHandler):
         
 class LoginHandler(BaseHandler):
     def get(self):
-        query = urllib.parse.urlparse(self.request.uri).query
-        qs = urllib.parse.parse_qs(query)      
-        if 'db' in qs:
-            dbname = qs['db']
-        elif 'next' in qs:
-            s = qs['next'][0]
-            dbname = urllib.parse.parse_qs(s[s.find('?')+1:])['db']
-        else:
-            dbname = {}
-        if len(dbname) == 0:
-            raise tornado.web.HTTPError(404)
-            return
-        else:
-            self.render('login.htm',db=dbname[0])
+        query = self.get_query_argument('next','')            
+        i = query[1:].find('/')+1
+        qs = query[1:i]
+        self.render('login.htm',db=qs)
         
     def post(self):
         pw = self.application.db['params'].find_one()
