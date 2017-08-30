@@ -1,5 +1,5 @@
 
-import os,re
+import os,re,urllib
 import tornado.escape
 import tornado.web
 import pymongo
@@ -64,7 +64,20 @@ class IndexHandler(BaseHandler):
         
 class LoginHandler(BaseHandler):
     def get(self):
-        self.render('login.htm')
+        query = urllib.parse.urlparse(self.request.uri).query
+        qs = urllib.parse.parse_qs(query)      
+        if 'db' in qs:
+            dbname = qs['db']
+        elif 'next' in qs:
+            s = qs['next'][0]
+            dbname = urllib.parse.parse_qs(s[s.find('?')+1:])['db']
+        else:
+            dbname = {}
+        if len(dbname) == 0:
+            raise tornado.web.HTTPError(404)
+            return
+        else:
+            self.render('login.htm',db=dbname[0])
         
     def post(self):
         pw = self.application.db['params'].find_one()
@@ -391,7 +404,7 @@ class Application(tornado.web.Application):
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),
                     (r'/write/api/([a-zA-Z0-9_]+)/()/()/()',ArticleApi),(r'/list/api/([a-zA-Z0-9]+)',ListApi),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
-                    (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
+                    (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
         settings = {'template_path':os.path.join(os.path.dirname(__file__),'templates'),
                         'static_path':os.path.join(os.path.dirname(__file__),'static'),
