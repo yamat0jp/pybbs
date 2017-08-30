@@ -299,7 +299,7 @@ class UserHandler(tornado.web.RequestHandler):
             qwr = Query()
             obj = self.table.get(qwr.number == num)
             if obj and(obj['password'] == pas):
-                self.table.update({'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</i></b>'},qwr.number == num)
+                self.table.update({'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>'},qwr.number == num)
                 self.redirect('/{0}{1}#{2}'.format(dbname,self.page(num),number))
             else:
                 self.redirect('/'+dbname)
