@@ -68,9 +68,9 @@ class IndexHandler(BaseHandler):
         
 class LoginHandler(BaseHandler):
     def get(self):
-        query = self.get_query_argument('next')
-        i = query[1:].find('/')
-        qs = query[1:i+1]  
+        query = self.get_query_argument('next','')
+        i = query[1:].find('/')+1
+        qs = query[1:i]  
         self.render('login.htm',db=qs)
         
     def post(self):
