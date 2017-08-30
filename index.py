@@ -1,5 +1,5 @@
 
-import os.path
+import os.path,urllib
 import shutil,re
 import tornado.escape
 import tornado.web
@@ -68,7 +68,20 @@ class IndexHandler(BaseHandler):
         
 class LoginHandler(BaseHandler):
     def get(self):
-        self.render('login.htm')
+        query = urllib.parse.urlparse(self.request.uri).query
+        qs = urllib.parse.parse_qs(query)      
+        if 'db' in qs:
+            dbname = qs['db']
+        elif 'next' in qs:
+            s = qs['next'][0]
+            dbname = urllib.parse.parse_qs(s[s.find('?')+1:])['db']
+        else:
+            dbname = {}
+        if len(dbname) == 0:
+            raise tornado.web.HTTPError(404)
+            return
+        else:
+            self.render('login.htm',db=dbname[0])
         
     def post(self):
         pw = self.application.db.get(where('kinds') == 'conf')
@@ -217,7 +230,7 @@ class RegistHandler(tornado.web.RequestHandler):
     
 class AdminHandler(BaseHandler):
     @tornado.web.authenticated               
-    def get(self,dbname,page='0'):
+    def get(self,dbname,page):
         if dbname == '':
             dbname = self.get_argument('record','')
         if self.application.collection(dbname) == False:
@@ -400,13 +413,13 @@ class Application(tornado.web.Application):
         self.db = TinyDB(st.json)             
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)',ArticleApi),
-                    (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
-                    (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
+                    (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/*',IndexHandler),
+                    (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
         settings = {'template_path':os.path.join(os.path.dirname(__file__),'templates'),
                         'static_path':os.path.join(os.path.dirname(__file__),'static'),
                         'ui_modules':{'Footer':FooterModule},
-                        'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
+                        'cookie_secret':'bZJc2sWbQLKo6GkHn/VB9oXwQt8SOROkRvJ5/xJ89Eo=',
                         'xsrf_cookies':True,
                         'debug':True,
                         'login_url':'/login'
