@@ -282,7 +282,7 @@ class UserHandler(tornado.web.RequestHandler):
             self.table = self.application.db[dbname]
             obj = self.table.find_one({'number':num})
             if obj and(obj['password'] == pas):
-                self.table.update({'number':num},{'$set':{'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</i></b>','raw':''}})
+                self.table.update({'number':num},{'$set':{'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>','raw':''}})
                 self.redirect('/'+dbname+self.page(num)+'#'+number)
             else:
                 self.redirect('/'+dbname)
