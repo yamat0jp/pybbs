@@ -15,7 +15,7 @@
     <form action=/login method="post">
     {% module xsrf_form_html() %}
     <p style=text-align:center>
-      <input type=text name=record>
+      <input type=text name=record value={{db}}>
     	  <input style=height:25px type="password" name="password">
       <input type="submit" value="ログイン">
     </p>

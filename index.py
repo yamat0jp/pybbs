@@ -68,14 +68,17 @@ class IndexHandler(BaseHandler):
         
 class LoginHandler(BaseHandler):
     def get(self):
-        self.render('login.htm')
+        query = self.get_query_argument('next')
+        i = query[1:].find('/')+1
+        qs = query[1:i]
+        self.render('login.htm',db=qs)
         
     def post(self):
         pw = self.application.db['params'].find_one()
         if self.get_argument('password') == pw['password']:
             self.set_current_user('admin')
         dbname = self.get_argument('record')
-        self.redirect('/'+dbname+'/admin/0/')
+        self.redirect('/'+dbname+'/admin/0')
         
 class LogoutHandler(BaseHandler):
     def get(self):
@@ -391,7 +394,7 @@ class Application(tornado.web.Application):
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),
                     (r'/write/api/([a-zA-Z0-9_]+)/()/()/()',ArticleApi),(r'/list/api/([a-zA-Z0-9]+)',ListApi),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
-                    (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
+                    (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
         settings = {'template_path':os.path.join(os.path.dirname(__file__),'templates'),
                         'static_path':os.path.join(os.path.dirname(__file__),'static'),
