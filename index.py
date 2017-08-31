@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os,re
 import tornado.escape
 import tornado.web
