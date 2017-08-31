@@ -436,7 +436,7 @@ def main():
     parse_command_line()
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(options.port)
-    tornado.ioloop.IOLoop.instance().start()
+    tornado.ioloop.IOLoop.current().start()
     
 if __name__ =='__main__':
     main()
