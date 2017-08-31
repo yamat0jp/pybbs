@@ -1,0 +1,22 @@
+{
+    "_id": {
+        "$oid": "583ff3b1f36d2859a59ce472"
+    },
+    "mentenance": false,
+    "out_words": [
+        "ˆ¢•Û",
+        "”nŽ­",
+        "Ž€‚Ë"
+    ],
+    "password": "jiro",
+    "title2": "<h1 style=color:gray;text-align:center>pybbs<\/h1>",
+    "bad_words": [
+        "<style",
+        "<link",
+        "<script",
+        "<img"
+    ],
+    "count": 30,
+    "title": "pybbs",
+    "info name": "info"
+}
