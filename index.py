@@ -402,7 +402,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        'debug':True,
+                        #'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
@@ -436,8 +436,8 @@ def main():
     app.db = conn.heroku_n905jfw2
     parse_command_line()
     http_server = tornado.httpserver.HTTPServer(app)
-    http_server.listen(options.port)
-    tornado.ioloop.IOLoop.current().start()
+    http_server.listen(os.environ.get('port',8888))
+    tornado.ioloop.IOLoop.instance().start()
     
 if __name__ =='__main__':
     main()
