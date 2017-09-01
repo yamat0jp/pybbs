@@ -93,7 +93,8 @@ class NaviHandler(tornado.web.RequestHandler):
     def name(self):
         names = self.application.db.tables()
         names.remove('_default')
-        names.remove('help')
+        if 'master' in names:
+            names.remove('master')
         na = self.application.db.get(where('kinds') == 'conf')['info name']
         if na in names:
             names.remove(na)
@@ -401,8 +402,7 @@ class ArticleApi(tornado.web.RequestHandler):
         
 class HelpHandler(tornado.web.RequestHandler):
     def get(self):
-        if self.current_user == b'admin':
-            self.redirect('/help')
+        self.render('help.htm',req='') 
         
     def post(self):
         com = self.get_argument('help','')
@@ -415,12 +415,18 @@ class HelpHandler(tornado.web.RequestHandler):
             req = '送信しました'
         self.render('help.htm',req=req)
         
+class MasterHandler(tornado.web.RequestHandler):
+    @tornado.web.authenticated
+    def get(self):
+        com = self.applicaiton.db.table('help').all()
+        self.render('master.htm',com=com)
+        
 class Application(tornado.web.Application):    
     def __init__(self):
         self.db = TinyDB(st.json)             
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)',ArticleApi),
-                    (r'/help',HelpHandler),
+                    (r'/help',HelpHandler),(r'/master',MasterHandler),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/*',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
