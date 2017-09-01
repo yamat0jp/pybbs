@@ -93,6 +93,7 @@ class NaviHandler(tornado.web.RequestHandler):
     def name(self):
         names = self.application.db.tables()
         names.remove('_default')
+        names.remove('help')
         na = self.application.db.get(where('kinds') == 'conf')['info name']
         if na in names:
             names.remove(na)
@@ -400,11 +401,14 @@ class ArticleApi(tornado.web.RequestHandler):
         
 class HelpHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render('help.htm',req='')
+        if self.current_user == b'admin':
+            self.redirect('/help')
         
     def post(self):
         com = self.get_argument('help','')
-        mail = self.application.db.get(where('kinds') == 'conf')['mail']
+        table = self.application.db.table('help')
+        time = datetime.now()
+        table.insert({'comment':com,'time':time.strftime('%Y/%m/%d %H:%M')})
         if com == '':
             req = ''
         else:
