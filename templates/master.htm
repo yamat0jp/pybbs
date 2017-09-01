@@ -5,7 +5,7 @@
 <body>
 <p>報告一覧
 {% for rec in com %}
-	<p>{{rec['comment']}}
+	<p>{% raw rec['comment'] %}
 	<p>{{rec['time']}}
 	<hr>
 {% end %}

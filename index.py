@@ -423,12 +423,29 @@ class MasterHandler(BaseHandler):
         else:
             raise tornado.web.HTTPError(404)
         
+class AlartHandler(UserHandler):
+    def get(self):
+        db = self.get_query_argument('db')
+        num = self.get_query_argument('num')
+        self.table = self.application.db.table(db)
+        tb = self.table.get(where('number') == int(num))
+        s = self.page(int(num))
+        link = '<p><a href=/{0}{1}#{2}>{0},{2}</a>'.format(db,s,num)
+        if 'master' in self.application.db.tables():
+            time = datetime.now()
+            data = {'comment':tb['raw']+link,'time':time.strftime('%Y/%m/%d')}
+            self.application.db.table('master').insert(data)
+        if s == '':
+            self.redirect('/{0}#{1}'.format(db,num))
+        else:
+            self.redirect('/{0}{1}#{2}'.format(db,s,num))
+        
 class Application(tornado.web.Application):    
     def __init__(self):
         self.db = TinyDB(st.json)             
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)',ArticleApi),
-                    (r'/help',HelpHandler),(r'/master',MasterHandler),
+                    (r'/help',HelpHandler),(r'/master',MasterHandler),(r'/alart',AlartHandler),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/*',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
