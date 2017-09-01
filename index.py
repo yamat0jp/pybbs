@@ -406,7 +406,7 @@ class HelpHandler(tornado.web.RequestHandler):
         
     def post(self):
         com = self.get_argument('help','')
-        table = self.application.db.table('help')
+        table = self.application.db.table('master')
         time = datetime.now()
         table.insert({'comment':com,'time':time.strftime('%Y/%m/%d %H:%M')})
         if com == '':
@@ -415,11 +415,13 @@ class HelpHandler(tornado.web.RequestHandler):
             req = '送信しました'
         self.render('help.htm',req=req)
         
-class MasterHandler(tornado.web.RequestHandler):
-    @tornado.web.authenticated
+class MasterHandler(BaseHandler):
     def get(self):
-        com = self.applicaiton.db.table('help').all()
-        self.render('master.htm',com=com)
+        if self.current_user == b'admin':
+            com = self.application.db.table('master').all()
+            self.render('master.htm',com=com)
+        else:
+            raise tornado.web.HTTPError(404)
         
 class Application(tornado.web.Application):    
     def __init__(self):

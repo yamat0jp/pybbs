@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+<head><meta charset=utf-8><title>mail</title></head>
+
+<body>
+<p>報告一覧
+{% for rec in com %}
+	<p>{{rec['comment']}}
+	<p>{{rec['time']}}
+	<hr>
+{% end %}
+</body>
+</html>
