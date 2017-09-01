@@ -398,11 +398,25 @@ class ArticleApi(tornado.web.RequestHandler):
         table = self.application.db.table(dbname)
         table.insert({'name':name,'title':title,'comment':comment})
         
+class HelpHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render('help.htm',req='')
+        
+    def post(self):
+        com = self.get_argument('help','')
+        mail = self.application.db.get(where('kinds') == 'conf')['mail']
+        if com == '':
+            req = ''
+        else:
+            req = '送信しました'
+        self.render('help.htm',req=req)
+        
 class Application(tornado.web.Application):    
     def __init__(self):
         self.db = TinyDB(st.json)             
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)',ArticleApi),
+                    (r'/help',HelpHandler),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/*',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
