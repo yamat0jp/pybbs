@@ -69,8 +69,11 @@ class IndexHandler(BaseHandler):
 class LoginHandler(BaseHandler):
     def get(self):
         query = self.get_query_argument('next','')
-        i = query[1:].find('/')+1
-        qs = query[1:i]  
+        i = query[1:].find('/')
+        if i == -1:
+            qs = query[1:]
+        else:
+            qs = query[1:i+1]  
         self.render('login.htm',db=qs)
         
     def post(self):
@@ -78,7 +81,10 @@ class LoginHandler(BaseHandler):
         if self.get_argument('password') == pw['password']:
             self.set_current_user('admin')
         dbname = self.get_argument('record')
-        self.redirect('/'+dbname+'/admin/0/')
+        if dbname == 'master':
+            self.redirect('/master')
+        else:
+            self.redirect('/'+dbname+'/admin/0/')
         
 class LogoutHandler(BaseHandler):
     def get(self):
@@ -416,6 +422,7 @@ class HelpHandler(tornado.web.RequestHandler):
         self.render('help.htm',req=req)
         
 class MasterHandler(BaseHandler):
+    @tornado.web.authenticated
     def get(self):
         if self.current_user == b'admin':
             com = self.application.db.table('master').all()
@@ -445,7 +452,7 @@ class Application(tornado.web.Application):
         self.db = TinyDB(st.json)             
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)',ArticleApi),
-                    (r'/help',HelpHandler),(r'/master',MasterHandler),(r'/alart',AlartHandler),
+                    (r'/help',HelpHandler),(r'/master/*',MasterHandler),(r'/alart',AlartHandler),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/*',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
