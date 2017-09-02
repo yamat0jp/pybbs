@@ -353,6 +353,10 @@ class HelpHandler(tornado.web.RequestHandler):
     
     def post(self):
         com = self.get_argument('help','')
+        line = com.splitlines(True)
+        com = ''
+        for x in line:
+            com += '<p>'+x+'</p><br>'
         time = datetime.now()
         db = self.application.db['master']
         db.insert({'comment':com,'time':time.strftime('%Y/%m/%d')})
