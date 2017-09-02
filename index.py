@@ -95,6 +95,8 @@ class NaviHandler(tornado.web.RequestHandler):
     def name(self):
         coll = sorted(self.application.coll(),key=str.lower)
         na = self.application.db['params'].find_one()['info name']
+        if 'master' in coll:
+            coll.remove('master')
         if na in coll:
             coll.remove(na)
         else:
