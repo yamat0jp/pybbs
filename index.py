@@ -374,10 +374,11 @@ class AlertHandler(UserHandler):
     def get(self):
         db = self.get_query_argument('db')
         num = self.get_query_argument('num')
-        com = self.application.db[db].find_one({'number':num})
+        tb = self.application.db[db].find_one({'number':int(num)})
+        com = tb['comment']
         time = datetime.now().strftime('%Y/%m/%d')
         s = self.page(int(num))
-        if s == '':
+        if s == None:
             link = '/{0}#{1}'.format(db,num)
         else:
             link = '/{0}{1}#{2}'.format(db,s,num)                            
