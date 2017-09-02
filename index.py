@@ -65,8 +65,11 @@ class IndexHandler(BaseHandler):
 class LoginHandler(BaseHandler):
     def get(self):
         query = self.get_query_argument('next','')            
-        i = query[1:].find('/')+1
-        qs = query[1:i]
+        i = query[1:].find('/')
+        if i == -1:
+            qs = query[1:]
+        else:
+            qs = query[1:i+1]
         self.render('login.htm',db=qs)
         
     def post(self):
@@ -74,7 +77,10 @@ class LoginHandler(BaseHandler):
         if self.get_argument('password') == pw['password']:
             self.set_current_user('admin')
         dbname = self.get_argument('record')
-        self.redirect('/'+dbname+'/admin/0/')
+        if dbname == 'master':
+            self.redirect('/master')
+        else:
+            self.redirect('/'+dbname+'/admin/0/')
         
 class LogoutHandler(BaseHandler):
     def get(self):
@@ -342,7 +348,42 @@ class SearchHandler(tornado.web.RequestHandler):
                 yield x       
         else:
             for x in table.find({'$or':[{'name':element[0]},{'name':element[1]},{'name':element[2]}]}):
-                yield x    
+                yield x  
+                
+class HelpHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render('help.htm',req='')
+    
+    def post(self):
+        com = self.get_argument('com','')
+        time = datetime.now()
+        db = self.application.db['master']
+        db.insert({'comment':com,'time':time.strftime('%Y/%m/%d')})
+        self.render('help.htm',req='送信しました')
+    
+class MasterHandler(BaseHandler):
+    @tornado.web.authenticated  
+    def get(self):
+        if self.current_user == b'admin':
+            com = self.application.db['master'].find()
+            self.render('master.htm',com=com)
+        else:
+            raise tornado.web.HTTPError(404)
+        
+class AlertHandler(UserHandler):
+    def get(self):
+        db = self.get_query_argument('db')
+        num = self.get_query_argument('num')
+        com = self.application.db[db].find_one({'number':num})
+        time = datetime.now().strftime('%Y/%m/%d')
+        s = self.page(int(num))
+        if s == '':
+            link = '/{0}#{1}'.format(db,num)
+        else:
+            link = '/{0}{1}#{2}'.format(db,s,num)                            
+        self.table = self.application.db['master']
+        self.table.insert({'comment':com+link,'time':time})
+        self.redirect(link)
                                         
 class FooterModule(tornado.web.UIModule):
     def render(self,number,url,link):
@@ -393,6 +434,7 @@ class Application(tornado.web.Application):
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),
                     (r'/write/api/([a-zA-Z0-9_]+)/()/()/()',ArticleApi),(r'/list/api/([a-zA-Z0-9]+)',ListApi),
+                    (r'/help',HelpHandler),(r'/master',MasterHandler),(r'/alert',AlertHandler),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
@@ -401,7 +443,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        #'debug':True,
+                        'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
