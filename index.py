@@ -375,7 +375,7 @@ class AlertHandler(UserHandler):
         db = self.get_query_argument('db')
         num = self.get_query_argument('num')
         tb = self.application.db[db].find_one({'number':int(num)})
-        com = tb['comment']
+        com = tb['raw']
         time = datetime.now().strftime('%Y/%m/%d')
         s = self.page(int(num))
         if s == None:
