@@ -278,10 +278,7 @@ class UserHandler(tornado.web.RequestHandler):
         self.table = self.application.db[dbname]
         q = self.get_query_argument('job','0',strip=True)
         num = self.page(int(q))
-        if num == '':
-            self.redirect('/{0}#{1}'.format(dbname,q))
-        else:
-            self.redirect('/{0}{1}#{2}'.format(dbname,num,q))
+        self.redirect('/{0}{1}#{2}'.format(dbname,num,q))
         
     def post(self,dbname):
         number = self.get_argument('number')
@@ -300,7 +297,7 @@ class UserHandler(tornado.web.RequestHandler):
         if self.table != None:
             rec = self.table.find({'number':{'$lte':number}}).count()
             conf = self.application.db['params'].find_one()
-            if self.table.find().count()-rec <= conf['count']:
+            if self.table.find().count()-rec >= conf['count']:
                 return '/'+str(1+rec//conf['count'])+'/'
             else:
                 return ''
@@ -379,7 +376,7 @@ class AlertHandler(UserHandler):
         com = tb['comment']
         time = datetime.now().strftime('%Y/%m/%d')
         s = self.page(int(num))
-        link = '/{0}{1}#{2}'.format(db,s,num)  
+        link = '/'+db+s+'#'+num  
         jump = '<p><a href={0}>{0}</a>'.format(link)                         
         self.table.insert({'comment':com+jump,'time':time})
         self.redirect(link)
