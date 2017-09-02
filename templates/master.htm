@@ -4,7 +4,7 @@
 <body>
 報告一覧
 {% for x in com %}
-	<p>{{x['comment']}}
+	<p>{% raw x['comment'] %}
 	<p>{{x['time']}}
 	<hr>
 {% end %}

@@ -300,7 +300,7 @@ class UserHandler(tornado.web.RequestHandler):
         if self.table != None:
             rec = self.table.find({'number':{'$lte':number}}).count()
             conf = self.application.db['params'].find_one()
-            if self.table.find().count()-rec >= conf['count']:
+            if self.table.find().count()-rec <= conf['count']:
                 return '/'+str(1+rec//conf['count'])+'/'
             else:
                 return ''
@@ -355,7 +355,7 @@ class HelpHandler(tornado.web.RequestHandler):
         self.render('help.htm',req='')
     
     def post(self):
-        com = self.get_argument('com','')
+        com = self.get_argument('help','')
         time = datetime.now()
         db = self.application.db['master']
         db.insert({'comment':com,'time':time.strftime('%Y/%m/%d')})
@@ -372,18 +372,16 @@ class MasterHandler(BaseHandler):
         
 class AlertHandler(UserHandler):
     def get(self):
+        self.table = self.application.db['master']
         db = self.get_query_argument('db')
         num = self.get_query_argument('num')
         tb = self.application.db[db].find_one({'number':int(num)})
-        com = tb['raw']
+        com = tb['comment']
         time = datetime.now().strftime('%Y/%m/%d')
         s = self.page(int(num))
-        if s == None:
-            link = '/{0}#{1}'.format(db,num)
-        else:
-            link = '/{0}{1}#{2}'.format(db,s,num)                            
-        self.table = self.application.db['master']
-        self.table.insert({'comment':com+link,'time':time})
+        link = '/{0}{1}#{2}'.format(db,s,num)  
+        jump = '<p><a href={0}>{0}</a>'.format(link)                         
+        self.table.insert({'comment':com+jump,'time':time})
         self.redirect(link)
                                         
 class FooterModule(tornado.web.UIModule):
