@@ -95,8 +95,6 @@ class NaviHandler(tornado.web.RequestHandler):
     def name(self):
         coll = sorted(self.application.coll(),key=str.lower)
         na = self.application.db['params'].find_one()['info name']
-        if 'master' in coll:
-            coll.remove('master')
         if na in coll:
             coll.remove(na)
         else:
@@ -118,8 +116,6 @@ class TitleHandler(NaviHandler):
         
     def title(self):
         name = self.application.coll()
-        if 'master' in name:
-            name.remove('master')
         for x in name:
             item = {}
             item['name'] = x
@@ -469,7 +465,7 @@ class Application(tornado.web.Application):
 
     def coll(self):
         name = self.db.collection_names()
-        for x in ['params','objectlabs-system.admin.collections','objectlabs-system','system.indexes']:
+        for x in ['params','objectlabs-system.admin.collections','objectlabs-system','system.indexes','master']:
             if x in name:
                 name.remove(x)
         return name
