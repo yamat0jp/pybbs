@@ -118,6 +118,8 @@ class TitleHandler(NaviHandler):
         
     def title(self):
         name = self.application.coll()
+        if 'master' in name:
+            name.remove('master')
         for x in name:
             item = {}
             item['name'] = x
