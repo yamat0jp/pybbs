@@ -1,5 +1,5 @@
 
-import os.path,urllib
+import os.path
 import shutil,re
 import tornado.escape
 import tornado.web
@@ -414,9 +414,12 @@ class HelpHandler(tornado.web.RequestHandler):
         
     def post(self):
         com = self.get_argument('help','')
+        text = ''
+        for line in com.splitlines():
+            text +='<p>'+line
         table = self.application.db.table('master')
         time = datetime.now()
-        table.insert({'comment':com,'time':time.strftime('%Y/%m/%d %H:%M')})
+        table.insert({'comment':text,'time':time.strftime('%Y/%m/%d %H:%M')})
         if com == '':
             req = ''
         else:
