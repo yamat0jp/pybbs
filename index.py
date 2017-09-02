@@ -124,6 +124,8 @@ class TitleHandler(NaviHandler):
     def title(self):
         names = self.application.db.tables()
         names.remove('_default')
+        if 'master' in names:
+            names.remove('master')
         for x in names:
             item = {}
             item['name'] = x
