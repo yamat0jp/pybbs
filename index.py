@@ -9,7 +9,7 @@ import tornado.options
 from tornado.options import define,options
 from tinydb import TinyDB,Query,where
 from tinydb.operations import delete
-from datetime import datetime
+from datetime import datetime,date
 import json
 
 define('port',default=8000,help='run on the given port',type=int)
@@ -98,12 +98,10 @@ class NaviHandler(tornado.web.RequestHandler):
         
     def name(self):
         names = self.application.db.tables()
-        names.remove('_default')
-        if 'master' in names:
-            names.remove('master')
         na = self.application.db.get(where('kinds') == 'conf')['info name']
-        if na in names:
-            names.remove(na)
+        for s in ['_default','master','temp',na]:
+            if s in names:
+                names.remove(s)
         else:
             na = ''
         return sorted(names),na
@@ -123,9 +121,9 @@ class TitleHandler(NaviHandler):
         
     def title(self):
         names = self.application.db.tables()
-        names.remove('_default')
-        if 'master' in names:
-            names.remove('master')
+        for s in ['_default','master','temp']:
+            if s in names:
+                names.remove(s)
         for x in names:
             item = {}
             item['name'] = x
@@ -444,23 +442,25 @@ class AlertHandler(UserHandler):
         s = self.page(int(num))
         jump = '/'+db+s+'#'+num
         link = '<p><a href={0}>{0}</a>'.format(jump)
-        if 'master' in self.application.db.tables():
-            time = datetime.now()
-            data = {'comment':tb['comment']+link,'time':time.strftime('%Y/%m/%d'),'link':jump}
-            id = self.application.db.table('master').insert(data)
+        time = datetime.now()
+        data = {'comment':tb['comment']+link,'time':time.strftime('%Y/%m/%d'),
+                'link':jump,'date':date.weekday(time)}
+        id = self.application.db.table('temp').insert(data)
         self.render('alert.htm',com=data['comment'],num=id)
     
     def post(self):
         id = int(self.get_argument('num'))
-        table = self.application.db.table('master')
+        table = self.application.db.table('temp')
         tb = table.get(eid=id)
         link = tb['link']
-        if self.get_argument('cancel','') == 'cancel':
-            table.remove(eids=[id])
-        else:
+        table.remove(eids=[id])
+        table.remove(where('date') != date.weekday(datetime.now()))
+        if self.get_argument('admit','') == 'ok':
             com = self.get_argument('com')
-            com += tb['comment']
-            table.update({'comment':com},eids=[id])
+            tb['comment'] = com+tb['comment']
+            del tb['date']
+            table = self.application.db.table('master')
+            table.insert(tb)
         self.redirect(link)
         
 class Application(tornado.web.Application):    
