@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+<head><meta charset=utf-8><title>報告申請画面</title>
+<link rel=stylesheet href={{static_url('css/main.css')}}</head>
+
+<body>
+<form action=/alert method=post>
+{% module xsrf_form_html() %}
+<p>宜しければ何かお書き添えください
+<p><textarea name=com></textarea>
+<p>{% raw com %}
+<p style=text-align:center><input name=admit type=submit value="送信"><input name=cancel type=submit value="キャンセル">
+<input type=hidden name=num value={{num}}>
+</form>
+</body></html>

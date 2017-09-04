@@ -5,6 +5,7 @@ import tornado.web
 import pymongo
 from datetime import datetime
 import json
+from bson.objectid import ObjectId
 
 class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
@@ -381,8 +382,20 @@ class AlertHandler(UserHandler):
         time = datetime.now().strftime('%Y/%m/%d')
         s = self.page(int(num))
         link = '/'+db+s+'#'+num  
-        jump = '<p><a href={0}>{0}</a>'.format(link)                         
-        self.table.insert({'comment':com+jump,'time':time})
+        jump = '<p><a href={0}>{0}</a>'.format(link)
+        result = self.table.insert({'comment':com+jump,'time':time,'link':link})
+        self.render('alert.htm',com=com+jump,num=str(result))
+        
+    def post(self):
+        com = self.get_argument('com')
+        id = ObjectId(self.get_argument('num'))
+        table = self.application.db['master']
+        if com != '':
+            table = self.application.db['master'] 
+            tb = table.find_one({'_id':id})
+            com += tb['comment']
+            link = tb['link']
+            table.update({'_id':id},{'comment':com,'time':tb['time']})
         self.redirect(link)
                                         
 class FooterModule(tornado.web.UIModule):
@@ -443,7 +456,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        #'debug':True,
+                        'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
