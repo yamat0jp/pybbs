@@ -387,14 +387,15 @@ class AlertHandler(UserHandler):
         self.render('alert.htm',com=com+jump,num=str(result))
         
     def post(self):
-        com = self.get_argument('com')
         id = ObjectId(self.get_argument('num'))
         table = self.application.db['master']
+        tb = table.find_one({'_id':id})      
+        link = tb['link'] 
+        if self.get_argument('cancel','') == 'cancel':
+            table.remove({'_id':id})
+        com = self.get_argument('com')
         if com != '':
-            table = self.application.db['master'] 
-            tb = table.find_one({'_id':id})
             com += tb['comment']
-            link = tb['link']
             table.update({'_id':id},{'comment':com,'time':tb['time']})
         self.redirect(link)
                                         
