@@ -3,7 +3,7 @@ import os,re,urllib
 import tornado.escape
 import tornado.web
 import pymongo
-from datetime import datetime
+from datetime import datetime,date
 import json
 from bson.objectid import ObjectId
 
@@ -383,20 +383,24 @@ class AlertHandler(UserHandler):
         s = self.page(int(num))
         link = '/'+db+s+'#'+num  
         jump = '<p><a href={0}>{0}</a>'.format(link)
-        result = self.table.insert({'comment':com+jump,'time':time,'link':link})
+        result = self.application.db['temp'].insert(
+            {'comment':com+jump,'time':time,'link':link,'date':date.weekday(datetime.now())})
         self.render('alert.htm',com=com+jump,num=str(result))
         
     def post(self):
         id = ObjectId(self.get_argument('num'))
-        table = self.application.db['master']
+        table = self.application.db['temp']
         tb = table.find_one({'_id':id})      
-        link = tb['link'] 
+        link = tb['link']
+        com = self.get_argument('com')
         if self.get_argument('cancel','') == 'cancel':
             table.remove({'_id':id})
-        com = self.get_argument('com')
         if com != '':
-            com += tb['comment']
-            table.update({'_id':id},{'comment':com,'time':tb['time']})
+            tb['comment'] = com+tb['comment']
+        table.remove({'date':{'$ne':date.weekday(datetime.now())}})
+        del tb['date']
+        table = self.application.db['master']
+        table.insert(tb)
         self.redirect(link)
                                         
 class FooterModule(tornado.web.UIModule):
@@ -457,7 +461,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        'debug':True,
+                        #'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
@@ -479,7 +483,8 @@ class Application(tornado.web.Application):
 
     def coll(self):
         name = self.db.collection_names()
-        for x in ['params','objectlabs-system.admin.collections','objectlabs-system','system.indexes','master']:
+        for x in ['objectlabs-system.admin.collections','objectlabs-system','system.indexes',
+                  'params','master','temp']:
             if x in name:
                 name.remove(x)
         return name
