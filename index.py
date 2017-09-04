@@ -393,11 +393,13 @@ class AlertHandler(UserHandler):
         tb = table.find_one({'_id':id})      
         link = tb['link']
         com = self.get_argument('com')
+        table.remove({'_id':id})
+        table.remove({'date':{'$ne':date.weekday(datetime.now())}})
         if self.get_argument('cancel','') == 'cancel':
-            table.remove({'_id':id})
+            relf.redirct(link)
+            return
         if com != '':
             tb['comment'] = com+tb['comment']
-        table.remove({'date':{'$ne':date.weekday(datetime.now())}})
         del tb['date']
         table = self.application.db['master']
         table.insert(tb)
