@@ -435,29 +435,40 @@ class MasterHandler(BaseHandler):
         else:
             raise tornado.web.HTTPError(404)
         
-class AlartHandler(UserHandler):
+class AlertHandler(UserHandler):
     def get(self):
         db = self.get_query_argument('db')
         num = self.get_query_argument('num')
         self.table = self.application.db.table(db)
         tb = self.table.get(where('number') == int(num))
         s = self.page(int(num))
-        link = '<p><a href=/{0}{1}#{2}>{0},{2}</a>'.format(db,s,num)
+        jump = '/'+db+s+'#'+num
+        link = '<p><a href={0}>{0}</a>'.format(jump)
         if 'master' in self.application.db.tables():
             time = datetime.now()
-            data = {'comment':tb['raw']+link,'time':time.strftime('%Y/%m/%d')}
-            self.application.db.table('master').insert(data)
-        if s == '':
-            self.redirect('/{0}#{1}'.format(db,num))
+            data = {'comment':tb['comment']+link,'time':time.strftime('%Y/%m/%d'),'link':jump}
+            id = self.application.db.table('master').insert(data)
+        self.render('alert.htm',com=data['comment'],num=id)
+    
+    def post(self):
+        id = int(self.get_argument('num'))
+        table = self.application.db.table('master')
+        tb = table.get(eid=id)
+        link = tb['link']
+        if self.get_argument('cancel','') == 'cancel':
+            table.remove(eids=[id])
         else:
-            self.redirect('/{0}{1}#{2}'.format(db,s,num))
+            com = self.get_argument('com')
+            com += tb['comment']
+            table.update({'comment':com},eids=[id])
+        self.redirect(link)
         
 class Application(tornado.web.Application):    
     def __init__(self):
         self.db = TinyDB(st.json)             
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)',ArticleApi),
-                    (r'/help',HelpHandler),(r'/master/*',MasterHandler),(r'/alart',AlartHandler),
+                    (r'/help',HelpHandler),(r'/master/*',MasterHandler),(r'/alert',AlertHandler),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/*',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
