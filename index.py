@@ -388,7 +388,7 @@ class AlertHandler(UserHandler):
         time = datetime.now().strftime('%Y/%m/%d')
         s = self.page(int(num))
         link = '/'+db+s+'#'+num  
-        jump = '<p><a href={0}>{0}</a>'.format(link)
+        jump = '<p><a href=/{0}/userdel?job={1}>{2}</a>'.format(db,num,link)
         result = self.application.db['temp'].insert(
             {'comment':com+jump,'time':time,'link':link,'date':date.weekday(datetime.now())})
         self.render('alert.htm',com=com+jump,num=str(result))
