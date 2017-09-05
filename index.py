@@ -90,6 +90,13 @@ class LogoutHandler(BaseHandler):
         
 class NaviHandler(tornado.web.RequestHandler):
     def get(self):  
+        db = self.application.db
+        if 'params' in db.collection_names() == False:
+            item = {"mentenance":false,"out_words":["阿保","馬鹿","死ね"],"password":"admin",
+                    "title2":"<h1 style=color:gray;text-align:center>pybbs<\/h1>",
+                    "bad_words":["<style","<link","<script","<img"],"count":30,
+                    "title":"pybbs","info name":"info"}
+            db['params'].insert(item)
         coll,na = self.name()                
         self.render('top.htm',coll=coll,name=na,full=self.full)
                   
