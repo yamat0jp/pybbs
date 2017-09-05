@@ -280,11 +280,10 @@ class AdminConfHandler(BaseHandler):
         self.redirect('/'+dbname+'/admin/0/')
           
 class UserHandler(tornado.web.RequestHandler):
-    table = None
     def get(self,dbname):
-        self.table = self.application.db[dbname]
+        table = self.application.db[dbname]
         q = self.get_query_argument('job','0',strip=True)
-        num = self.page(int(q))
+        num = self.page(dbname,int(q))
         self.redirect('/{0}{1}#{2}'.format(dbname,num,q))
         
     def post(self,dbname):
@@ -292,22 +291,22 @@ class UserHandler(tornado.web.RequestHandler):
         if number.isdigit() == True:
             num = int(number)
             pas = self.get_argument('password')
-            self.table = self.application.db[dbname]
+            table = self.application.db[dbname]
             obj = self.table.find_one({'number':num})
             if obj and(obj['password'] == pas):
-                self.table.update({'number':num},{'$set':{'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>','raw':''}})
-                self.redirect('/'+dbname+self.page(num)+'#'+number)
+                table.update({'number':num},{'$set':{'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>','raw':''}})
+                redirect('/'+dbname+self.page(num)+'#'+number)
             else:
                 self.redirect('/'+dbname)
                 
-    def page(self,number):
-        if self.table != None:
-            rec = self.table.find({'number':{'$lte':number}}).count()
-            conf = self.application.db['params'].find_one()
-            if self.table.find().count()-rec >= conf['count']:
-                return '/'+str(1+rec//conf['count'])+'/'
-            else:
-                return ''
+    def page(self,table,number):
+        tb = self.application.db[table]
+        rec = tb.find({'number':{'$lte':number}}).count()
+        conf = self.application.db['params'].find_one()
+        if tb.find().count()-rec >= conf['count']:
+            return '/'+str(1+rec//conf['count'])+'/'
+        else:
+            return ''
       
 class SearchHandler(tornado.web.RequestHandler):       
     def post(self,dbname):
@@ -380,15 +379,15 @@ class MasterHandler(BaseHandler):
         
 class AlertHandler(UserHandler):
     def get(self):
-        self.table = self.application.db['master']
+        table = self.application.db['master']
         db = self.get_query_argument('db')
         num = self.get_query_argument('num')
         tb = self.application.db[db].find_one({'number':int(num)})
         com = tb['comment']
         time = datetime.now().strftime('%Y/%m/%d')
-        s = self.page(int(num))
+        s = self.page(db,int(num))
         link = '/'+db+s+'#'+num  
-        jump = '<p><a href=/{0}/userdel?job={1}>{2}</a>'.format(db,num,link)
+        jump = '<p><a href={0}>{0}</a>'.format(link)
         result = self.application.db['temp'].insert(
             {'comment':com+jump,'time':time,'link':link,'date':date.weekday(datetime.now())})
         self.render('alert.htm',com=com+jump,num=str(result))
