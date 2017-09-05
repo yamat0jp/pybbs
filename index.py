@@ -90,13 +90,12 @@ class LogoutHandler(BaseHandler):
         
 class NaviHandler(tornado.web.RequestHandler):
     def get(self):  
-        db = self.application.db
-        if 'params' in db.collection_names() == False:
+        if self.application.collection('params') == False:
             item = {"mentenance":False,"out_words":[u"阿保",u"馬鹿",u"死ね"],"password":"admin",
-                    "title2":"<h1 style=color:gray;text-align:center>pybbs<\/h1>",
+                    "title2":"<h1 style=color:gray;text-align:center>pybbs</h1>",
                     "bad_words":["<style","<link","<script","<img"],"count":30,
                     "title":"pybbs","info name":"info"}
-            db['params'].insert(item)
+            self.application.db['params'].insert(item)
         coll,na = self.name()                
         self.render('top.htm',coll=coll,name=na,full=self.full)
                   
@@ -470,7 +469,7 @@ class Application(tornado.web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
                         'xsrf_cookies':True,
-                        #'debug':True,
+                        'debug':True,
                         'login_url':'/login'
                         }
         tornado.web.Application.__init__(self,handlers,**settings)
