@@ -92,7 +92,7 @@ class NaviHandler(tornado.web.RequestHandler):
     def get(self):  
         db = self.application.db
         if 'params' in db.collection_names() == False:
-            item = {"mentenance":false,"out_words":["阿保","馬鹿","死ね"],"password":"admin",
+            item = {"mentenance":False,"out_words":[u"阿保",u"馬鹿",u"死ね"],"password":"admin",
                     "title2":"<h1 style=color:gray;text-align:center>pybbs<\/h1>",
                     "bad_words":["<style","<link","<script","<img"],"count":30,
                     "title":"pybbs","info name":"info"}
