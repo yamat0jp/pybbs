@@ -402,7 +402,7 @@ class AlertHandler(UserHandler):
         table.remove({'_id':id})
         table.remove({'date':{'$ne':date.weekday(datetime.now())}})
         if self.get_argument('cancel','') == 'cancel':
-            relf.redirct(link)
+            self.redirct(link)
             return
         if com != '':
             tb['comment'] = com+tb['comment']
