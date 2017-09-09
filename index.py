@@ -57,11 +57,14 @@ class IndexHandler(BaseHandler):
             start = len(table)-i
             if start < 0:
                 start = 0
+        bool = (dbname == params['info name'])
         rec = sorted(table.all(),key=lambda x: x['number'])[start:start+i]
+        if bool == True:
+            rec = rec[::-1]
         if len(table) >= 10*i:
             self.render('modules/full.htm',position=pos,records=rec,data=params,db=dbname)
             return
-        if (dbname == params['info name'])and(self.current_user != b'admin'):
+        if (bool == True)and(self.current_user != b'admin'):
             self.render('modules/info.htm',position=pos,records=rec,data=params,db=dbname)
         else:
             self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname,aikotoba=rule)
@@ -99,9 +102,11 @@ class NaviHandler(tornado.web.RequestHandler):
     def name(self):
         names = self.application.db.tables()
         na = self.application.db.get(where('kinds') == 'conf')['info name']
-        for s in ['_default','master','temp',na]:
+        for s in ['_default','master','temp']:
             if s in names:
                 names.remove(s)
+        if na in names:
+            names.remove(na)
         else:
             na = ''
         return sorted(names),na
@@ -206,6 +211,8 @@ class RegistHandler(tornado.web.RequestHandler):
         if error == '':
             if not na:
                 na = u'誰かさん'
+            if sub == '':
+                sub = u'タイトルなし.'
             s = datetime.now()
             reg = {'number':no,'name':na,'title':sub,'comment':text,'raw':com,'password':pw,'date':s.strftime('%Y/%m/%d %H:%M')}
             article.insert(reg)
