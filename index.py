@@ -53,12 +53,16 @@ class IndexHandler(BaseHandler):
             if start < 0:
                 start = 0
         rec = table.find()
-        rec.sort('number')
+        bool = (dbname == params['info name']) 
+        if bool == True:
+            rec.sort('number',-1)
+        else:
+            rec.sort('number')
         rec.skip(start).limit(i)
         if table.count() >= 10*i:
             self.render('modules/full.htm',position=pos,records=rec,data=params,db=dbname)
             return
-        if (dbname == params['info name'])and(self.current_user != b'admin'):
+        if (bool == True)and(self.current_user != b'admin'):
             self.render('modules/info.htm',position=pos,records=rec,data=params,db=dbname)
         else:
             self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname,aikotoba=rule)
