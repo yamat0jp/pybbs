@@ -1,7 +1,15 @@
 <!doctype html>
-<html>
-<head><meta charset=utf-8 name="google-site-verification"  content="5KOTJTKv1HgTtIt0zVGzuyAkADCwXRme-RiiKJ03l3s" />
-	<title>Top Page</title>
+<html class=no-js lang=ja>
+<head>
+	<meta charset=utf-8 name="google-site-verification"  content="5KOTJTKv1HgTtIt0zVGzuyAkADCwXRme-RiiKJ03l3s" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Top Page</title>	
+	<link rel=stylesheet href={{static_url('css/top.css')}}>
+	<link rel=stylesheet href={{static_url('css/normalize.css')}}>
+	<script src=http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js></script>	
+	<script src={{static_url('js/top.js')}}></script>
+	<script src={{static_url('js/modernizr.custom.min.js')}}></script>
+	<script src={{static_url('js/jquery-ui-1.10.3.custom.min.js')}}></script>
 </head>
 <body>
 <div id="fb-root"></div>
@@ -13,13 +21,33 @@
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 <header><h1 style=text-align:center>無料電子掲示板へようこそ</h1></header>
+{% set d = 0 %}
+<div class=slideshow>
+	<div class=slideshow-slides>
 {% for x in coll %}
+	{% if d % 5 == 0 %}
+		<div class=slide>
+	{% end %}
+	{% set d += 1 %}
 	{% if full(x) == True %}
 	<p><a href=/{{x}} style=color:red>{{x}}</a>
 	{% else %}
 	<p><a href=/{{x}}>{{x}}</a>
 	{% end %}
+	{% if d % 5 == 0 %}
+		</div>
+	{% end %}
 {% end %}
+{% if d % 5 != 0 %}
+	</div>
+{% end %}
+	</div>
+	<div class=slideshow-nav>
+	<a href=# class=prev>prev</a>
+	<a href=# class=next>next</a>
+	</div>
+	<div class=slideshow-indicator></div>
+</div>
 {% if name != '' %}
 	<p>[ <a href=/{{name}}>{{name}}</a> ] <=お知らせ
 {% end %}
