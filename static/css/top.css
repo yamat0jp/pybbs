@@ -1,10 +1,8 @@
 
 .slideshow {
-	background-color:rgb(50,50,50);
+	background-color:rgb(225,225,225);
 	height:465px;
 	min-width:960px;
-	border: solid 1px black;
-	outline-style:dotted;
 	overflow:hidden;
 	position:relative
 }
@@ -12,14 +10,14 @@
 .slideshow-slides {
 	height:100%;
 	position:absolute;
-	width:100%
+	width:100%;
 }
 
 .slideshow-slides .slide {
 	height:100%;
-	overflow:hidden;
+	overflow:auto;
 	position:absolute;
-	width:100%
+	width:100%;
 }
 
 .slideshow-nav a,

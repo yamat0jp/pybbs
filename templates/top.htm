@@ -22,10 +22,11 @@
 }(document, 'script', 'facebook-jssdk'));</script>
 <header><h1 style=text-align:center>無料電子掲示板へようこそ</h1></header>
 {% set d = 0 %}
+{% set i = 10 %}
 <div class=slideshow>
 	<div class=slideshow-slides>
 {% for x in coll %}
-	{% if d % 5 == 0 %}
+	{% if d % i == 0 %}
 		<div class=slide>
 	{% end %}
 	{% set d += 1 %}
@@ -34,11 +35,11 @@
 	{% else %}
 	<p><a href=/{{x}}>{{x}}</a>
 	{% end %}
-	{% if d % 5 == 0 %}
+	{% if d % i == 0 %}
 		</div>
 	{% end %}
 {% end %}
-{% if d % 5 != 0 %}
+{% if d % i != 0 %}
 	</div>
 {% end %}
 	</div>

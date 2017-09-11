@@ -46,9 +46,9 @@ $(function(){
 				.eq(currentIndex).addClass('active');
 		}
 		
-		function startTimver(){
+		function startTimer(){
 			timer = setInterval(function(){
-				var nextIndex = (currentIndex+1)%slideCount;
+				var nextIndex = (currentIndex+1) % slideCount;
 				goToSlide(nextIndex);
 			},interval);
 		}
@@ -75,16 +75,10 @@ $(function(){
 			}
 		});
 		
-		/*
-		$container.on({
-			'mouseenter':stopTimer(),
-			'mouseleave':startTimer()
-		});
-		*/
 
+		
 		goToSlide(currentIndex);
 	
-		startTimer();	
 	
 	});
 	
