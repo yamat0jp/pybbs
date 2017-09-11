@@ -29,7 +29,7 @@
 
 .slideshow-nav a:before,
 .slideshow-indicator a:before {
-	content:url(../img/sprites.png);
+	content:url(static/img/sprites.png);
 	display:inline-block;
 	font-size:0;
 	line-height:0
@@ -53,7 +53,7 @@
 }
 
 .slideshow-nav a.next {
-	margin-left:480px
+	margin-left:408px
 }
 
 .slideshow-nav a.next:before {
