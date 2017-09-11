@@ -1,8 +1,8 @@
 
 .slideshow {
-	width:200px;
-	height:400px;
-	display:inline-block;
+	background-color:rgb(50,50,50);
+	height:465px;
+	min-width:960px;
 	border: solid 1px black;
 	outline-style:dotted;
 	overflow:hidden;
@@ -29,7 +29,7 @@
 
 .slideshow-nav a:before,
 .slideshow-indicator a:before {
-	content:url(static/img/sprites.png);
+	content:url(../img/sprites.png);
 	display:inline-block;
 	font-size:0;
 	line-height:0
@@ -109,7 +109,7 @@
 	position:static
 }
 
-.no-js .slideshow-slides .slide .box {
+.no-js .slideshow-slides .slide .box{
 	margin:auto;
 	position:static
 }

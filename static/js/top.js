@@ -19,6 +19,7 @@ $(function(){
 			$(this).css({left:100*i+'%'});
 			indicatorHTML += '<a href="#">'+(i+1)+'</a>';
 		});
+		
 		$indicator.html(indicatorHTML);
 		
 		
@@ -33,15 +34,15 @@ $(function(){
 				$navNext = $nav.find('.next');
 			if (currentIndex === 0){
 				$navPrev.addClass('disabled');
-			}else{
+			} else {
 				$navPrev.removeClass('disabled');
 			}
 			if (currentIndex === slideCount-1){
 				$navNext.addClass('disabled');
-			} else{
+			} else {
 				$navNext.removeClass('disabled');
 			}
-			$indecator.find('a').removeClass('active')
+			$indicator.find('a').removeClass('active')
 				.eq(currentIndex).addClass('active');
 		}
 		
@@ -60,9 +61,9 @@ $(function(){
 		
 		$nav.on('click','a',function(event){
 			event.preventDefault();
-			if ($(this).hasClass('Prev')){
+			if ($(this).hasClass('prev')){
 				goToSlide(currentIndex-1);
-			}else{
+			} else {
 				goToSlide(currentIndex+1);
 			}
 		});
@@ -74,15 +75,17 @@ $(function(){
 			}
 		});
 		
+		/*
 		$container.on({
-			mouseenter:stopTimer,
-			mouseleave:startTimer
+			'mouseenter':stopTimer(),
+			'mouseleave':startTimer()
 		});
-		
+		*/
+
 		goToSlide(currentIndex);
-		
-		startTimer();
-	});
 	
+		startTimer();	
+	
+	});
 	
 });
