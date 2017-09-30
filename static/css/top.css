@@ -6,10 +6,6 @@
 	overflow:hidden;
 	position:relative
 	}
-.slideshow .slide img {
-	float:right;
-	height:465px
-	}
 .slideshow-nav a.prev {
 	margin-left:-480px
 	}

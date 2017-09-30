@@ -28,7 +28,7 @@
 {% for x in coll %}
 	{% if d % i == 0 %}
 		<div class=slide>
-	<img src={{static_url('img/slide{0}.jpg'.format(1+d//i))}}>
+	<img src={{static_url('img/slide{0}.jpg'.format(1+d//i))}} style=float:right;height:465px>
 	{% end %}
 	{% set d += 1 %}
 	{% if full(x) == True %}
