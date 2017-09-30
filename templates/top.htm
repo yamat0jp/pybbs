@@ -28,7 +28,7 @@
 {% for x in coll %}
 	{% if d % i == 0 %}
 		<div class=slide>
-		<img src={{static_url('img/slide{0}.jpg'.format(1+d//i))}} alt="" height=465 style=float:right>
+	<img src={{static_url('img/slide{0}.jpg'.format(1+d//i))}}>
 	{% end %}
 	{% set d += 1 %}
 	{% if full(x) == True %}
@@ -54,10 +54,8 @@
 	<p>[ <a href=/{{name}}>{{name}}</a> ] <=お知らせ
 {% end %}
 <p>[ <a href=/master>master</a> ] <=管理人
-<div class="fb-like" data-href="http://pybbs.herokuapp.com" data-layout="box_count" data-action="like" data-size="small" data-show-faces="true" data-share="false"></div>
-<p><a href="http://www.xn--gckj5d1ktb3488cn4q.jp/" target="_blank"><img alt="無料カウンター" src="http://www.xn--gckj5d1ktb3488cn4q.jp/counter.php?id=pybbs" border="0"></a>
+<div class="fb-like" data-href="http://pybbs.herokuapp.com" data-layout="box_count" data-action="like" data-size="small" data-show-faces="true" data-share="false"></div><footer>
 <p><br>
-<footer>
 <p><a href=/title>タイトル表示</a>
 <p><a href=/help>使い方案内</a>
 <p>PR リンク
