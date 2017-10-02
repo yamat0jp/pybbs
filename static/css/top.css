@@ -8,6 +8,9 @@
 }
 @media only screen and (max-width:899px)
 and (min-width:600px){
+header h1 {
+	font-size:1em
+	}
 .slideshow .slide img {
 	display:none
 	}
@@ -19,6 +22,9 @@ and (min-width:600px){
 	}
 }
 @media only screen and (max-width:599px){
+header h1 {
+	font-size:1em
+	}
 .slideshow .slide img {
 	display:none
 	}
@@ -31,7 +37,7 @@ and (min-width:600px){
 }
 
 .slideshow {
-	background-color:rgb(225,225,225);
+	background-color:rgb(255,225,225);
 	height:465px;
 	overflow:hidden;
 	position:relative
@@ -48,6 +54,10 @@ and (min-width:600px){
 	overflow:auto;
 	position:absolute;
 	width:100%;
+}
+
+.slide p {
+	font-size:1.5em
 }
 
 .slideshow-nav a,
