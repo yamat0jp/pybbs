@@ -57,6 +57,10 @@ header h1 {
 	width:100%;
 }
 
+.slide p {
+	font-size:1.5em
+}
+
 .slideshow-nav a,
 .slideshow-indicator a {
 	overflow:hidden
