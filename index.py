@@ -441,6 +441,7 @@ class ArticleApi(tornado.web.RequestHandler):
         else:
             del response['_id']
             del response['comment']
+            del response['password']
         self.write(json.dumps(response,ensure_ascii=False))      
             
     def post(self,dbname,name,title,article):
