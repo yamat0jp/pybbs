@@ -503,4 +503,4 @@ class Application(tornado.web.Application):
 
 app = Application()
 conn = pymongo.MongoClient(os.environ['MONGODB_URI'],13678)
-app.db = conn.heroku_n905jfw2
+app.db = conn[os.environ['DB_ACCOUNT']]
