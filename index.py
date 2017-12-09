@@ -91,6 +91,11 @@ class LogoutHandler(BaseHandler):
     def get(self):
         self.clear_current_user()
         self.redirect('/login')
+ 
+class JumpHandler(BaseHandler):
+    def get(self):
+        self.clear_current_user()
+        self.redirect('/')
         
 class NaviHandler(tornado.web.RequestHandler):
     def get(self):  
@@ -371,7 +376,7 @@ class HelpHandler(tornado.web.RequestHandler):
         db = self.application.db['master']
         db.insert({'comment':com,'time':time.strftime('%Y/%m/%d')})
         self.render('help.htm',req='送信しました')
-    
+       
 class MasterHandler(BaseHandler):
     @tornado.web.authenticated  
     def get(self):
@@ -380,7 +385,7 @@ class MasterHandler(BaseHandler):
             self.render('master.htm',com=com)
         else:
             raise tornado.web.HTTPError(404)
-        
+    
 class AlertHandler(UserHandler):
     def get(self):
         table = self.application.db['master']
@@ -464,7 +469,7 @@ class Application(tornado.web.Application):
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),
                     (r'/write/api/([a-zA-Z0-9_]+)/()/()/()',ArticleApi),(r'/list/api/([a-zA-Z0-9]+)',ListApi),
-                    (r'/help',HelpHandler),(r'/master',MasterHandler),(r'/alert',AlertHandler),
+                    (r'/help',HelpHandler),(r'/master',MasterHandler),(r'/alert',AlertHandler),(r'/jump',JumpHandler),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
