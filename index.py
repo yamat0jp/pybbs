@@ -502,6 +502,5 @@ class Application(tornado.web.Application):
         return name
 
 app = Application()
-MONGOLAB_URI = 'mongodb://kainushi:1234abcd@ds113678.mlab.com:13678/heroku_n905jfw2'
-conn = pymongo.MongoClient(MONGOLAB_URI,13678)
+conn = pymongo.MongoClient(os.environ['MONGODB_URI'],13678)
 app.db = conn.heroku_n905jfw2
