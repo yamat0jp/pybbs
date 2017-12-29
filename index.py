@@ -2,10 +2,15 @@
 import os,re,urllib
 import tornado.escape
 import tornado.web
+import tornado.ioloop
+from tornado.options import define,options
 import pymongo
 from datetime import datetime,date
 import json
 from bson.objectid import ObjectId
+
+define("port", default=5000, help="run on the given port", type=int)
+tornado.options.parse_command_line()
 
 class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
