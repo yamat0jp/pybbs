@@ -1,1 +1,1 @@
-web: gunicorn -k tornado index:app
+web: python index.py --port=$PORT

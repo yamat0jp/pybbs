@@ -505,7 +505,9 @@ class Application(tornado.web.Application):
             if x in name:
                 name.remove(x)
         return name
-
-app = Application()
-conn = pymongo.MongoClient(os.environ['MONGODB_URI'],13678)
-app.db = conn[os.environ['DB_ACCOUNT']]
+if __name__ == '__main__':
+    app = Application()
+    conn = pymongo.MongoClient(os.environ['MONGODB_URI'],13678)
+    app.db = conn[os.environ['DB_ACCOUNT']]
+    app.listen(tornado.options.options.port)
+tornado.ioloop.IOLoop.current().start()
