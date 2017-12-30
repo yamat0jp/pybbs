@@ -7,9 +7,9 @@ from datetime import datetime,date
 import json
 
 define("port", default=5000, help="run on the given port", type=int)
-tornado.options.parse_command_line()
+options.parse_command_line()
 
-class BaseHandler(tornado.web.RequestHandler):
+class BaseHandler(web.RequestHandler):
     def get_current_user(self):
         user = self.get_secure_cookie('admin_user')
         return tornado.escape.utf8(user)
@@ -32,7 +32,7 @@ class IndexHandler(BaseHandler):
                 coll.insert({})
                 coll.remove({})
             else:
-                raise tornado.web.HTTPError(404)
+                raise web.HTTPError(404)
                 return
         key = self.get_argument('key','')
         if key:
@@ -99,7 +99,7 @@ class JumpHandler(BaseHandler):
         self.clear_current_user()
         self.redirect('/')
         
-class NaviHandler(tornado.web.RequestHandler):
+class NaviHandler(web.RequestHandler):
     def get(self):  
         if self.application.collection('params') == False:
             item = {"mentenance":False,"out_words":[u"阿保",u"馬鹿",u"死ね"],"password":"admin",
@@ -164,7 +164,7 @@ class TitleHandler(NaviHandler):
                 item['date2'] = j+31*(i.month-1)+i.day
             yield item
         
-class RegistHandler(tornado.web.RequestHandler):
+class RegistHandler(web.RequestHandler):
     def post(self,dbname):
         if self.application.collection(dbname) == False:
             raise tornado.web.HTTPError(404)
@@ -243,7 +243,7 @@ class RegistHandler(tornado.web.RequestHandler):
         return text
     
 class AdminHandler(BaseHandler):
-    @tornado.web.authenticated               
+    @web.authenticated               
     def get(self,dbname,page='0'):
         if dbname == '':
             dbname = self.get_argument('record','')
@@ -268,7 +268,7 @@ class AdminHandler(BaseHandler):
         self.render('modules/admin.htm',position=pos,records=rec,mente=check,password=mente['password'],db=dbname)
 
 class AdminConfHandler(BaseHandler):
-    @tornado.web.authenticated
+    @web.authenticated
     def post(self,dbname,func):
         if func == 'set':
             param = self.application.db['params'].find_one()
@@ -290,7 +290,7 @@ class AdminConfHandler(BaseHandler):
                 table.remove({'number':int(x)})
         self.redirect('/'+dbname+'/admin/0/')
           
-class UserHandler(tornado.web.RequestHandler):
+class UserHandler(web.RequestHandler):
     def get(self,dbname):
         table = self.application.db[dbname]
         q = self.get_query_argument('job','0',strip=True)
@@ -319,7 +319,7 @@ class UserHandler(tornado.web.RequestHandler):
         else:
             return ''
       
-class SearchHandler(tornado.web.RequestHandler):       
+class SearchHandler(web.RequestHandler):       
     def post(self,dbname):
         arg = self.get_argument('word1')
         self.word = arg
@@ -364,7 +364,7 @@ class SearchHandler(tornado.web.RequestHandler):
             for x in table.find({'$or':[{'name':element[0]},{'name':element[1]},{'name':element[2]}]}):
                 yield x  
                 
-class HelpHandler(tornado.web.RequestHandler):
+class HelpHandler(web.RequestHandler):
     def get(self):
         self.render('help.htm',req='')
     
@@ -380,7 +380,7 @@ class HelpHandler(tornado.web.RequestHandler):
         self.render('help.htm',req='送信しました')
        
 class MasterHandler(BaseHandler):
-    @tornado.web.authenticated  
+    @web.authenticated  
     def get(self):
         if self.current_user == b'admin':
             com = self.application.db['master'].find()
@@ -421,11 +421,11 @@ class AlertHandler(UserHandler):
         table.insert(tb)
         self.redirect(link)
                                         
-class FooterModule(tornado.web.UIModule):
+class FooterModule(web.UIModule):
     def render(self,number,url,link):
         return self.render_string('modules/footer.htm',index=number,url=url,link=link)
     
-class HeadlineApi(tornado.web.RequestHandler):
+class HeadlineApi(web.RequestHandler):
     def get(self):
         response = {}
         for coll in self.application.coll():
@@ -438,7 +438,7 @@ class HeadlineApi(tornado.web.RequestHandler):
             response[coll] = mydict                 
         self.write(json.dumps(response,ensure_ascii=False))
         
-class ArticleApi(tornado.web.RequestHandler):
+class ArticleApi(web.RequestHandler):
     def get(self,dbname,number):
         if self.application.collection(dbname) == True:
             table = self.application.db[dbname]
@@ -455,7 +455,7 @@ class ArticleApi(tornado.web.RequestHandler):
         coll = self.application.db[dbname] 
         coll.insert({'name':name,'title':title,'comment':article})
         
-class ListApi(tornado.web.RequestHandler):
+class ListApi(web.RequestHandler):
     def get(self,dbname):
         if self.application.collection(dbname) == True:
             table = self.application.db[dbname]
@@ -466,7 +466,7 @@ class ListApi(tornado.web.RequestHandler):
             response = {}
         self.write(json.dumps(response,ensure_ascii=False))
            
-class Application(tornado.web.Application):    
+class Application(web.Application):    
     def __init__(self):
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),
@@ -483,7 +483,7 @@ class Application(tornado.web.Application):
                         #'debug':True,
                         'login_url':'/login'
                         }
-        tornado.web.Application.__init__(self,handlers,**settings)
+        web.Application.__init__(self,handlers,**settings)
  
     def gpos(self,dbname,page):
         params = self.db['params'].find_one()
@@ -511,5 +511,5 @@ if __name__ == '__main__':
     app = Application()
     conn = pymongo.MongoClient(os.environ['MONGODB_URI'],13678)
     app.db = conn[os.environ['DB_ACCOUNT']]
-    app.listen(tornado.options.options.port)
-tornado.ioloop.IOLoop.current().start()
+    app.listen(options.port)
+ioloop.IOLoop.current().start()
