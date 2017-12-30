@@ -6,9 +6,6 @@ import pymongo
 from datetime import datetime,date
 import json
 
-define("port", default=5000, help="run on the given port", type=int)
-options.parse_command_line()
-
 class BaseHandler(web.RequestHandler):
     def get_current_user(self):
         user = self.get_secure_cookie('admin_user')
@@ -507,9 +504,12 @@ class Application(web.Application):
             if x in name:
                 name.remove(x)
         return name
+    
 if __name__ == '__main__':
+    define("port", default=5000, help="run on the given port", type=int)
+    options.parse_command_line()
     app = Application()
     conn = pymongo.MongoClient(os.environ['MONGODB_URI'],13678)
     app.db = conn[os.environ['DB_ACCOUNT']]
     app.listen(options.port)
-ioloop.IOLoop.current().start()
+    ioloop.IOLoop.current().start()
