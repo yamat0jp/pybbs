@@ -1,11 +1,7 @@
 
 import os.path
 import shutil,re
-import tornado.escape
-import tornado.web
-import tornado.httpserver
-import tornado.ioloop
-import tornado.options
+from tornado import escape,web,httpserver,ioloop
 from tornado.options import define,options
 from tinydb import TinyDB,Query,where
 from tinydb.operations import delete
@@ -14,10 +10,10 @@ import json
 
 define('port',default=8000,help='run on the given port',type=int)
 
-class BaseHandler(tornado.web.RequestHandler):
+class BaseHandler(web.RequestHandler):
     def get_current_user(self):
         user = self.get_secure_cookie('admin_user')
-        return tornado.escape.utf8(user)
+        return escape.utf8(user)
     
     def set_current_user(self,username):
         self.set_secure_cookie('admin_user',username)
@@ -35,7 +31,7 @@ class IndexHandler(BaseHandler):
             if self.current_user == b'admin':
                 self.application.db.table(dbname)
             else:
-                raise tornado.web.HTTPError(404)
+                raise web.HTTPError(404)
                 return
         key = self.get_argument('key','')
         if key:
@@ -45,11 +41,11 @@ class IndexHandler(BaseHandler):
                 self.render('article.htm',record=rec)
                 return
             else:
-                raise tornado.web.HTTPError(404)
+                raise web.HTTPError(404)
                 return
         i = params['count']      
-        rule = tornado.escape.url_unescape(self.get_cookie('aikotoba',''))
-        na = tornado.escape.url_unescape(self.get_cookie("username",u"誰かさん"))
+        rule = escape.url_unescape(self.get_cookie('aikotoba',''))
+        na = escape.url_unescape(self.get_cookie("username",u"誰かさん"))
         pos = self.application.gpos(dbname,page)
         table = self.application.db.table(dbname)
         start = (pos-1)*i
@@ -94,7 +90,7 @@ class LogoutHandler(BaseHandler):
         self.clear_current_user()
         self.redirect('/login')
         
-class NaviHandler(tornado.web.RequestHandler):              
+class NaviHandler(web.RequestHandler):              
     def get(self):
         col,na = self.name()
         if self.application.collection('params') == False:
@@ -164,10 +160,10 @@ class TitleHandler(NaviHandler):
                 item['date2'] = j+31*(i.month-1)+i.day
             yield item
         
-class RegistHandler(tornado.web.RequestHandler):
+class RegistHandler(web.RequestHandler):
     def post(self,dbname):
         if self.application.collection(dbname) == False:
-            raise tornado.web.HTTPError(404)
+            raise web.HTTPError(404)
             return
         self.database = dbname
         rec = self.application.db.get(where('kinds') == 'conf')
@@ -240,12 +236,12 @@ class RegistHandler(tornado.web.RequestHandler):
         return text
     
 class AdminHandler(BaseHandler):
-    @tornado.web.authenticated               
+    @web.authenticated               
     def get(self,dbname,page):
         if dbname == '':
             dbname = self.get_argument('record','')
         if self.application.collection(dbname) == False:
-            raise tornado.web.HTTPError(404)
+            raise web.HTTPError(404)
             return
         table = self.application.db.table(dbname) 
         rec = sorted(table.all(),key=lambda x: x['number'])                   
@@ -264,7 +260,7 @@ class AdminHandler(BaseHandler):
         self.render('modules/admin.htm',position=pos,records=rec[start:start+i],mente=check,password=mente['password'],db=dbname)
 
 class AdminConfHandler(BaseHandler):
-    @tornado.web.authenticated
+    @web.authenticated
     def post(self,dbname,func):
         if func == 'set':
             param = self.application.db.get(where('kinds') == 'conf')['mentenance']
@@ -303,7 +299,7 @@ class AdminConfHandler(BaseHandler):
                     table = database.table(x)
                     table.insert_multiple(bak.table(x).all())
           
-class UserHandler(tornado.web.RequestHandler):
+class UserHandler(web.RequestHandler):
     table = None
     def get(self,dbname):
         self.table = self.application.db.table(dbname)
@@ -337,7 +333,7 @@ class UserHandler(tornado.web.RequestHandler):
             else:
                 return ''
       
-class SearchHandler(tornado.web.RequestHandler):       
+class SearchHandler(web.RequestHandler):       
     def post(self,dbname):
         arg = self.get_argument('word1')
         self.word = arg 
@@ -347,7 +343,7 @@ class SearchHandler(tornado.web.RequestHandler):
     
     def get(self,dbname):
         if self.application.collection(dbname) == False:
-            raise tornado.web.HTTPError(404)
+            raise web.HTTPError(404)
             return
         self.render('modules/search.htm',records=[],word1='',db=dbname)
         
@@ -378,11 +374,11 @@ class SearchHandler(tornado.web.RequestHandler):
             for x in table.search(query):
                 yield x
                                         
-class FooterModule(tornado.web.UIModule):
+class FooterModule(web.UIModule):
     def render(self,number,url,link):
         return self.render_string('modules/footer.htm',index=number,url=url,link=link)
     
-class HeadlineApi(tornado.web.RequestHandler):
+class HeadlineApi(web.RequestHandler):
     def get(self):
         response = {}
         for x in self.application.db.tables():
@@ -399,7 +395,7 @@ class HeadlineApi(tornado.web.RequestHandler):
             rec = sorted(table.all(),key=lambda x: x['number'])[i-1]
             return {'number':rec['number'],'title':rec['title'],'name':rec['name'],'comment':rec['raw'][0:19]}
         
-class ArticleApi(tornado.web.RequestHandler):
+class ArticleApi(web.RequestHandler):
     def get(self,dbname,number):
         if self.application.collection(dbname) == True:
             table = self.application.db.table(dbname)
@@ -410,7 +406,7 @@ class ArticleApi(tornado.web.RequestHandler):
                 del response['comment']
             self.write(json.dumps(response,ensure_ascii=False))
         else:
-            tornado.web.HTTPError(404)
+            web.HTTPError(404)
     
     def post(self,dbname):
         name = self.get_argument('name',u'誰かさん')
@@ -419,7 +415,7 @@ class ArticleApi(tornado.web.RequestHandler):
         table = self.application.db.table(dbname)
         table.insert({'name':name,'title':title,'comment':comment})
         
-class HelpHandler(tornado.web.RequestHandler):
+class HelpHandler(web.RequestHandler):
     def get(self):
         self.render('help.htm',req='') 
         
@@ -438,13 +434,13 @@ class HelpHandler(tornado.web.RequestHandler):
         self.render('help.htm',req=req)
         
 class MasterHandler(BaseHandler):
-    @tornado.web.authenticated
+    @web.authenticated
     def get(self):
         if self.current_user == b'admin':
             com = self.application.db.table('master').all()
             self.render('master.htm',com=com)
         else:
-            raise tornado.web.HTTPError(404)
+            raise web.HTTPError(404)
         
 class AlertHandler(UserHandler):
     def get(self):
@@ -476,7 +472,7 @@ class AlertHandler(UserHandler):
             table.insert(tb)
         self.redirect(link)
         
-class Application(tornado.web.Application):    
+class Application(web.Application):    
     def __init__(self):
         self.db = TinyDB(st.json)             
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
@@ -493,7 +489,7 @@ class Application(tornado.web.Application):
                         'debug':True,
                         'login_url':'/login'
                         }
-        tornado.web.Application.__init__(self,handlers,**settings)
+        web.Application.__init__(self,handlers,**settings)
  
     def gpos(self,dbname,page):
         params = self.db.get(where('kinds') == 'conf')
@@ -516,7 +512,7 @@ class static():
 
 st = static()
 if __name__ == '__main__':
-    tornado.options.parse_command_line()
-    http_server = tornado.httpserver.HTTPServer(Application())
+    options.parse_command_line()
+    http_server = httpserver.HTTPServer(Application())
     http_server.listen(options.port)
-    tornado.ioloop.IOLoop.instance().start()
+    ioloop.IOLoop.instance().start()
