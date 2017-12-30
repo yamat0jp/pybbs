@@ -12,7 +12,7 @@ options.parse_command_line()
 class BaseHandler(web.RequestHandler):
     def get_current_user(self):
         user = self.get_secure_cookie('admin_user')
-        return tornado.escape.utf8(user)
+        return escape.utf8(user)
     
     def set_current_user(self,username):
         self.set_secure_cookie('admin_user',username)
@@ -42,11 +42,11 @@ class IndexHandler(BaseHandler):
                 self.render('article.htm',record=rec)
                 return
             else:
-                tornado.web.HTTPError(404)
+                web.HTTPError(404)
                 return
         i = params['count']      
-        rule = tornado.escape.url_unescape(self.get_cookie('aikotoba',''))
-        na = tornado.escape.url_unescape(self.get_cookie("username",u"誰かさん"))
+        rule = escape.url_unescape(self.get_cookie('aikotoba',''))
+        na = escape.url_unescape(self.get_cookie("username",u"誰かさん"))
         pos = self.application.gpos(dbname,page)
         table = self.application.db[dbname]
         start = (pos-1)*i
@@ -167,7 +167,7 @@ class TitleHandler(NaviHandler):
 class RegistHandler(web.RequestHandler):
     def post(self,dbname):
         if self.application.collection(dbname) == False:
-            raise tornado.web.HTTPError(404)
+            raise web.HTTPError(404)
             return
         self.database = dbname
         rec = self.application.db['params'].find_one()
@@ -221,11 +221,11 @@ class RegistHandler(web.RequestHandler):
             item = items.sort('number')[article.count()-1]
             no = item['number']+1
         if error == '':
-            self.set_cookie('aikotoba',tornado.escape.url_escape(rule))
+            self.set_cookie('aikotoba',escape.url_escape(rule))
             s = datetime.now()
             reg = {'number':no,'name':na,'title':sub,'comment':text,'raw':com,'password':pw,'date':s.strftime('%Y/%m/%d %H:%M')}
             article.insert(reg)
-            self.set_cookie('username',tornado.escape.url_escape(na))
+            self.set_cookie('username',escape.url_escape(na))
             self.redirect('/'+dbname+'#article')
         else:
             self.render('regist.htm',content=error)
@@ -248,7 +248,7 @@ class AdminHandler(BaseHandler):
         if dbname == '':
             dbname = self.get_argument('record','')
         if self.application.collection(dbname) == False:
-            raise tornado.web.HTTPError(404)
+            raise web.HTTPError(404)
             return
         table = self.application.db[dbname] 
         rec = table.find().sort('number')                   
@@ -329,7 +329,7 @@ class SearchHandler(web.RequestHandler):
     
     def get(self,dbname):
         if self.application.collection(dbname) == False:
-            raise tornado.web.HTTPError(404)
+            raise web.HTTPError(404)
             return
         self.render('modules/search.htm',records=[],word1='',db=dbname)
         
@@ -386,7 +386,7 @@ class MasterHandler(BaseHandler):
             com = self.application.db['master'].find()
             self.render('master.htm',com=com)
         else:
-            raise tornado.web.HTTPError(404)
+            raise web.HTTPError(404)
     
 class AlertHandler(UserHandler):
     def get(self):
