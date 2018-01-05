@@ -510,8 +510,8 @@ class static():
     json = 'static/db/db.json'
     bak = 'static/db/bak.json'
 
-st = static()
 if __name__ == '__main__':
+    st = static()
     options.parse_command_line()
     http_server = httpserver.HTTPServer(Application())
     http_server.listen(options.port)
