@@ -2,13 +2,10 @@
 import os.path
 import shutil,re
 from tornado import escape,web,httpserver,ioloop
-from tornado.options import define,options
 from tinydb import TinyDB,Query,where
 from tinydb.operations import delete
 from datetime import datetime,date
 import json
-
-define('port',default=8000,help='run on the given port',type=int)
 
 class BaseHandler(web.RequestHandler):
     def get_current_user(self):
@@ -512,7 +509,6 @@ class static():
 
 if __name__ == '__main__':
     st = static()
-    options.parse_command_line()
     http_server = httpserver.HTTPServer(Application())
-    http_server.listen(options.port)
+    http_server.listen(8888)
     ioloop.IOLoop.instance().start()
