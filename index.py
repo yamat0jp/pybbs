@@ -1,10 +1,11 @@
 
 import os,re
-from tornado import escape,web,ioloop
+from tornado import escape,web,ioloop,httpserver
 import pymongo
 from datetime import datetime,date
 import json
 from bson.objectid import ObjectId #don't remove
+from tornado.options import define,options
 
 class BaseHandler(web.RequestHandler):
     def get_current_user(self):
@@ -504,8 +505,11 @@ class Application(web.Application):
         return name
     
 if __name__ == '__main__':
+    define('port',default=5000,help='run on the given port',type=int)
+    options.parse_command_line()
     app = Application()
+    http_server = httpserver.HTTPServer(app)
     conn = pymongo.MongoClient(os.environ['MONGODB_URI'],13678)
     app.db = conn[os.environ['DB_ACCOUNT']]
-    app.listen(5000)
-    ioloop.IOLoop.current().start()
+    http_server.listen(options.port)
+    ioloop.IOLoop.instance().start()
