@@ -215,7 +215,7 @@ class RegistHandler(web.RequestHandler):
             s = datetime.now()
             reg = {'number':no,'name':na,'title':sub,'comment':text,'raw':com,'password':pw,'date':s.strftime('%Y/%m/%d %H:%M')}
             article.insert(reg)
-            self.set_cookie('username',tornado.escape.url_escape(na))
+            self.set_cookie('username',escape.url_escape(na))
             self.redirect('/'+dbname+'#article')
         else:
             self.render('regist.htm',content=error)
