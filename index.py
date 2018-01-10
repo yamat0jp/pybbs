@@ -4,6 +4,7 @@ from tornado import escape,web,ioloop
 import pymongo
 from datetime import datetime,date
 import json
+from bson.objectid import ObjectId #don't remove
 
 class BaseHandler(web.RequestHandler):
     def get_current_user(self):
@@ -288,7 +289,6 @@ class AdminConfHandler(BaseHandler):
           
 class UserHandler(web.RequestHandler):
     def get(self,dbname):
-        table = self.application.db[dbname]
         q = self.get_query_argument('job','0',strip=True)
         num = self.page(dbname,int(q))
         self.redirect('/{0}{1}#{2}'.format(dbname,num,q))
@@ -299,10 +299,10 @@ class UserHandler(web.RequestHandler):
             num = int(number)
             pas = self.get_argument('password')
             table = self.application.db[dbname]
-            obj = self.table.find_one({'number':num})
+            obj = table.find_one({'number':num})
             if obj and(obj['password'] == pas):
                 table.update({'number':num},{'$set':{'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>','raw':''}})
-                redirect('/'+dbname+self.page(num)+'#'+number)
+                self.redirect('/'+dbname+self.page(dbname,num)+'#'+number)
             else:
                 self.redirect('/'+dbname)
                 
@@ -386,7 +386,6 @@ class MasterHandler(BaseHandler):
     
 class AlertHandler(UserHandler):
     def get(self):
-        table = self.application.db['master']
         db = self.get_query_argument('db')
         num = self.get_query_argument('num')
         tb = self.application.db[db].find_one({'number':int(num)})
@@ -508,4 +507,5 @@ if __name__ == '__main__':
     app = Application()
     conn = pymongo.MongoClient(os.environ['MONGODB_URI'],13678)
     app.db = conn[os.environ['DB_ACCOUNT']]
+    app.listen(5000)
     ioloop.IOLoop.current().start()
