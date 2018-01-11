@@ -318,7 +318,8 @@ class UserHandler(web.RequestHandler):
 class SearchHandler(web.RequestHandler):       
     def post(self,dbname):
         arg = self.get_argument('word1')
-        self.word = arg
+        self.word = arg[:]
+        self.andor = self.get_argument('type')
         self.radiobox = self.get_argument('filter')       
         rec = sorted(self.search(dbname),key=lambda x: x['number'])
         self.render('modules/search.htm',records=rec,word1=arg,db=dbname)
@@ -331,6 +332,7 @@ class SearchHandler(web.RequestHandler):
         
     def search(self,dbname):
         table = self.application.db[dbname]    
+        andor = self.andor == 'OR'
         element = self.word.split()
         if len(element) == 0:
             element = ['']
@@ -339,18 +341,25 @@ class SearchHandler(web.RequestHandler):
         elm = []
         for i in range(3):
             elm.append(re.escape(element[i]))
-        if self.radiobox == 'comment':    
-            for x in table.find({'$or':[{'raw':re.compile(elm[0],re.IGNORECASE)},
-                                        {'raw':re.compile(elm[1],re.IGNORECASE)},
-                                        {'raw':re.compile(elm[2],re.IGNORECASE)}
-                                        ]}):
+        if self.radiobox == 'comment':
+            query = [{'raw':re.compile(elm[0],re.IGNORECASE)},
+                        {'raw':re.compile(elm[1],re.IGNORECASE)},
+                        {'raw':re.compile(elm[2],re.IGNORECASE)}
+                        ]
+            if andor:    
+                result = table.find({'$or':query})
+                color = 'yellow'
+            else:
+                result = table.find({'$and':query})
+                color = 'aqua'
+            for x in result:
                 com = ''
                 for text in x['raw'].splitlines(True):
                     if re.match(' ',text):
                         text = text.replace(' ','&nbsp;',1)                  
                     for i in range(3):                        
                         if element[i].lower() in text.lower():
-                            com = com +'<p style=background-color:yellow>'+text+'<br></p>'  
+                            com = com +'<p style=background-color:'+color+'>'+text+'<br></p>'  
                             break                          
                     else:
                         com = com+'<p>'+text+'<br></p>'
