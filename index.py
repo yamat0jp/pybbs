@@ -347,13 +347,19 @@ class SearchHandler(web.RequestHandler):
         
     def search(self,dbname):
         table = self.application.db.table(dbname)    
+        andor = self.andor == 'OR'    
         element = self.word.split()
         if len(element) == 0:
             element = ['']
         while len(element) < 3:
             element.append(element[0])
         if self.radiobox == 'comment':
-            query = (Query().raw.search(element[0])) | (Query().raw.search(element[1])) | (Query().raw.search(element[2]))
+            if andor:
+                query = (Query().raw.search(element[0])) | (Query().raw.search(element[1])) | (Query().raw.search(element[2]))
+                color = 'yellow'
+            else:
+                query = (Query().raw.search(element[0])) & (Query().raw.search(element[1])) & (Query().raw.search(element[2]))
+                color = 'aqua'
         else:
             query = (Query().name == element[0]) | (Query().name == element[1]) | (Query().name == element[2])
         if self.radiobox == 'comment':    
@@ -362,7 +368,7 @@ class SearchHandler(web.RequestHandler):
                 for text in x['raw'].splitlines(True):                  
                     for word in element:                        
                         if text.find(word) > -1:
-                            com = com +'<p style=background-color:yellow>'+text+'<br></p>'  
+                            com = com +'<p style=background-color:'+color+'>'+text+'<br></p>'  
                             break                          
                     else:
                         com = com+'<p>'+text+'<br></p>'
