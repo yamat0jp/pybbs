@@ -8,23 +8,25 @@
     <form action=/{{db}}/search method="post">
     {% module xsrf_form_html() %}   
     <p style=font-weight:bold;text-align:center>検索ページ
-    </p>
-      <p style=text-align:center>OR検索。全角スペースで区切ってください。
-      </p>
-      <p><br></p><p><br></p><p><br></p>
-        <p>検索ワード</p>
+    <p style=text-align:center>検索。全角スペースで区切ってください。
+    <p><br><p><br>
+    <select name=type>
+      <option value=OR>OR</option>
+      <option value=AND>AND</option>
+    </select>      
+    <p><br>
+        <p>検索ワード
         <input name=word1 type=search value={{word1}}>
     <p><label><input type="radio" name="filter" value="name">名前から検索 </label>
          <label><input type="radio" checked="true" name="filter" value="comment">本文から検索</label>
-    </p>
       <p>
     <input type="submit" value="検索"></p>
     </form>
       <p><a href=/{{db}}>掲示板へ戻る
-</a></p>   
+</a>  
 {% end %}
 
 {% block footer %}
 <hr>
-    <p style=text-align:center><a href="/{{db}}">掲示板へ戻る</a></p>	
+    <p style=text-align:center><a href="/{{db}}">掲示板へ戻る</a>	
 {% end %}

@@ -333,8 +333,9 @@ class UserHandler(web.RequestHandler):
 class SearchHandler(web.RequestHandler):       
     def post(self,dbname):
         arg = self.get_argument('word1')
-        self.word = arg 
-        self.radiobox = self.get_argument('filter')      
+        self.word = arg[:]
+        self.radiobox = self.get_argument('filter')  
+        self.andor = self.get_argument('type')    
         rec = sorted(self.search(dbname),key=lambda x: x['number'])
         self.render('modules/search.htm',records=rec,word1=arg,db=dbname)
     
