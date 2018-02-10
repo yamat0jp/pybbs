@@ -1,4 +1,4 @@
-
+#coding=utf-8
 import os.path
 import shutil,re
 from tornado import escape,web,httpserver,ioloop
