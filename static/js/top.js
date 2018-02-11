@@ -5,6 +5,7 @@ $(function(){
 			$slides = $slideGroup.find('.slide'),
 			$nav = $container.find('.slideshow-nav'),
 			$indicator = $container.find('.slideshow-indicator'),
+			$images = $slides.find('img'),
 			
 			slideCount = $slides.length,
 			indicatorHTML = '',
@@ -13,7 +14,7 @@ $(function(){
 			easing = 'easeInOutExpo',
 			interval = 7500,
 			timer;
-		
+				
 		
 		$slides.each(function(i){
 			$(this).css({left:100*i+'%'});

@@ -13,7 +13,7 @@ header h1 {
 	}
 .slideshow .slide img {
 	display:none
-	}
+}
 .slideshow-nav a.prev {
 	margin-left:-300px
 	}
@@ -27,7 +27,7 @@ header h1 {
 	}
 .slideshow .slide img {
 	display:none
-	}
+}
 .slideshow-nav a.prev {
 	margin-left:-150px
 	}
