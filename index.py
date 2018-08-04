@@ -1,4 +1,4 @@
-#coding=utf-8
+﻿#coding=utf-8
 import os.path
 import shutil,re
 from tornado import escape,web,httpserver,ioloop
@@ -490,7 +490,7 @@ class Application(web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKo6GkHn/VB9oXwQt8SOROkRvJ5/xJ89Eo=',
                         'xsrf_cookies':True,
-                        'debug':True,
+                        #'debug':True,
                         'login_url':'/login'
                         }
         web.Application.__init__(self,handlers,**settings)
@@ -511,8 +511,9 @@ class Application(web.Application):
             return False
 
 class static():
-    json = 'static/db/db.json'
-    bak = 'static/db/bak.json'
+    base = os.path.dirname(__file__)
+    json = os.path.join(base,'static/db/db.json')
+    bak = os.path.join(base,'static/db/bak.json')
 
 if __name__ == '__main__':
     st = static()
