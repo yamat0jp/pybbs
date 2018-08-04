@@ -203,6 +203,8 @@ class RegistHandler(web.RequestHandler):
             error = error + u'本文がありません.'
         elif i > 1000:
             error = error +u'文字数が1,000をこえました.'
+        if escape.url_unescape(self.get_argument('aikotoba')) != u'げんき':
+            error = error + u'合言葉未入力.'
         article = self.application.db.table(dbname)
         if len(article) == 0:
             no = 1
@@ -218,6 +220,7 @@ class RegistHandler(web.RequestHandler):
             reg = {'number':no,'name':na,'title':sub,'comment':text,'raw':com,'password':pw,'date':s.strftime('%Y/%m/%d %H:%M')}
             article.insert(reg)
             self.set_cookie('username',escape.url_escape(na))
+            self.set_cookie('aikotoba',escape.url_escape(u'げんき'))
             self.redirect('/'+dbname+'#article')
         else:
             self.render('regist.htm',content=error)
@@ -492,7 +495,7 @@ class Application(web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKo6GkHn/VB9oXwQt8SOROkRvJ5/xJ89Eo=',
                         'xsrf_cookies':True,
-                        'debug':True,
+                        #'debug':True,
                         'login_url':'/login'
                         }
         web.Application.__init__(self,handlers,**settings)
