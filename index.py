@@ -387,7 +387,7 @@ class HeadlineApi(web.RequestHandler):
         response = {}
         for x in self.application.db.tables():
             if x != '_default':
-                response[x] = self.get_data(x)           
+                response[x] = self.get_data(x)
         self.write(json.dumps(response,ensure_ascii=False))
     
     def get_data(self,dbname):
@@ -478,7 +478,7 @@ class AlertHandler(UserHandler):
         
 class Application(web.Application):    
     def __init__(self):
-        self.db = TinyDB(st.json)             
+        self.db = TinyDB(st.json)
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)',ArticleApi),
                     (r'/help',HelpHandler),(r'/master/*',MasterHandler),(r'/alert',AlertHandler),
