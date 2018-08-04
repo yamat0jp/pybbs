@@ -510,7 +510,7 @@ class Application(web.Application):
         return pos
     
     def collection(self,name):
-        if name in self.db.tables():
+        if name in self.db.tables() and name != 'master':
             return True
         else:
             return False
