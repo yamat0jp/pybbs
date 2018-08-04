@@ -391,7 +391,7 @@ class HeadlineApi(web.RequestHandler):
     def get(self):
         response = {}
         for x in self.application.db.tables():
-            if x != '_default':
+            if (x != '_default')and(x != 'master'):
                 response[x] = self.get_data(x)
         self.write(json.dumps(response,ensure_ascii=False))
     
