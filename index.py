@@ -80,6 +80,8 @@ class LoginHandler(BaseHandler):
         if dbname == 'master':
             self.redirect('/master')
         else:
+            if self.application.collection(dbname) == False:
+                self.application.db.table(dbname)
             self.redirect('/'+dbname+'/admin/0/')
         
 class LogoutHandler(BaseHandler):
@@ -89,13 +91,13 @@ class LogoutHandler(BaseHandler):
         
 class NaviHandler(web.RequestHandler):              
     def get(self):
-        col,na = self.name()
-        if self.application.collection('params') == False:
+        if self.application.db.get(where('kinds') == 'conf') == None:
             item = {"mentenance":False,"out_words":[u"阿保",u"馬鹿",u"死ね"],"password":"admin",
                     "title2":"<h1 style=color:gray;text-align:center>pybbs</h1>",
                     "bad_words":["<style","<link","<script","<img"],"count":30,
-                    "title":"pybbs","info name":"info"}
+                    "title":"pybbs","info name":"info","kinds":"conf"}
             self.application.db.insert(item)
+        col,na = self.name()
         self.render('top.htm',coll=col,name=na,full=self.full)
         
     def name(self):
@@ -396,7 +398,7 @@ class HeadlineApi(web.RequestHandler):
         if i == 0:
             return {}
         else:
-            rec = sorted(table.all(),key=lambda x: x['number'])[i-1]
+            rec = sorted(table.all(),key=lambda x: x['title'])[i-1]
             return {'number':rec['number'],'title':rec['title'],'name':rec['name'],'comment':rec['raw'][0:19]}
         
 class ArticleApi(web.RequestHandler):
@@ -490,7 +492,7 @@ class Application(web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':'bZJc2sWbQLKo6GkHn/VB9oXwQt8SOROkRvJ5/xJ89Eo=',
                         'xsrf_cookies':True,
-                        #'debug':True,
+                        'debug':True,
                         'login_url':'/login'
                         }
         web.Application.__init__(self,handlers,**settings)
