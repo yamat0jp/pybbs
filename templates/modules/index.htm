@@ -15,6 +15,7 @@
 	<script src={{static_url('js/jquery-live-preview.js')}}></script>
 	<link href={{static_url('css/livepreview-demo.css')}} rel=stylesheet type=text/css>
 	<script src={{static_url('js/sub.js')}}></script>
+	<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
   </head> 
   <body>
   {% block header %}
@@ -50,6 +51,7 @@
       <input type="submit" value="削除">
       <p><a href=/{{db}}/search>検索ページ</a></p>
     </form>
+    <p style=text-align:right><a href=#article>下へ移動</a></p>
     <p style=text-align:center>{{db}}</p>
   {% module Footer(position,'/'+db,'#article') %}
   {% end %}
