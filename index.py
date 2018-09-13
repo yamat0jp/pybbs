@@ -184,7 +184,7 @@ class RegistHandler(web.RequestHandler):
             if word in com:
                 error += u'禁止ワード.'
                 break
-        for line in com.splitlines(True):
+        for line in com.splitlines():
             if error:
                 break
             for word in words:
@@ -197,7 +197,7 @@ class RegistHandler(web.RequestHandler):
                     url.append(x.group())
             if re.match(' ',line):
                 line = line.replace(' ','&nbsp;',1)
-            if line == '\n':
+            if len(line) == 0:
                 text += '<br>'
             else:
                 text += '<p>'+self.link(line)+'</p>'
