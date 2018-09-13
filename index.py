@@ -197,7 +197,7 @@ class RegistHandler(web.RequestHandler):
                     url.append(x.group())
             if re.match(' ',line):
                 line = line.replace(' ','&nbsp;',1)
-            if len(line) == 0:
+            if len(line) <= 2:
                 text += '<br>'
             else:
                 text += '<p>'+self.link(line)+'</p>'
