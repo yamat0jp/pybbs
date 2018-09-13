@@ -197,7 +197,10 @@ class RegistHandler(web.RequestHandler):
                     url.append(x.group())
             if re.match(' ',line):
                 line = line.replace(' ','&nbsp;',1)
-            text = text+'<p>'+self.link(line)+'<br></p>'
+            if len(line) == 0:
+                text += '<br>'
+            else:
+                text += '<p>'+self.link(line)+'</p>'
         s = ''
         for x in url:
             s = s+'<tr><td><a href={0} class=livepreview target=_blank>{0}</a></td></tr>'.format(x)
