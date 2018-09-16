@@ -190,8 +190,13 @@ class RegistHandler(web.RequestHandler):
             for x in obj:
                 if x.group() not in url:
                     url.append(x.group())
-            if re.match(' ',line):
-                line = line.replace(' ','&nbsp;',1)
+            j = 0
+            for x in line:
+                if x == ' ':
+                    j += 1
+                else:
+                    break
+            line = line.replace(' ','&nbsp;',j)
             text = text+'<p>'+self.link(line)+'<br></p>'
         s = ''
         for x in url:
@@ -523,5 +528,5 @@ class static():
 if __name__ == '__main__':
     st = static()
     http_server = httpserver.HTTPServer(Application())
-    http_server.listen(8888)
+    http_server.listen(5000)
     ioloop.IOLoop.instance().start()
