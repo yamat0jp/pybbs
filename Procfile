@@ -1,1 +1,1 @@
-web: python pybbs.py 
+web: python index.py 
