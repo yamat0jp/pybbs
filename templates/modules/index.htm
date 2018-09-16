@@ -58,13 +58,15 @@
   {% block body %}
     {% for record in records %}
       {% if db == '' %}
-        {% set text = record['dbname'] %}
+        {% set text = record['dbname']+'-' %}
+        {% set link = '/'+record['dbname']+'/userdel?job='+str(record['number']) %}
       {% else %}
         {% set text = '' %}
+        {% set link = '/'+db+'/userdel?job='+str(record['number']) %}
       {% end %}
     <hr size=1>
-	<section id=number><a href=/{{db}}/userdel?job={{record['number']}} style=text-decoration:none>
-		{{text}}-[{{record['number']}}]</a><a name={{record['number']}}></a></section>
+	<section id=number><a href={{link}} style=text-decoration:none>
+		{{text}}[{{record['number']}}]</a><a name={{record['number']}}></a></section>
 	<section id=title>{{record['title']}}</section>
 	<section id=name>　Name:<h1>{{record['name']}}</h1></section>
 	<section id=date>　Date:<h1>{{record['date']}}</h1></section>
