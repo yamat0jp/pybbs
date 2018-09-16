@@ -195,8 +195,14 @@ class RegistHandler(web.RequestHandler):
             for x in obj:
                 if x.group() not in url:
                     url.append(x.group())
-            if re.match(' ',line):
-                line = line.replace(' ','&nbsp;',1)
+            j = 0
+            for x in line:
+                if x == ' ':
+                    j += 1
+                else:
+                    break
+            if j > 0: 
+                line = line.replace(' ','&nbsp;',j)     
             if len(line) == 0:
                 text += '<br>'
             else:
