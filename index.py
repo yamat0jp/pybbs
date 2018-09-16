@@ -519,7 +519,10 @@ class Application(web.Application):
         name = self.db.collection_names()
         for x in ['objectlabs-system.admin.collections','objectlabs-system','system.indexes',
                   'params','master','temp']:
-            if x in name or x[-4:] == '_bot':
+            if x in name:
+                name.remove(x)
+        for x in name:
+            if x[-4:] == '_bot':
                 name.remove(x)
         return name
 
