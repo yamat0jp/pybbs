@@ -98,10 +98,11 @@ class WebHookHandler(tornado.web.RequestHandler):
                 if event['type'] == 'unfollow':
                     self.database[bot].remove({'name':self.uid})
                     return
-                else:
+                elif event['type'] == 'join':
                     db = self.database[bot]
                     if not db.find_one({'name':self.uid}):
                         db.insert({'name':self.uid, 'dbname':'glove'})
+                    return
                 x = event['message']['text']                
                 if self.setting(x):
                     linebot.reply_message(event['replyToken'],
