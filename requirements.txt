@@ -2,5 +2,4 @@ tornado
 pymongo
 requests
 line-bot-sdk
-putz
 future

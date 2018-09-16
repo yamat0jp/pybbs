@@ -9,7 +9,7 @@ import tornado.ioloop
 import tornado.web
 import tornado.escape
 import os, re, glob
-import pytz, pymongo
+import pymongo
 from datetime import datetime
 from linebot import LineBotApi, WebhookParser
 from linebot.exceptions import InvalidSignatureError
@@ -18,8 +18,8 @@ from linebot.models import TextSendMessage
 
 class WebHookHandler(tornado.web.RequestHandler):        
     def main(self, no):
-        pz = pytz.timezone('Asia/Tokyo')
-        now = datetime.now(pz)
+        #pz = pytz.timezone('Asia/Tokyo')
+        now = datetime.now()#pz)
         t = now.hour
         w = now.weekday()
         if (w < 5)and(t >= 9)and(t < 16):
