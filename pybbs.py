@@ -1,4 +1,4 @@
-
+# -*- coding:utf-8 -*-
 import os,re
 from tornado import escape,web,ioloop,httpserver
 import pymongo
@@ -44,7 +44,7 @@ class IndexHandler(BaseHandler):
                 return
         i = params['count']      
         rule = escape.url_unescape(self.get_cookie('aikotoba',''))
-        na = escape.url_unescape(self.get_cookie("username",u"誰かさん"))
+        na = escape.url_unescape(self.get_cookie('username',u'誰かさん'))
         pos = self.application.gpos(dbname,page)
         table = self.application.db[dbname]
         start = (pos-1)*i
@@ -326,20 +326,28 @@ class UserHandler(web.RequestHandler):
             return ''
       
 class SearchHandler(web.RequestHandler):       
-    def post(self,dbname):
+    def post(self,dbname=''):
         arg = self.get_argument('word1')
         self.word = arg[:]
         self.andor = self.get_argument('type')
         self.radiobox = self.get_argument('filter')       
-        rec = sorted(self.search(dbname),key=lambda x: x['number'])
+        if dbname == '':
+            rec = []
+            for x in self.application.coll():
+                moji = self.search(x)
+                for y in sorted(moji,key=lambda k: k['number']):
+                    y['dbname'] = x
+                    rec.append(y) 
+        else:
+            rec = sorted(self.search(dbname),key=lambda x: x['number'])
         self.render('modules/search.htm',records=rec,word1=arg,db=dbname)
-    
-    def get(self,dbname):
-        if self.application.collection(dbname) == False:
+
+    def get(self,dbname=''):
+        if self.application.collection(dbname) == False and dbname != '':
             raise web.HTTPError(404)
             return
         self.render('modules/search.htm',records=[],word1='',db=dbname)
-        
+    
     def search(self,dbname):
         table = self.application.db[dbname]    
         andor = self.andor == 'OR'
@@ -364,15 +372,22 @@ class SearchHandler(web.RequestHandler):
                 color = 'aqua'
             for x in result:
                 com = ''
-                for text in x['raw'].splitlines(True):
-                    if re.match(' ',text):
-                        text = text.replace(' ','&nbsp;',1)                  
+                for text in x['raw'].splitlines():
+                    for y in text:
+                        if y == ' ':
+                            i += 1
+                        else:
+                            break
+                    text = text.replace(' ','&nbsp;',i)                  
                     for i in range(3):                        
                         if element[i].lower() in text.lower():
                             com = com +'<p style=background-color:'+color+'>'+text+'<br></p>'  
                             break                          
                     else:
-                        com = com+'<p>'+text+'<br></p>'
+                        if text == '':
+                            com += '<br>'
+                        else:
+                            com += '<p>'+text+'</p>'
                 x['comment'] = com
                 yield x       
         else:
@@ -486,7 +501,7 @@ class Application(web.Application):
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),
                     (r'/write/api/([a-zA-Z0-9_]+)/()/()/()',ArticleApi),(r'/list/api/([a-zA-Z0-9]+)',ListApi),
                     (r'/help',HelpHandler),(r'/master',MasterHandler),(r'/alert',AlertHandler),(r'/jump',JumpHandler),
-                    (r'/callback',WebHookHandler),(r'/init',InitHandler),
+                    (r'/callback',WebHookHandler),(r'/init',InitHandler),(r'/search',SearchHandler),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]

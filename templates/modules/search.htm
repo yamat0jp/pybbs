@@ -5,7 +5,12 @@
 {% end %}
 
 {% block header %}
-    <form action=/{{db}}/search method="post">
+	{% if db == '' %}
+		{% set text = '/search' %}
+	{% else %}
+		{% set text = '/'+db+'/search' %}
+	{% end %}
+    <form action={{text}} method="post">
     {% module xsrf_form_html() %}   
     <p style=font-weight:bold;text-align:center>検索ページ
       <p style=text-align:center>検索。スペースで区切ってください。
