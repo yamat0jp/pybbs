@@ -93,12 +93,13 @@ class WebHookHandler(tornado.web.RequestHandler):
         for event in dic['events']:
             if 'replyToken' in event.keys():
                 self.uid = event['source']['userId']
-                self.database = pymongo.MongoClient(var.uri)[var.ac]                
+                self.database = pymongo.MongoClient(var.uri)[var.ac] 
+                bot = 'users_bot'               
                 if event['type'] == 'unfollow':
-                    self.database['users'].remove({'name':self.uid})
+                    self.database[bot].remove({'name':self.uid})
                     return
                 else:
-                    db = self.database['users']
+                    db = self.database[bot]
                     if not db.find_one({'name':self.uid}):
                         db.insert({'name':self.uid, 'dbname':'glove'})
                 x = event['message']['text']                
