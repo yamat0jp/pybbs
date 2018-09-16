@@ -5,6 +5,7 @@ import pymongo
 from datetime import datetime,date
 import json
 from bson.objectid import ObjectId #don't remove
+from botmod import *
 
 class BaseHandler(web.RequestHandler):
     def get_current_user(self):
@@ -485,13 +486,14 @@ class Application(web.Application):
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),
                     (r'/write/api/([a-zA-Z0-9_]+)/()/()/()',ArticleApi),(r'/list/api/([a-zA-Z0-9]+)',ListApi),
                     (r'/help',HelpHandler),(r'/master',MasterHandler),(r'/alert',AlertHandler),(r'/jump',JumpHandler),
+                    (r'/callback',WebHookHandler),(r'/init',InitHandler),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
         settings = {'template_path':os.path.join(os.path.dirname(__file__),'templates'),
                         'static_path':os.path.join(os.path.dirname(__file__),'static'),
                         'ui_modules':{'Footer':FooterModule},
-                        'cookie_secret':'bZJc2sWbQLKos6GkHn/VB9oXwQt8SOROkRvJ5/xJ89E=',
+                        'cookie_secret':os.environ['cookie'],
                         'xsrf_cookies':True,
                         #'debug':True,
                         'login_url':'/login'
@@ -517,15 +519,15 @@ class Application(web.Application):
         name = self.db.collection_names()
         for x in ['objectlabs-system.admin.collections','objectlabs-system','system.indexes',
                   'params','master','temp']:
-            if x in name:
+            if x in name or x[-4:] == '_bot':
                 name.remove(x)
         return name
-    
+
 if __name__ == '__main__':
     app = Application()
     http_server = httpserver.HTTPServer(app)
-    conn = pymongo.MongoClient(os.environ['MONGODB_URI'],13678)
-    app.db = conn[os.environ['DB_ACCOUNT']]
+    conn = pymongo.MongoClient(var.uri,13678)
+    app.db = conn[var.ac]
     port = int(os.environ.get('PORT',5000))
     http_server.listen(port)
     ioloop.IOLoop.instance().start()
