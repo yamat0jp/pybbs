@@ -453,7 +453,7 @@ class AlertHandler(UserHandler):
         
 class CleanHandler(web.RequestHandler):
     def post(self):
-        bool = self.get_argument(all, 'false').lower()
+        bool = self.get_argument('all', 'false').lower()
         table = self.application.db['master']
         if bool == 'true':
             table.remove()
