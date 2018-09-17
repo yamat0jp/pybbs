@@ -458,10 +458,14 @@ class CleanHandler(web.RequestHandler):
         if bool == 'true':
             table.remove()
         elif bool == 'false':
-            for x in list(table.find()):
-                item = self.application.db[x['db']].find_one({'number':int(x['num'])})
-                if not item or item['raw'] == '':
-                    table.remove({'_id':x['_id']})   
+            for x in list(table.find()):                
+                item = self.application.db[x['db']]
+                if not 'number' in item.keys():
+                    table.remove({'_id':x['_id']})
+                else:
+                    item.find_one({'number':int(x['num'])})
+                    if not item or item['raw'] == '':
+                        table.remove({'_id':x['_id']})   
         com = self.application.db['master'].find()
         self.render('master.htm', com=com)    
                                         
