@@ -429,7 +429,8 @@ class AlertHandler(UserHandler):
         link = '/'+db+s+'#'+num  
         jump = '<p><a href={0}>{0}</a>'.format(link)
         result = self.application.db['temp'].insert(
-            {'comment':com+jump,'time':time,'link':link,'date':date.weekday(datetime.now())})
+            {'comment':com+jump,'time':time,'link':link,
+             'date':date.weekday(datetime.now()),'db':db,'num':num})
         self.render('alert.htm',com=com+jump,num=str(result))
         
     def post(self):
@@ -449,6 +450,18 @@ class AlertHandler(UserHandler):
         table = self.application.db['master']
         table.insert(tb)
         self.redirect(link)
+        
+class ClearnHandler(web.RequestHandler):
+    def get(self):
+        bool = self.get_argument(all, False)
+        table = self.application.db['master']
+        if bool:
+            table.remove()
+        else:
+            for x in table.find_all():
+                item = self.application.db[x['db']]
+                if not item.find_one({'number':x['num']}):
+                    table.remove({'_id':x['_id']})       
                                         
 class FooterModule(web.UIModule):
     def render(self,number,url,link):
