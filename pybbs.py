@@ -357,7 +357,7 @@ class SearchHandler(web.RequestHandler):
             rec = []
             for x in self.application.db.tables():
                 if self.application.collection(x):
-                    for y in sorted(self.search(x),lambda k: k['number']):
+                    for y in sorted(self.search(x),key=lambda k: k['number']):
                         y['dbname'] = x
                         rec.append(y)        
         else:
