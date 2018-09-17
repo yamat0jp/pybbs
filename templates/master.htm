@@ -12,7 +12,7 @@
 <p><a href=/jump>ログアウト</a>
 <form action=/clean?all=false method=post>
 {% module xsrf_form_html() %}
-<p>削除済みだけ<input type=submit value=削除></form>
+<p>削除済みだけ<input type=submit value=削除>（要望欄も消えます）</form>
 <form action=/clean?all=true method=post>
 {% module xsrf_form_html() %}
 <p>全ての報告を<input type=submit value=削除></form>
