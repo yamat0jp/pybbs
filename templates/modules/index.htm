@@ -48,9 +48,14 @@
       {% module xsrf_form_html() %}
       <label><p>記事No</p><input name="number"></label>
       <label><p>Pass</p><input type="password" name="password"></label>
-      <input type="submit" value="削除">
-      <p><a href=/{{db}}/search>検索ページ</a></p>
+      <p><input type="submit" value="削除">
     </form>
+    <form action=/{{db}}/userdel method=post id=search>
+    	  {% module xsrf_form_html() %} 
+    	  <label><p>記事No</p><input name=number></label>
+      <p><input type=submit value=表示>
+    </form>
+    <p><a href=/{{db}}/search>検索ページ</a></p>   
     <p style=text-align:right><a href=#article>下へ移動</a></p>
     <p style=text-align:center>{{db}}</p>
   {% module Footer(position,'/'+db,'#article') %}

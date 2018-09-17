@@ -307,7 +307,12 @@ class UserHandler(web.RequestHandler):
         number = self.get_argument('number')
         if number.isdigit() == True:
             num = int(number)
-            pas = self.get_argument('password')
+            if 'password' in self.request.arguments.keys():
+                pas = self.get_argument('password')
+            else:
+                num = self.page(dbname,num)
+                self.redirect('/{0}{1}#{2}'.format(dbname, num, number))
+                return
             table = self.application.db[dbname]
             obj = table.find_one({'number':num})
             if obj and(obj['password'] == pas):
@@ -458,8 +463,7 @@ class CleanHandler(web.RequestHandler):
         if bool == 'true':
             table.remove()
         elif bool == 'false':
-            for x in list(table.find()):                
-
+            for x in list(table.find()):           
                 if not 'number' in x.keys():
                     table.remove({'_id':x['_id']})
                 else:
@@ -532,7 +536,7 @@ class Application(web.Application):
                         #'debug':True,
                         'login_url':'/login'
                         }
-        web.Application.__init__(self,handlers,**settings)
+        super().__init__(handlers,**settings)
  
     def gpos(self,dbname,page):
         params = self.db['params'].find_one()
