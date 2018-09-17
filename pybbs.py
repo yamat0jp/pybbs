@@ -197,12 +197,15 @@ class RegistHandler(web.RequestHandler):
                 else:
                     break
             line = line.replace(' ','&nbsp;',j)
-            text = text+'<p>'+self.link(line)+'<br></p>'
+            if line == '':
+                text += '<br>'
+            else:
+                text += '<p>'+self.link(line)+'</p>'
         s = ''
         for x in url:
-            s = s+'<tr><td><a class=livepreview target=_blank href={0}>{0}</a></td></tr>'.format(x)
+            s += '<tr><td><a class=livepreview target=_blank href={0}>{0}</a></td></tr>'.format(x)
         if s:
-            text = text+'<table><tr><td>検出URL:</td></tr>'+s+'</table>'
+            text += '<table><tr><td>検出URL:</td></tr>'+s+'</table>'
         pw = self.get_argument('password')
         if i == 0:
             error = error + u'本文がありません.'
@@ -236,10 +239,10 @@ class RegistHandler(web.RequestHandler):
         obj = re.finditer('>>[0-9]+',command)
         for x in obj:
             s = '<a class=minpreview data-preview-url=/{0}?key={1} href=/{0}/userdel?job={1}>>>{1}</a>'.format(self.database,x.group()[2:])
-            text = text+command[i:x.start()]+s
+            text += command[i:x.start()]+s
             i = x.end()
         else:
-            text = text+command[i:]
+            text += command[i:]
         return text
     
 class AdminHandler(BaseHandler):
@@ -346,11 +349,20 @@ class SearchHandler(web.RequestHandler):
         self.word = arg[:]
         self.radiobox = self.get_argument('filter')  
         self.andor = self.get_argument('type')    
-        rec = sorted(self.search(dbname),key=lambda x: x['number'])
+        if not dbname:
+            dbname = ''
+            rec = []
+            for x in self.application.db.tables():
+                if x[-4:] != '_bot' and x != 'master':
+                    rec.extend(sorted(self.search(x),key=lambda y:y['number']))
+        else:
+            rec = sorted(self.search(dbname),key=lambda x: x['number'])
         self.render('modules/search.htm',records=rec,word1=arg,db=dbname)
     
     def get(self,dbname):
-        if self.application.collection(dbname) == False:
+        if not dbname:
+            dbname = ''
+        elif self.application.collection(dbname) == False:
             raise web.HTTPError(404)
             return
         self.render('modules/search.htm',records=[],word1='',db=dbname)
@@ -375,13 +387,16 @@ class SearchHandler(web.RequestHandler):
         if self.radiobox == 'comment':    
             for x in table.search(query):
                 com = ''
-                for text in x['raw'].splitlines(True):                  
+                for text in x['raw'].splitlines():                  
                     for word in element:                        
                         if text.find(word) > -1:
-                            com = com +'<p style=background-color:'+color+'>'+text+'<br></p>'  
+                            com += '<p style=background-color:'+color+'>'+text+'<br></p>'  
                             break                          
                     else:
-                        com = com+'<p>'+text+'<br></p>'
+                        if text == '':
+                            com += '<br>'
+                        else:
+                            com += '<p>'+text+'</p>'
                 x['comment'] = com
                 yield x       
         else:
@@ -491,7 +506,7 @@ class Application(web.Application):
         self.db = TinyDB(st.json)
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)',ArticleApi),
-                    (r'/help',HelpHandler),(r'/master/*',MasterHandler),(r'/alert',AlertHandler),
+                    (r'/help',HelpHandler),(r'/master/*',MasterHandler),(r'/alert',AlertHandler),(r'/search',SearchHandler)
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/*',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
