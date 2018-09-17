@@ -463,7 +463,7 @@ class CleanHandler(web.RequestHandler):
                 data = item.find_one({'number':x['num']})
                 if not data or data['raw'] == '':
                     table.remove({'_id':x['_id']})   
-        com = self.application['master'].find()
+        com = self.application.db['master'].find()
         self.render('master.htm', com=com)    
                                         
 class FooterModule(web.UIModule):
