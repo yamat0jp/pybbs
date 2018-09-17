@@ -102,3 +102,12 @@ table {
 .prettyprint ol.linenums > li {
 	list-style-type:decimal
 }
+
+form#search {
+	border:solid;
+	display:inline-block;
+	margin-top:30px;
+	margin-right:30px;
+	margin-bottom:30px;
+	margin-left:30px
+}
