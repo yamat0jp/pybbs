@@ -333,7 +333,7 @@ class UserHandler(web.RequestHandler):
             qwr = Query()
             obj = self.table.get(qwr.number == num)
             if obj and obj['password'] == pas:
-                self.table.update({'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>'},qwr.number == num)
+                self.table.update({'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>','raw':''},qwr.number == num)
                 self.redirect('/{0}{1}#{2}'.format(dbname,self.page(num),number))
             else:
                 self.redirect('/'+dbname)
@@ -485,7 +485,7 @@ class AlertHandler(UserHandler):
         link = '<p><a href={0}>{0}</a>'.format(jump)
         time = datetime.now()
         data = {'comment':tb['comment']+link,'time':time.strftime('%Y/%m/%d'),
-                'link':jump,'date':date.weekday(time)}
+                'link':jump,'date':date.weekday(time),'db':db,'num':int(num)}
         id = self.application.db.table('temp').insert(data)
         self.render('alert.htm',com=data['comment'],num=id)
     
@@ -504,12 +504,26 @@ class AlertHandler(UserHandler):
             table.insert(tb)
         self.redirect(link)
         
+class CleanHandler(web.RequestHandler):
+    def post(self):
+        bool = self.get_argument('all','false').lower()
+        table = self.application.db.table('master')
+        if bool == 'true':
+            table.purge()
+        elif bool == 'false':
+            for x in table:
+                tb = self.application.db.table(x['db'])
+                item = tb.get(where('number') == x['num'])
+                if not item or item['raw'] == '':
+                    table.remove(doc_ids=[x.doc_id])
+        self.redirect('/master')
+                
 class Application(web.Application):    
     def __init__(self):
         self.db = TinyDB(st.json)
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)',ArticleApi),
-                    (r'/help',HelpHandler),(r'/master/*',MasterHandler),(r'/alert',AlertHandler),(r'/search',SearchHandler),
+                    (r'/help',HelpHandler),(r'/master/*',MasterHandler),(r'/alert',AlertHandler),(r'/search',SearchHandler),(r'/clean',CleanHandler),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/*',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
