@@ -459,11 +459,11 @@ class CleanHandler(web.RequestHandler):
             table.remove()
         elif bool == 'false':
             for x in list(table.find()):                
-                item = self.application.db[x['db']]
-                if not 'number' in item.keys():
+
+                if not 'number' in x.keys():
                     table.remove({'_id':x['_id']})
                 else:
-                    item.find_one({'number':int(x['num'])})
+                    item = self.application.db[x['db']].find_one({'number':int(x['num'])})
                     if not item or item['raw'] == '':
                         table.remove({'_id':x['_id']})   
         com = self.application.db['master'].find()
