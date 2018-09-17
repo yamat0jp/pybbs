@@ -352,7 +352,7 @@ class SearchHandler(web.RequestHandler):
         if dbname == '':
             rec = []
             for x in self.application.db.tables():
-                if x[-4:] != '_bot' and x != 'master':
+                if x[-3:] != '_bot' and x != 'master':
                     for y in sorted(self.search(x),lambda k: k['number']):
                         y['dbname'] = x
                         rec.append(y)        
