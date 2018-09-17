@@ -6,6 +6,7 @@ from tinydb import TinyDB,Query,where
 from tinydb.operations import delete
 from datetime import datetime,date
 import json
+from botmod import *
 
 class BaseHandler(web.RequestHandler):
     def get_current_user(self):
@@ -517,13 +518,14 @@ class CleanHandler(web.RequestHandler):
                 if not item or item['raw'] == '':
                     table.remove(doc_ids=[x.doc_id])
         self.redirect('/master')
-                
+                    
 class Application(web.Application):    
     def __init__(self):
         self.db = TinyDB(st.json)
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)',ArticleApi),
                     (r'/help',HelpHandler),(r'/master/*',MasterHandler),(r'/alert',AlertHandler),(r'/search',SearchHandler),(r'/clean',CleanHandler),
+                    (r'/callback',WebHookHandler),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/*',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
