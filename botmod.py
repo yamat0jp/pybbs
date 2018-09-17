@@ -9,7 +9,8 @@ import tornado.ioloop
 import tornado.web
 import tornado.escape
 import os, re, glob
-import pymongo
+from tinydb import *
+import dbjson
 from datetime import datetime
 from linebot import LineBotApi, WebhookParser
 from linebot.exceptions import InvalidSignatureError
@@ -62,23 +63,23 @@ class WebHookHandler(tornado.web.RequestHandler):
     
     def setting(self, dbname):
         dbname = dbname.lower()
-        ca = self.database.collection_names(include_system_collections=False)
+        ca = self.database.tables()
         ca.remove('users_bot')
-        if dbname[-4:] == '_bot' and dbname in ca:
+        if dbname[-3:] == '_bot' and dbname in ca:
             db = self.database['users_bot']
-            item = db.find_one({'name':self.uid})
+            item = db.get(where('name') == self.uid)
             if item['dbname'] == dbname:
                 return False
             else:
-                db.update({'name':self.uid}, {'name':self.uid, 'dbname':dbname})
+                db.update({'name':self.uid, 'dbname':dbname},where('name') == self.uid)
                 return True
         return False
 
     def users(self):
-        db = self.database['users_bot']
-        item = db.find_one({'name':self.uid})
+        db = self.database.table('users_bot')
+        item = db.get(where('name') == self.uid)
         x = item['dbname']
-        return self.database[x], x
+        return self.database.table(x), x
                           
     def post(self):
         '''
@@ -95,15 +96,15 @@ class WebHookHandler(tornado.web.RequestHandler):
         for event in dic['events']:
             if 'replyToken' in event.keys():
                 self.uid = event['source']['userId']
-                self.database = pymongo.MongoClient(var.uri)[var.ac] 
-                bot = 'users_bot'               
+                self.database = TinyDB(st.json) 
+                bot = 'users_bot'      
+                tb = self.database.table(bot)         
                 if event['type'] == 'unfollow':
-                    self.database[bot].remove({'name':self.uid})
+                    tb.remove(where('name') == self.uid))
                     return
                 elif event['type'] == 'join':
-                    db = self.database[bot]
-                    if not db.find_one({'name':self.uid}):
-                        db.insert({'name':self.uid, 'dbname':'glove'})
+                    if not tb.get(where('name') == self.uid):
+                        tb.insert({'name':self.uid, 'dbname':'glove'})
                     return
                 x = event['message']['text']                
                 if self.setting(x):
@@ -120,7 +121,7 @@ class WebHookHandler(tornado.web.RequestHandler):
 
 class InitHandler(tornado.web.RequestHandler):
     def get(self):        
-        self.db = pymongo.MongoClient(var.uri)[var.ac]
+        self.db = TinyDB(st.json)
         for x in glob.glob('./*.txt'):
             f = open(x)
             data = f.read()
@@ -139,23 +140,16 @@ class InitHandler(tornado.web.RequestHandler):
             elif dic:
                 dic['no'] = x
                 item.append(dic)
-        table = self.db[name+'_bot']
-        table.remove()
+        table = self.db.table(name+'_bot')
+        table.purge()
         for x in item:
             table.insert(x)
                      
 class VarParam():
     token = os.environ['Access_Token']
     ch = os.environ['Channel_Secret']
-    uri = os.environ['MONGODB_URI']
-    ac = os.environ['ACCOUNT']    
 
 var = VarParam()
-if __name__ == '__main__':
-    application = tornado.web.Application([(r'/callback',WebHookHandler),(r'/init',InitHandler)])
-    port = int(os.environ.get('PORT',5000))#important in heroku
-    linebot = LineBotApi(token)
-    webhook = WebhookParser(ch)  
-    application.listen(port)
-    tornado.ioloop.IOLoop.instance().start()
+st = dbjson.static()
+
     

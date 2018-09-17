@@ -7,6 +7,7 @@ from tinydb.operations import delete
 from datetime import datetime,date
 import json
 from botmod import *
+import dbjson
 
 class BaseHandler(web.RequestHandler):
     def get_current_user(self):
@@ -555,13 +556,8 @@ class Application(web.Application):
         else:
             return False
 
-class static():
-    base = os.path.dirname(__file__)
-    json = os.path.join(base,'static/db/db.json')
-    bak = os.path.join(base,'static/db/bak.json')
-
 if __name__ == '__main__':
-    st = static()
+    st = dbjson.static()
     http_server = httpserver.HTTPServer(Application())
     http_server.listen(5000)
     ioloop.IOLoop.instance().start()
