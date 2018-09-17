@@ -451,17 +451,20 @@ class AlertHandler(UserHandler):
         table.insert(tb)
         self.redirect(link)
         
-class ClearnHandler(web.RequestHandler):
-    def get(self):
-        bool = self.get_argument(all, False)
+class CleanHandler(web.RequestHandler):
+    def post(self):
+        bool = self.get_argument(all, 'false').lower()
         table = self.application.db['master']
-        if bool:
+        if bool == 'true':
             table.remove()
-        else:
-            for x in table.find_all():
+        elif bool == 'false':
+            for x in table.find():
                 item = self.application.db[x['db']]
-                if not item.find_one({'number':x['num']}):
-                    table.remove({'_id':x['_id']})       
+                data = item.find_one({'number':x['num']})
+                if not data or data['raw'] == '':
+                    table.remove({'_id':x['_id']})   
+        com = self.application['master'].find()
+        self.render('master.htm', com=com)    
                                         
 class FooterModule(web.UIModule):
     def render(self,number,url,link):
@@ -514,7 +517,7 @@ class Application(web.Application):
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),
                     (r'/write/api/([a-zA-Z0-9_]+)/()/()/()',ArticleApi),(r'/list/api/([a-zA-Z0-9]+)',ListApi),
                     (r'/help',HelpHandler),(r'/master',MasterHandler),(r'/alert',AlertHandler),(r'/jump',JumpHandler),
-                    (r'/callback',WebHookHandler),(r'/init',InitHandler),(r'/search',SearchHandler),
+                    (r'/callback',WebHookHandler),(r'/init',InitHandler),(r'/search',SearchHandler),(r'/clean',CleanHandler),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]

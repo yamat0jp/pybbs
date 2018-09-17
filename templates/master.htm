@@ -10,6 +10,10 @@
 	<hr>
 {% end %}
 <p><a href=/jump>ログアウト</a>
-<p><a href=/clean?all=false>削除済みだけ削除</a>
-<p><a href=/clean?all=true>全ての報告を削除</a>
+<form action=/clean?all=false method=post>
+{% module xsrf_form_html() %}
+<p>削除済みだけ<input type=submit value=削除></form>
+<form action=/clean?all=true method=post>
+{% module xsrf_form_html() %}
+<p>全ての報告を<input type=submit value=削除></form>
 </body></html>
