@@ -344,13 +344,12 @@ class UserHandler(web.RequestHandler):
                 return ''
       
 class SearchHandler(web.RequestHandler):       
-    def post(self,dbname):
+    def post(self,dbname=''):
         arg = self.get_argument('word1')
         self.word = arg[:]
         self.radiobox = self.get_argument('filter')  
         self.andor = self.get_argument('type')    
-        if not dbname:
-            dbname = ''
+        if dbname == '':
             rec = []
             for x in self.application.db.tables():
                 if x[-4:] != '_bot' and x != 'master':
@@ -361,10 +360,8 @@ class SearchHandler(web.RequestHandler):
             rec = sorted(self.search(dbname),key=lambda x: x['number'])
         self.render('modules/search.htm',records=rec,word1=arg,db=dbname)
     
-    def get(self,dbname):
-        if not dbname:
-            dbname = ''
-        elif self.application.collection(dbname) == False:
+    def get(self,dbname=''):
+        if dbname != '' and self.application.collection(dbname) == False:
             raise web.HTTPError(404)
             return
         self.render('modules/search.htm',records=[],word1='',db=dbname)
