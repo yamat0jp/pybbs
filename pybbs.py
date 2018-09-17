@@ -324,11 +324,15 @@ class UserHandler(web.RequestHandler):
         number = self.get_argument('number')
         if number.isdigit() == True:
             num = int(number)
-            pas = self.get_argument('password')
             self.table = self.application.db.table(dbname)
+            if 'password' in self.request.arguments.keys():
+                pas = self.get_argument('password')
+            else:
+                self.redirect('/{0}{1}#{2}'.format(dbname,self.page(num),number))
+                return
             qwr = Query()
             obj = self.table.get(qwr.number == num)
-            if obj and(obj['password'] == pas):
+            if obj and obj['password'] == pas:
                 self.table.update({'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>'},qwr.number == num)
                 self.redirect('/{0}{1}#{2}'.format(dbname,self.page(num),number))
             else:
@@ -352,7 +356,7 @@ class SearchHandler(web.RequestHandler):
         if dbname == '':
             rec = []
             for x in self.application.db.tables():
-                if x[-3:] != '_bot' and x != 'master':
+                if self.application.collection(x):
                     for y in sorted(self.search(x),lambda k: k['number']):
                         y['dbname'] = x
                         rec.append(y)        
@@ -529,7 +533,8 @@ class Application(web.Application):
         return pos
     
     def collection(self,name):
-        if name in self.db.tables() and name != 'master':
+        names = ['master','info','_default']
+        if name in self.db.tables() and not name in names and name[-3:] != '_bot':
             return True
         else:
             return False

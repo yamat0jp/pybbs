@@ -101,7 +101,7 @@ table {
 
 form#search {
 	border:solid;
-	display:inline;
+	display:inline-block;
 	margin-top:30px;
 	margin-right:30px;
 	margin-left:30px;
