@@ -105,14 +105,17 @@ class NaviHandler(web.RequestHandler):
     def name(self):
         names = self.application.db.tables()
         na = self.application.db.get(where('kinds') == 'conf')['info name']
-        for s in ['_default','master','temp']:
-            if s in names:
-                names.remove(s)
+        s = set(['_default','master','temp'])
         if na in names:
-            names.remove(na)
+            s.add(na)
         else:
             na = ''
-        return sorted(names),na
+        names = names - s
+        item = []
+        for x in names:
+            if x[-4:] != '_bot':
+                item.append(x)
+        return sorted(item),na
                 
     def full(self,dbname):
         if dbname in self.application.db.tables():
