@@ -100,7 +100,7 @@ class WebHookHandler(tornado.web.RequestHandler):
                 bot = 'users_bot'      
                 tb = self.database.table(bot)         
                 if event['type'] == 'unfollow':
-                    tb.remove(where('name') == self.uid))
+                    tb.remove(where('name') == self.uid)
                     return
                 elif event['type'] == 'join':
                     if not tb.get(where('name') == self.uid):
