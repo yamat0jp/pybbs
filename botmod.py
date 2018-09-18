@@ -56,7 +56,7 @@ class WebHookHandler(tornado.web.RequestHandler):
         s = '-*-database names-*-\n'
         out = ['objectlabs-system','objectlabs-system.admin.collections','users_bot']
         for x in self.database.collection_names(include_system_collections=False):
-            if not x in out and x[-3:] == '_bot':
+            if not x in out and x[-4:] == '_bot':
                 s += x[:-4]+'\n'
         return s
     
@@ -64,7 +64,7 @@ class WebHookHandler(tornado.web.RequestHandler):
         dbname = dbname.lower()
         ca = self.database.collection_names(include_system_collections=False)
         ca.remove('users_bot')
-        if dbname[-3:] == '_bot' and dbname in ca:
+        if dbname[-4:] == '_bot' and dbname in ca:
             db = self.database['users_bot']
             item = db.find_one({'name':self.uid})
             if item['dbname'] == dbname:
