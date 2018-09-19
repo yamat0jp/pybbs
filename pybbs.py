@@ -5,7 +5,7 @@ import pymongo
 from datetime import datetime,date
 import json
 from bson.objectid import ObjectId #don't remove
-from botmod import *
+from botmod import WebHookHandler, InitHandler, VarParam
 
 class BaseHandler(web.RequestHandler):
     def get_current_user(self):
@@ -566,6 +566,7 @@ class Application(web.Application):
 
 if __name__ == '__main__':
     app = Application()
+    var = VarParam()
     http_server = httpserver.HTTPServer(app)
     conn = pymongo.MongoClient(var.uri,13678)
     app.db = conn[var.ac]

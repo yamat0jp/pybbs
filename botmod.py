@@ -153,10 +153,10 @@ class VarParam():
     uri = os.environ['MONGODB_URI']
     ac = os.environ['ACCOUNT']    
 
-var = VarParam()
 if __name__ == '__main__':
     application = tornado.web.Application([(r'/callback',WebHookHandler),(r'/init',InitHandler)])
     port = int(os.environ.get('PORT',5000))#important in heroku
+    var = VarParam()
     linebot = LineBotApi(token)
     webhook = WebhookParser(ch)  
     application.listen(port)
