@@ -67,7 +67,9 @@ class WebHookHandler(tornado.web.RequestHandler):
         if dbname[-4:] == '_bot' and dbname in ca:
             db = self.database['users_bot']
             item = db.find_one({'name':self.uid})
-            if not item or item['dbname'] == dbname:
+            if not item:
+                db.insert({'name':self.uid, 'dbname':dbname})
+            elif item['dbname'] == dbname:
                 return False
             else:
                 db.update({'name':self.uid}, {'name':self.uid, 'dbname':dbname})
