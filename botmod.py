@@ -69,6 +69,7 @@ class WebHookHandler(tornado.web.RequestHandler):
             item = db.find_one({'name':self.uid})
             if not item:
                 db.insert({'name':self.uid, 'dbname':dbname})
+                return True
             elif item['dbname'] == dbname:
                 return False
             else:
