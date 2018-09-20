@@ -143,13 +143,13 @@ class InitHandler(tornado.web.RequestHandler):
         table.remove()
         for x in item:
             table.insert(x)
-                     
+
 class VarParam():
     token = os.environ['Access_Token']
     ch = os.environ['Channel_Secret']
     uri = os.environ['MONGODB_URI']
     ac = os.environ['ACCOUNT']    
-
+                     
 if __name__ == '__main__':
     application = tornado.web.Application([(r'/callback',WebHookHandler),(r'/init',InitHandler)])
     port = int(os.environ.get('PORT',5000))#important in heroku
@@ -158,4 +158,6 @@ if __name__ == '__main__':
     webhook = WebhookParser(ch)  
     application.listen(port)
     tornado.ioloop.IOLoop.instance().start()
+else:
+    var = VarParam()
     
