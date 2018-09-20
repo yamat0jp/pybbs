@@ -562,7 +562,7 @@ class Application(web.Application):
         for x in name:
             if x[-4:] == '_bot':
                 name.remove(x)
-        return name
+        return sorted(name)
 
 if __name__ == '__main__':
     app = Application()
