@@ -519,7 +519,7 @@ class ListApi(web.RequestHandler):
         self.write(json.dumps(response,ensure_ascii=False))
            
  
-class WebHookHandler(tornado.web.RequestHandler):        
+class WebHookHandler(web.RequestHandler):        
     def main(self, no):
         #pz = pytz.timezone('Asia/Tokyo')
         now = datetime.now()#pz)
@@ -623,7 +623,7 @@ class WebHookHandler(tornado.web.RequestHandler):
                         TextSendMessage(text=self.main(x))
                     )
 
-class InitHandler(tornado.web.RequestHandler):
+class InitHandler(web.RequestHandler):
     def get(self):        
         uri = self.application.uri
         ac = self.application.ac
