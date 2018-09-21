@@ -648,8 +648,12 @@ class InitHandler(web.RequestHandler):
             table.insert(x) 
             
 class TestHandler(web.RequestHandler):
+    text = escape.json_encode({'type':'text', 'text':'hello'})
+    def get(self):
+        self.write(self.text)
+        
     def post(self):
-        return escape.json_encode({'type':'text', 'text':'hello'})
+        self.write(self.text)
     
 class Application(web.Application):    
     token = os.environ['Access_Token']
