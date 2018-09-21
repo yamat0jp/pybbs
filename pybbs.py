@@ -6,8 +6,8 @@ from datetime import datetime,date
 import json
 from bson.objectid import ObjectId #don't remove
 from linebot.api import LineBotApi
-from linebot.exceptions import InvalidSignatureError
-from linebot.models import TextSendMessage
+from linebot.exceptions import (InvalidSignatureError)
+from linebot.models import (TextSendMessage)
 
 
 class BaseHandler(web.RequestHandler):
