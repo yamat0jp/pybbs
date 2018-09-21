@@ -588,7 +588,7 @@ class WebHookHandler(web.RequestHandler):
         '''
         signature = self.request.headers['X-Line-Signature']
         body = self.request.body
-        parser = WebhookParser(ch)
+        parser = WebhookParser(self.application.ch)
         try:
             parser.parse(body, signature)
         except InvalidSignatureError:
@@ -609,7 +609,7 @@ class WebHookHandler(web.RequestHandler):
                         db.insert({'name':self.uid, 'dbname':'glove'})
                     return
                 x = event['message']['text']    
-                linebot = LineBotApi(self.application.ch)            
+                linebot = LineBotApi(self.application.token)            
                 if self.setting(x):
                     linebot.reply_message(event['replyToken'],
                         TextSendMessage(text=u'設定完了.'))
