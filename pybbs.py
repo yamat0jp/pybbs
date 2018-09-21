@@ -591,22 +591,19 @@ class WebHookHandler(web.RequestHandler):
         try:
             parser.parse(body, signature)
         except InvalidSignatureError:
-            tornado.web.HTTPError(404)
+            web.HTTPError(404)
             return
         '''
-        uri = self.application.uri
-        ac = self.application.ac
         dic = escape.json_decode(self.request.body)              
         for event in dic['events']:
             if 'replyToken' in event.keys():
                 self.uid = event['source']['userId']
-                self.database = pymongo.MongoClient(uri)[ac] 
                 bot = 'users_bot'               
                 if event['type'] == 'unfollow':
-                    self.database[bot].remove({'name':self.uid})
+                    self.application.db[bot].remove({'name':self.uid})
                     return
                 elif event['type'] == 'join':
-                    db = self.database[bot]
+                    db = self.application.db[bot]
                     if not db.find_one({'name':self.uid}):
                         db.insert({'name':self.uid, 'dbname':'glove'})
                     return
@@ -625,9 +622,6 @@ class WebHookHandler(web.RequestHandler):
 
 class InitHandler(web.RequestHandler):
     def get(self):        
-        uri = self.application.uri
-        ac = self.application.ac
-        self.db = pymongo.MongoClient(uri)[ac]
         for x in glob.glob('./*.txt'):
             f = open(x)
             data = f.read()
@@ -656,6 +650,7 @@ class Application(web.Application):
     ch = os.environ['Channel_Secret']
     uri = os.environ['MONGODB_URI']
     ac = os.environ['ACCOUNT']   
+    db = pymongo.MongoClient(uri)[ac]
     def __init__(self):
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),
@@ -704,8 +699,6 @@ class Application(web.Application):
 if __name__ == '__main__':
     app = Application()
     http_server = httpserver.HTTPServer(app)
-    conn = pymongo.MongoClient(app.uri,13678)
-    app.db = conn[app.ac]
     port = int(os.environ.get('PORT',5000))
     http_server.listen(port)
     ioloop.IOLoop.instance().start()
