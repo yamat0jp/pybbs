@@ -608,6 +608,9 @@ class WebHookHandler(web.RequestHandler):
                     if not db.find_one({'name':self.uid}):
                         db.insert({'name':self.uid, 'dbname':'glove'})
                     return
+                else:
+                    if event['type'] != 'message':
+                        return
                 x = event['message']['text']    
                 linebot = LineBotApi(self.application.token)            
                 if self.setting(x):
