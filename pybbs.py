@@ -596,7 +596,7 @@ class WebHookHandler(web.RequestHandler):
         '''
         uri = self.application.uri
         ac = self.application.ac
-        dic = tornado.escape.json_decode(self.request.body)              
+        dic = escape.json_decode(self.request.body)              
         for event in dic['events']:
             if 'replyToken' in event.keys():
                 self.uid = event['source']['userId']
