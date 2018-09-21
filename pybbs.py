@@ -558,17 +558,17 @@ class WebHookHandler(web.RequestHandler):
     def help(self):
         s = '-*-database names-*-\n'
         out = ['objectlabs-system','objectlabs-system.admin.collections','users_bot']
-        for x in self.database.collection_names(include_system_collections=False):
+        for x in self.application.db.collection_names(include_system_collections=False):
             if not x in out and x[-4:] == '_bot':
                 s += x[:-4]+'\n'
         return s
     
     def setting(self, dbname):
         dbname = dbname.lower()
-        ca = self.database.collection_names(include_system_collections=False)
+        ca = self.application.db.collection_names(include_system_collections=False)
         ca.remove('users_bot')
         if dbname[-4:] == '_bot' and dbname in ca:
-            db = self.database['users_bot']
+            db = self.application.db['users_bot']
             item = db.find_one({'name':self.uid})
             if item['dbname'] == dbname:
                 return False
@@ -578,10 +578,10 @@ class WebHookHandler(web.RequestHandler):
         return False
 
     def users(self):
-        db = self.database['users_bot']
+        db = self.application.db['users_bot']
         item = db.find_one({'name':self.uid})
         x = item['dbname']
-        return self.database[x], x
+        return self.application.db[x], x
                           
     def post(self):
         '''
@@ -640,7 +640,7 @@ class InitHandler(web.RequestHandler):
             elif dic:
                 dic['no'] = x
                 item.append(dic)
-        table = self.db[name+'_bot']
+        table = self.application.db[name+'_bot']
         table.remove()
         for x in item:
             table.insert(x) 
