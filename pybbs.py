@@ -612,19 +612,15 @@ class WebHookHandler(web.RequestHandler):
                     return
                 elif event['type'] != 'message' or event['message']['type'] != 'text':
                     return
-                x = event['message']['text']    
-                linebot = LineBotApi(self.application.token)            
+                x = event['message']['text']     
                 if self.setting(x):
-                    linebot.reply_message(event['replyToken'],
-                        TextSendMessage(text=u'設定完了.'))
+                    te = u'設定完了.'
                 elif x == '?':
-                    linebot.reply_message(event['replyToken'],
-                        TextSendMessage(text=self.help())
-                    )
+                    te = self.help()
                 else:
-                    linebot.reply_message(event['replyToken'],
-                        TextSendMessage(text=self.main(x))
-                    )
+                    te = self.main(x)
+                linebot = LineBotApi(self.application.token)            
+                linebot.reply_message(event['replyToken'], TextSendMessage(text=te))
 
 class InitHandler(web.RequestHandler):
     def get(self):        
