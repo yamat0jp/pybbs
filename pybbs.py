@@ -609,7 +609,7 @@ class WebHookHandler(web.RequestHandler):
                         db.insert({'name':self.uid, 'dbname':'glove'})
                     return
                 x = event['message']['text']    
-                linebot = LineBotApi(self.application.token)            
+                linebot = LineBotApi(self.application.ch)            
                 if self.setting(x):
                     linebot.reply_message(event['replyToken'],
                         TextSendMessage(text=u'設定完了.'))
