@@ -360,18 +360,16 @@ class SearchHandler(web.RequestHandler):
         table = self.application.db[dbname]    
         andor = self.andor == 'OR'
         element = self.word.split()
-        if len(element) == 0:
-            element = ['']
-        while len(element) < 3:
-            element.append(element[0])
         elm = []
-        for i in range(3):
-            elm.append(re.escape(element[i]))
+        for x in element:
+            if x != '':
+                elm.append(re.escape(x))
         if self.radiobox == 'comment':
-            query = [{'raw':re.compile(elm[0],re.IGNORECASE)},
-                        {'raw':re.compile(elm[1],re.IGNORECASE)},
-                        {'raw':re.compile(elm[2],re.IGNORECASE)}
-                        ]
+            query = []
+            for qu in elm:
+                query.append({'raw':re.compile(qu,re.IGNORECASE)})
+            if len(query) == 0:
+                return
             if andor:    
                 result = table.find({'$or':query})
                 color = 'yellow'
@@ -380,6 +378,7 @@ class SearchHandler(web.RequestHandler):
                 color = 'aqua'
             for x in result:
                 com = ''
+                i = 0
                 for text in x['raw'].splitlines():
                     for y in text:
                         if y == ' ':
@@ -387,8 +386,8 @@ class SearchHandler(web.RequestHandler):
                         else:
                             break
                     text = text.replace(' ','&nbsp;',i)                  
-                    for i in range(3):                        
-                        if element[i].lower() in text.lower():
+                    for y in element:                        
+                        if y.lower() in text.lower():
                             com = com +'<p style=background-color:'+color+'>'+text+'<br></p>'  
                             break                          
                     else:
@@ -399,7 +398,13 @@ class SearchHandler(web.RequestHandler):
                 x['comment'] = com
                 yield x       
         else:
-            for x in table.find({'$or':[{'name':element[0]},{'name':element[1]},{'name':element[2]}]}):
+            query = []
+            for x in element:
+                if x != '':
+                    query.append({'name':x})
+            if len(query) == 0:
+                return
+            for x in table.find({'$or':query}):
                 yield x  
                 
 class HelpHandler(web.RequestHandler):
