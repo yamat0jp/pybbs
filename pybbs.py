@@ -5,6 +5,7 @@ import pymongo
 from datetime import datetime,date
 import json
 from bson.objectid import ObjectId #don't remove
+from linebot.api import LineBotApi
 
 
 class BaseHandler(web.RequestHandler):
@@ -581,7 +582,7 @@ class WebHookHandler(web.RequestHandler):
         db = self.application.db['users_bot']
         item = db.find_one({'name':self.uid})
         x = item['dbname']
-        return self.application.db[x], x
+        return db[x], x
                           
     def post(self):
         '''
@@ -607,7 +608,8 @@ class WebHookHandler(web.RequestHandler):
                     if not db.find_one({'name':self.uid}):
                         db.insert({'name':self.uid, 'dbname':'glove'})
                     return
-                x = event['message']['text']                
+                x = event['message']['text']    
+                linebot = LineBotApi(self.application.token)            
                 if self.setting(x):
                     linebot.reply_message(event['replyToken'],
                         TextSendMessage(text=u'設定完了.'))
