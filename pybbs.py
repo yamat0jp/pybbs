@@ -649,7 +649,7 @@ class InitHandler(web.RequestHandler):
             
 class TestHandler(web.RequestHandler):
     def post(self):
-        pass
+        return escape.json_encode({'type':'text', 'text':'hello'})
     
 class Application(web.Application):    
     token = os.environ['Access_Token']
