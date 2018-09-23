@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 import os,re,glob
-from tornado import escape,web,ioloop,httpserver
+from tornado import escape,web,ioloop,httpserver,httpclient
 import pymongo
 from datetime import datetime,date
 import json
@@ -23,7 +23,7 @@ class BaseHandler(web.RequestHandler):
 
 class IndexHandler(BaseHandler):
     def get(self,dbname,page='0'):
-        params = self.application.db['params'].find_one()
+        params = self.application.db['params'].find_one({'app':'bbs'})
         if params['mentenance'] == True:
             self.render('mentenance.htm',title=params['title'],db=dbname)
             return
@@ -81,7 +81,7 @@ class LoginHandler(BaseHandler):
         self.render('login.htm',db=qs)
         
     def post(self):
-        pw = self.application.db['params'].find_one()
+        pw = self.application.db['params'].find_one({'app':'bbs'})
         if self.get_argument('password') == pw['password']:
             self.set_current_user('admin')
         dbname = self.get_argument('record')
@@ -106,14 +106,14 @@ class NaviHandler(web.RequestHandler):
             item = {"mentenance":False,"out_words":[u"阿保",u"馬鹿",u"死ね"],"password":"admin",
                     "title2":"<h1 style=color:gray;text-align:center>pybbs</h1>",
                     "bad_words":["<style","<link","<script","<img"],"count":30,
-                    "title":"pybbs","info name":"info"}
+                    "title":"pybbs","info name":"info",'app':'bbs'}       
             self.application.db['params'].insert(item)
         coll,na = self.name()                
         self.render('top.htm',coll=coll,name=na,full=self.full)
                   
     def name(self):
         coll = sorted(self.application.coll(),key=str.lower)
-        na = self.application.db['params'].find_one()['info name']
+        na = self.application.db['params'].find_one({'app':'bbs'})['info name']
         if na in coll:
             coll.remove(na)
         else:
@@ -122,7 +122,7 @@ class NaviHandler(web.RequestHandler):
             
     def full(self,dbname):
         if dbname in self.application.db.collection_names():
-            i = 10*self.application.db['params'].find_one()['count']
+            i = 10*self.application.db['params'].find_one({'app':'bbs'})['count']
             table = self.application.db[dbname]
             if table.count() >= i:
                 return True
@@ -171,7 +171,7 @@ class RegistHandler(web.RequestHandler):
             raise web.HTTPError(404)
             return
         self.database = dbname
-        rec = self.application.db['params'].find_one()
+        rec = self.application.db['params'].find_one({'app':'bbs'})
         words = rec['bad_words']
         out = rec['out_words']
         rule = self.get_argument('aikotoba')
@@ -262,7 +262,7 @@ class AdminHandler(BaseHandler):
             return
         table = self.application.db[dbname] 
         rec = table.find().sort('number')                   
-        mente = self.application.db['params'].find_one()
+        mente = self.application.db['params'].find_one({'app':'bbs'})
         if mente['mentenance'] == True:
             check = 'checked=checked'
         else:
@@ -281,7 +281,7 @@ class AdminConfHandler(BaseHandler):
     @web.authenticated
     def post(self,dbname,func):
         if func == 'set':
-            param = self.application.db['params'].find_one()
+            param = self.application.db['params'].find_one({'app':'bbs'})
             if self.get_argument('mente','') == 'on':
                 mente = True
             else:
@@ -327,7 +327,7 @@ class UserHandler(web.RequestHandler):
     def page(self,table,number):
         tb = self.application.db[table]
         rec = tb.find({'number':{'$lte':number}}).count()
-        conf = self.application.db['params'].find_one()
+        conf = self.application.db['params'].find_one({'app':'bbs'})
         if tb.find().count()-rec >= conf['count']:
             return '/'+str(1+rec//conf['count'])+'/'
         else:
@@ -388,7 +388,7 @@ class SearchHandler(web.RequestHandler):
                     text = text.replace(' ','&nbsp;',i)                  
                     for y in element:                        
                         if y.lower() in text.lower():
-                            com = com +'<p style=background-color:'+color+'>'+text+'<br></p>'  
+                            com += '<p style=background-color:'+color+'>'+text+'<br></p>'  
                             break                          
                     else:
                         if text == '':
@@ -652,6 +652,30 @@ class InitHandler(web.RequestHandler):
         for x in item:
             table.insert(x) 
             
+class TokenHandler(web.RequestHandler):
+    def on_response(self, response):
+        dic = escape.json_decode(response.body)
+        token = dic['access_token']
+        table = self.application.db['params']
+        data = {'app':'bot', 'access_token':token}
+        if table.find_one({'app':'bot'}):
+            table.save(data)
+        else:
+            table.insert(data)
+        self.finish()
+
+    @web.asynchronous   
+    def get(self):
+        url = 'https://api.line.me/v2/oauth/accessToken'
+        headers = 'application/x-www-form-urlencoded'
+        grant = 'grant_type=client_credentials'
+        ci = 'client_id='+self.application.id
+        cs = 'client_secret='+self.application.ch
+        body = grant+'&'+ci+'&'+cs
+        req = httpclient.HTTPRequest(url=url,method='POST',headers=headers,body=body)
+        http = httpclient.AsyncHTTPClient()
+        http.fetch(req, callback=self.on_response)
+    
 class TestHandler(web.RequestHandler):
     text = escape.json_encode({'type':'text', 'text':'hello'})
     def get(self):
@@ -660,8 +684,8 @@ class TestHandler(web.RequestHandler):
     def post(self):
         self.write(self.text)
     
-class Application(web.Application):    
-    token = os.environ['Access_Token']
+class Application(web.Application):  
+    id = os.environ['Bot_Id']  
     ch = os.environ['Channel_Secret']
     uri = os.environ['MONGODB_URI']
     ac = os.environ['ACCOUNT']   
@@ -671,7 +695,7 @@ class Application(web.Application):
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),
                     (r'/write/api/([a-zA-Z0-9_]+)/()/()/()',ArticleApi),(r'/list/api/([a-zA-Z0-9]+)',ListApi),
                     (r'/help',HelpHandler),(r'/master',MasterHandler),(r'/alert',AlertHandler),(r'/jump',JumpHandler),
-                    (r'/callback',WebHookHandler),(r'/init',InitHandler),(r'/search',SearchHandler),(r'/clean',CleanHandler),(r'/hatena',TestHandler),
+                    (r'/callback',WebHookHandler),(r'/init',InitHandler),(r'/search',SearchHandler),(r'/clean',CleanHandler),(r'/hatena',TestHandler),(r'/token',TokenHandler),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
@@ -686,7 +710,7 @@ class Application(web.Application):
         super().__init__(handlers,**settings)
  
     def gpos(self,dbname,page):
-        params = self.db['params'].find_one()
+        params = self.db['params'].find_one({'app':'bbs'})
         pos = int(page)
         if pos <= 0:
             pos = 0
