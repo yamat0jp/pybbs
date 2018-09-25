@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 import os,re,glob
 from tornado import escape,web,ioloop,httpserver,httpclient
-import pymongo
+import pymongo, urllib
 from datetime import datetime,date
 import json
 from bson.objectid import ObjectId #don't remove
@@ -624,7 +624,8 @@ class WebHookHandler(web.RequestHandler):
                     te = self.help()
                 else:
                     te = self.main(x)
-                linebot = LineBotApi(self.application.token)            
+                token = self.application.db['params'].find_one({'app':'bot'})['access_token']
+                linebot = LineBotApi(token)            
                 linebot.reply_message(event['replyToken'], TextSendMessage(text=te))
 
 class InitHandler(web.RequestHandler):
@@ -668,10 +669,8 @@ class TokenHandler(web.RequestHandler):
     def get(self):
         url = 'https://api.line.me/v2/oauth/accessToken'
         headers = 'application/x-www-form-urlencoded'
-        grant = 'grant_type=client_credentials'
-        ci = 'client_id='+self.application.id
-        cs = 'client_secret='+self.application.ch
-        body = grant+'&'+ci+'&'+cs
+        data = {'grant_type':'client_credentials', 'client_id':self.application.id, 'client_secret':self.application.ch}
+        body = urllib.parse.urlencode(data)
         req = httpclient.HTTPRequest(url=url,method='POST',headers=headers,body=body)
         http = httpclient.AsyncHTTPClient()
         http.fetch(req, callback=self.on_response)
