@@ -624,9 +624,10 @@ class WebHookHandler(web.RequestHandler):
                     te = self.help()
                 else:
                     te = self.main(x)
-                token = self.application.db['params'].find_one({'app':'bot'})['access_token']
-                linebot = LineBotApi(token)            
-                linebot.reply_message(event['replyToken'], TextSendMessage(text=te))
+                item = self.application.db['params'].find_one({'app':'bot'})
+                if 'access_token' in item.keys():
+                    linebot = LineBotApi(token)            
+                    linebot.reply_message(event['replyToken'], TextSendMessage(text=te))
 
 class InitHandler(web.RequestHandler):
     def get(self):        
