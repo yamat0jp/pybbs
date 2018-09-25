@@ -574,7 +574,8 @@ class WebHookHandler(web.RequestHandler):
     def setting(self, dbname):
         dbname = dbname.lower()
         ca = self.application.db.collection_names(include_system_collections=False)
-        ca.remove('users_bot')
+        if 'users_bos' in ca.keys():
+            ca.remove('users_bot')
         if dbname[-4:] == '_bot' and dbname in ca:
             db = self.application.db['users_bot']
             item = db.find_one({'name':self.uid})
