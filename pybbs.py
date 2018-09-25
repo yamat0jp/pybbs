@@ -611,12 +611,11 @@ class WebHookHandler(web.RequestHandler):
                 if event['type'] == 'unfollow':
                     self.application.db[bot].remove({'name':self.uid})
                     return
-                elif event['type'] == 'join':
-                    db = self.application.db[bot]
-                    if not db.find_one({'name':self.uid}):
-                        db.insert({'name':self.uid, 'dbname':'glove'})
-                    return
                 elif event['type'] != 'message' or event['message']['type'] != 'text':
+                    return
+                if not bot in self.application.db.collection_names() or not self.application.db[bot].find_one({'name':self.uid}):
+                    db = self.application.db[bot]
+                    db.insert({'name':self.uid, 'dbname':'glove'})
                     return
                 x = event['message']['text']     
                 if self.setting(x):
