@@ -628,8 +628,8 @@ class WebHookHandler(web.RequestHandler):
                     linebot = LineBotApi(item['access_token'])            
                     linebot.reply_message(event['replyToken'], TextSendMessage(text=te))
                 else:
-                    item = {'type':'text', 'text':'hello'}
-                    self.write(escape.json_encode(item))
+                    event['message']['text'] = te
+                    self.write(escape.json_encode(event))
 
 class InitHandler(web.RequestHandler):
     def get(self):        
