@@ -616,7 +616,6 @@ class WebHookHandler(web.RequestHandler):
                 if not bot in self.application.db.collection_names() or not self.application.db[bot].find_one({'name':self.uid}):
                     db = self.application.db[bot]
                     db.insert({'name':self.uid, 'dbname':'glove'})
-                    return
                 x = event['message']['text']     
                 if self.setting(x):
                     te = u'設定完了.'
@@ -626,8 +625,11 @@ class WebHookHandler(web.RequestHandler):
                     te = self.main(x)
                 item = self.application.db['params'].find_one({'app':'bot'})
                 if item and 'access_token' in item.keys():
-                    linebot = LineBotApi(token)            
+                    linebot = LineBotApi(item['access_token'])            
                     linebot.reply_message(event['replyToken'], TextSendMessage(text=te))
+                else:
+                    item = {'type':'text', 'text':'hello'}
+                    self.write(escape.json_encode(item))
 
 class InitHandler(web.RequestHandler):
     def get(self):        
