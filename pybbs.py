@@ -625,7 +625,7 @@ class WebHookHandler(web.RequestHandler):
                 else:
                     te = self.main(x)
                 item = self.application.db['params'].find_one({'app':'bot'})
-                if 'access_token' in item.keys():
+                if item and 'access_token' in item.keys():
                     linebot = LineBotApi(token)            
                     linebot.reply_message(event['replyToken'], TextSendMessage(text=te))
 
