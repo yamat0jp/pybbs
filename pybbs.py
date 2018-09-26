@@ -590,7 +590,7 @@ class WebHookHandler(web.RequestHandler):
         db = self.application.db['users_bot']
         item = db.find_one({'name':self.uid})
         x = item['dbname']
-        return db[x], x
+        return self.application.db[x], x[:-4]
                           
     def post(self):
         '''
