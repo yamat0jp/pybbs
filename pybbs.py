@@ -637,7 +637,7 @@ class InitHandler(web.RequestHandler):
             f = open(x)
             data = f.read()
             f.close()
-            self.main(x[2:-4], data)
+            self.main(x[2:-4].lower(), data)
     
     def main(self, name, data):
         if name == 'requirements':
@@ -678,14 +678,6 @@ class TokenHandler(web.RequestHandler):
         http = httpclient.AsyncHTTPClient()
         http.fetch(req, callback=self.on_response)
     
-class TestHandler(web.RequestHandler):
-    text = escape.json_encode({'type':'text', 'text':'hello'})
-    def get(self):
-        self.write(self.text)
-        
-    def post(self):
-        self.write(self.text)
-    
 class Application(web.Application):  
     id = os.environ['Bot_Id']  
     ch = os.environ['Channel_Secret']
@@ -698,7 +690,7 @@ class Application(web.Application):
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),
                     (r'/write/api/([a-zA-Z0-9_]+)/()/()/()',ArticleApi),(r'/list/api/([a-zA-Z0-9]+)',ListApi),
                     (r'/help',HelpHandler),(r'/master',MasterHandler),(r'/alert',AlertHandler),(r'/jump',JumpHandler),
-                    (r'/callback',WebHookHandler),(r'/init',InitHandler),(r'/search',SearchHandler),(r'/clean',CleanHandler),(r'/hatena',TestHandler),(r'/token',TokenHandler),
+                    (r'/callback',WebHookHandler),(r'/init',InitHandler),(r'/search',SearchHandler),(r'/clean',CleanHandler),(r'/token',TokenHandler),
                     (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
