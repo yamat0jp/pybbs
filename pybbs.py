@@ -579,7 +579,7 @@ class WebHookHandler(web.RequestHandler):
         if dbname[-4:] == '_bot' and dbname in ca:
             db = self.application.db['users_bot']
             item = db.find_one({'name':self.uid})
-            if item['dbname'] == dbname:
+            if item['dbname'] == dbname[:-4]:
                 return False
             else:
                 db.update({'name':self.uid}, {'name':self.uid, 'dbname':dbname})
