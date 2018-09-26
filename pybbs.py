@@ -624,12 +624,12 @@ class WebHookHandler(web.RequestHandler):
                 else:
                     te = self.main(x)
                 item = self.application.db['params'].find_one({'app':'bot'})
-                if item and 'access_token' in item.keys():
-                    linebot = LineBotApi(item['access_token'])            
-                    linebot.reply_message(event['replyToken'], TextSendMessage(text=te))
+                if item:
+                    token = item['access_token']
                 else:
-                    event['message']['text'] = te
-                    self.write(escape.json_encode(dic))
+                    token = self.application.tk
+                linebot = LineBotApi(token)            
+                linebot.reply_message(event['replyToken'], TextSendMessage(text=te))
 
 class InitHandler(web.RequestHandler):
     def get(self):        
@@ -691,6 +691,7 @@ class Application(web.Application):
     ch = os.environ['Channel_Secret']
     uri = os.environ['MONGODB_URI']
     ac = os.environ['ACCOUNT']   
+    tk = os.environ['long_token']
     db = pymongo.MongoClient(uri)[ac]
     def __init__(self):
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
