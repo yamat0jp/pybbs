@@ -618,7 +618,7 @@ class WebHookHandler(web.RequestHandler):
                     de = item['default']
                 else:
                     de = '_bot'         
-                if item and 'access_token' in item.key():
+                if item and 'access_token' in item.keys():
                     token = item['access_token']
                 else:      
                     token =self.application.tk
