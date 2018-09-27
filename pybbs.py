@@ -567,7 +567,7 @@ class WebHookHandler(web.RequestHandler):
         s = '-*-database names-*-\n'
         out = ['objectlabs-system','objectlabs-system.admin.collections','users_bot']
         for x in self.application.db.collection_names(include_system_collections=False):
-            if not x in out and x[-4:] == '_bot':
+            if not x in out and x[-4:] == '_bot' and x != '_bot':
                 s += x[:-4]+'\n'
         return s
     
@@ -613,26 +613,38 @@ class WebHookHandler(web.RequestHandler):
                     return
                 elif event['type'] != 'message' or event['message']['type'] != 'text':
                     return
-                if not bot in self.application.db.collection_names() or not self.application.db[bot].find_one({'name':self.uid}):
+                elif event['type'] == 'join':
                     db = self.application.db[bot]
-                    db.insert({'name':self.uid, 'dbname':'glove'})
-                x = event['message']['text']     
+                    db.insert({'name':self.uid, 'dbname':'globe_bot'})
+                    return
+                item = self.application.db['params'].find_one({'app':'bot'})
+                if item:
+                    de = item['default']
+                    token = item['access_token']
+                else:
+                    de = '_bot'                
+                    token =self.application.tk
+            """ if not bot in self.application.db.collection_names() or not self.application.db[bot].find_one({'name':self.uid}):
+                    db = self.application.db[bot]
+                    db.insert({'name':self.uid, 'dbname':de})
+            """ x = event['message']['text']     
                 if self.setting(x):
                     te = u'設定完了.'
                 elif x == '?':
                     te = self.help()
                 else:
                     te = self.main(x)
-                item = self.application.db['params'].find_one({'app':'bot'})
-                if item:
-                    token = item['access_token']
-                else:
-                    token = self.application.tk
                 linebot = LineBotApi(token)            
                 linebot.reply_message(event['replyToken'], TextSendMessage(text=te))
 
 class InitHandler(web.RequestHandler):
     def get(self):        
+        de = self.get_argument('default', '')     
+        if de == '':
+            self.write('set default db name')
+            return
+        tb = self.application.db['params']
+        tb.insert({'app':'bot', 'default':de+'_bot'})
         for x in glob.glob('./*.txt'):
             f = open(x)
             data = f.read()
