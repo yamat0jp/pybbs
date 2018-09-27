@@ -62,10 +62,10 @@ class WebHookHandler(tornado.web.RequestHandler):
         return s
     
     def setting(self, dbname):
-        dbname = dbname.lower()
+        dbname = dbname.lower()+'_bot'
         ca = self.database.tables()
         ca.remove('users_bot')
-        if dbname[-4:] == '_bot' and dbname in ca:
+        if dbname in ca:
             db = self.database['users_bot']
             item = db.get(where('name') == self.uid)
             if item['dbname'] == dbname:
@@ -79,7 +79,7 @@ class WebHookHandler(tornado.web.RequestHandler):
         db = self.database.table('users_bot')
         item = db.get(where('name') == self.uid)
         x = item['dbname']
-        return self.database.table(x), x
+        return self.database.table(x), x[:-4]
                           
     def post(self):
         '''
@@ -104,29 +104,35 @@ class WebHookHandler(tornado.web.RequestHandler):
                     return
                 elif event['type'] == 'join':
                     if not tb.get(where('name') == self.uid):
-                        tb.insert({'name':self.uid, 'dbname':'glove'})
+                        item = tb['params'].get(where('app') == 'bot')
+                        if not item:
+                            de = '_bot'
+                        else:
+                            de = item['default']
+                        tb.insert({'name':self.uid, 'dbname':de})
                     return
                 x = event['message']['text']                
                 if self.setting(x):
-                    linebot.reply_message(event['replyToken'],
-                        TextSendMessage(text=u'設定完了.'))
+                    te = u'設定完了.'
                 elif x == '?':
-                    linebot.reply_message(event['replyToken'],
-                        TextSendMessage(text=self.help())
-                    )
+                    te = self.help()
                 else:
-                    linebot.reply_message(event['replyToken'],
-                        TextSendMessage(text=self.main(x))
-                    )
+                    te = self.main(x)
+                linebot.reply_message(event['replyToken'], TextSendMessage(text=te))
 
 class InitHandler(tornado.web.RequestHandler):
     def get(self):        
+        de = self.get_argument('default', '')
+        if de == '':
+            self.write('set default db name')
+            return
         self.db = TinyDB(st.json)
+        self.db['params'].insert({'app':'bot', 'default':de+'_bot'})
         for x in glob.glob('./*.txt'):
             f = open(x)
             data = f.read()
             f.close()
-            self.main(x[2:-4], data)
+            self.main(x[2:-4].lower(), data)
     
     def main(self, name, data):
         if name == 'requirements':
@@ -146,7 +152,7 @@ class InitHandler(tornado.web.RequestHandler):
             table.insert(x)
                      
 class VarParam():
-    token = os.environ['Access_Token']
+    token = os.environ['long_token']
     ch = os.environ['Channel_Secret']
 
 var = VarParam()
