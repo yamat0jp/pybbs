@@ -640,7 +640,10 @@ class InitHandler(web.RequestHandler):
             self.write('set default db name')
             return
         tb = self.application.db['params']
-        tb.insert({'app':'bot', 'default':de+'_bot'})
+        if tb.find_one({'app':'bot'}):
+            tb.update({'app':'bot', 'default':de+'_bot'})
+        else:
+            tb.insert({'app':'bot', 'default':de+'_bot'})
         for x in glob.glob('./*.txt'):
             f = open(x)
             data = f.read()
