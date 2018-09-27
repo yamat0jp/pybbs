@@ -639,7 +639,7 @@ class InitHandler(web.RequestHandler):
     def get(self):        
         de = self.get_argument('default', '')     
         if de == '':
-            self.write('set default db name')
+            self.write('set default db name: example ./init?default=glove')
             return
         tb = self.application.db['params']
         if tb.find_one({'app':'bot'}):
