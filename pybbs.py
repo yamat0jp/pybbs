@@ -616,9 +616,11 @@ class WebHookHandler(web.RequestHandler):
                 item = self.application.db['params'].find_one({'app':'bot'})
                 if item:
                     de = item['default']
-                    token = item['access_token']
                 else:
-                    de = '_bot'                
+                    de = '_bot'         
+                if item and 'access_token' in item.key():
+                    token = item['access_token']
+                else:      
                     token =self.application.tk
                 if not bot in self.application.db.collection_names() or not self.application.db[bot].find_one({'name':self.uid}):
                     db = self.application.db[bot]
