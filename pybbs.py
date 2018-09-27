@@ -641,7 +641,7 @@ class InitHandler(web.RequestHandler):
             return
         tb = self.application.db['params']
         if tb.find_one({'app':'bot'}):
-            tb.update({'app':'bot', 'default':de+'_bot'})
+            tb.update({'app':'bot'}, {'app':'bot', 'default':de+'_bot'})
         else:
             tb.insert({'app':'bot', 'default':de+'_bot'})
         for x in glob.glob('./*.txt'):
