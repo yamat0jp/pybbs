@@ -613,10 +613,6 @@ class WebHookHandler(web.RequestHandler):
                     return
                 elif event['type'] != 'message' or event['message']['type'] != 'text':
                     return
-                elif event['type'] == 'join':
-                    db = self.application.db[bot]
-                    db.insert({'name':self.uid, 'dbname':'globe_bot'})
-                    return
                 item = self.application.db['params'].find_one({'app':'bot'})
                 if item:
                     de = item['default']
@@ -624,10 +620,10 @@ class WebHookHandler(web.RequestHandler):
                 else:
                     de = '_bot'                
                     token =self.application.tk
-            """ if not bot in self.application.db.collection_names() or not self.application.db[bot].find_one({'name':self.uid}):
+                if not bot in self.application.db.collection_names() or not self.application.db[bot].find_one({'name':self.uid}):
                     db = self.application.db[bot]
                     db.insert({'name':self.uid, 'dbname':de})
-            """ x = event['message']['text']     
+                x = event['message']['text']     
                 if self.setting(x):
                     te = u'設定完了.'
                 elif x == '?':
