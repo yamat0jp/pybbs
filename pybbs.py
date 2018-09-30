@@ -639,7 +639,12 @@ class InitHandler(web.RequestHandler):
     def get(self):        
         de = self.get_argument('default', '')     
         if de == '':
-            self.write('set default db name: example ./init?default=glove')
+            names = self.application.db.collection_names()
+            db = []
+            for x in names:
+                if x[-4:] == '_bot':
+                    db.append(x[:-4])
+            self.render('init.htm',db=db)
             return
         tb = self.application.db['params']
         if tb.find_one({'app':'bot'}):
