@@ -1,0 +1,8 @@
+<!doctype html>
+<html>
+<header><meta charset=utf-8><title>setting</title></header>
+<body>
+{% for x in db %}
+	<p><a href={{static_url('init.htm?default='+x)}}>{{x}}</a>
+{% end %}
+</body></html>
