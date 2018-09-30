@@ -642,7 +642,7 @@ class InitHandler(web.RequestHandler):
             names = self.application.db.collection_names()
             db = []
             for x in names:
-                if x[-4:] == '_bot':
+                if x[-4:] == '_bot' and x != 'users_bot':
                     db.append(x[:-4])
             self.render('init.htm',db=db)
             return
