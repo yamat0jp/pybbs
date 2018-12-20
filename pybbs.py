@@ -474,7 +474,7 @@ class CleanHandler(web.RequestHandler):
             self.application.db['temp'].remove()
         elif bool == 'false':
             for x in list(table.find()):           
-                if not 'number' in x.keys():
+                if not 'num' in x.keys():
                     table.remove({'_id':x['_id']})
                 else:
                     item = self.application.db[x['db']].find_one({'number':int(x['num'])})
