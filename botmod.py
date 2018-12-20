@@ -152,8 +152,14 @@ class InitHandler(tornado.web.RequestHandler):
             table.insert(x)
                      
 class VarParam():
-    token = os.environ['long_token']
-    ch = os.environ['Channel_Secret']
+    file = open('.env','r')
+    str = file.readline()
+    while str:
+        if str[:12] == 'Access_Token':
+            token = str[13:]
+        elif str[:14] == 'Channel_Secret':
+            ch = str[15:]
+        str = file.readline()
 
 var = VarParam()
 st = dbjson.static()
