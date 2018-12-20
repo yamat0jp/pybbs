@@ -427,7 +427,8 @@ class MasterHandler(BaseHandler):
     def get(self):
         if self.current_user == b'admin':
             com = self.application.db['master'].find()
-            self.render('master.htm',com=com)
+            sum = self.application.db['temp'].find().count()
+            self.render('master.htm',com=com,sum=sum)
         else:
             raise web.HTTPError(404)
     
@@ -470,16 +471,18 @@ class CleanHandler(web.RequestHandler):
         table = self.application.db['master']
         if bool == 'true':
             table.remove()
+            self.application.db['temp'].remove()
         elif bool == 'false':
             for x in list(table.find()):           
                 if not 'number' in x.keys():
                     table.remove({'_id':x['_id']})
                 else:
                     item = self.application.db[x['db']].find_one({'number':int(x['num'])})
-                    if not item or item['raw'] == '':
+                    if (not item)or(item['raw'] == ''):
                         table.remove({'_id':x['_id']})   
         com = self.application.db['master'].find()
-        self.render('master.htm', com=com)    
+        sum = self.application.db['temp'].find().count()
+        self.render('master.htm', com=com, sum=sum)
                                         
 class FooterModule(web.UIModule):
     def render(self,number,url,link):
