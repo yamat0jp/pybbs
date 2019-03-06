@@ -22,6 +22,7 @@ class BaseHandler(web.RequestHandler):
 
 class IndexHandler(BaseHandler):
     def get(self,dbname,page='0'):
+        self.sparse()
         dbname = escape.url_unescape(dbname)
         params = self.application.db.get(where('kinds') == 'conf')
         if params['mentenance'] == True:
@@ -64,7 +65,14 @@ class IndexHandler(BaseHandler):
             self.render('modules/info.htm',position=pos,records=rec,data=params,db=dbname)
         else:
             self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname,aikotoba=rule)
-        
+
+    def sparse(self):
+        if date.weekday(datetime.now()) == 6:
+            table = self.application.db.table('temp')
+            item = table.all(where('date') < 6)
+            if len(item) > 0:
+                table.remove(where('date') < 6)
+
 class LoginHandler(BaseHandler):
     def get(self):
         query = self.get_query_argument('next','')
