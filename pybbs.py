@@ -22,6 +22,7 @@ class BaseHandler(web.RequestHandler):
 
 class IndexHandler(BaseHandler):
     def get(self,dbname,page='0'):
+        dbname = escape.url_unescape(dbname)
         params = self.application.db.get(where('kinds') == 'conf')
         if params['mentenance'] == True:
             self.render('mentenance.htm',title=params['title'],db=dbname)
@@ -91,7 +92,7 @@ class LogoutHandler(BaseHandler):
         self.clear_current_user()
         self.redirect('/login')
         
-class NaviHandler(web.RequestHandler):              
+class NaviHandler(web.RequestHandler):
     def get(self):
         if self.application.db.get(where('kinds') == 'conf') == None:
             item = {"mentenance":False,"out_words":[u"阿保",u"馬鹿",u"死ね"],"password":"admin",
@@ -527,12 +528,12 @@ class Application(web.Application):
     def __init__(self):
         self.db = TinyDB(st.json)
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
-                    (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_]+)',ArticleApi),
+                    (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_%]+)/([0-9]+)',ArticleApi),(r'/write/api/([a-zA-Z0-9_%]+)',ArticleApi),
                     (r'/help',HelpHandler),(r'/master/*',MasterHandler),(r'/alert',AlertHandler),(r'/search',SearchHandler),(r'/clean',CleanHandler),
                     (r'/callback',WebHookHandler),
-                    (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/*',IndexHandler),
-                    (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
-                    (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
+                    (r'/([a-zA-Z0-9_%]+)',IndexHandler),(r'/([a-zA-Z0-9_%]+)/([0-9]+)/*',IndexHandler),
+                    (r'/([a-zA-Z0-9_%]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_%]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_%]+)/userdel',UserHandler),
+                    (r'/([a-zA-Z0-9_%]+)/search',SearchHandler),(r'/([a-zA-Z0-9_%]+)/regist',RegistHandler)]
         settings = {'template_path':os.path.join(os.path.dirname(__file__),'templates'),
                         'static_path':os.path.join(os.path.dirname(__file__),'static'),
                         'ui_modules':{'Footer':FooterModule},
@@ -562,5 +563,5 @@ class Application(web.Application):
 if __name__ == '__main__':
     st = dbjson.static()
     http_server = httpserver.HTTPServer(Application())
-    http_server.listen(5000)
+    http_server.listen(8000)
     ioloop.IOLoop.instance().start()
