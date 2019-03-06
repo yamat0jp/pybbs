@@ -73,10 +73,13 @@ class IndexHandler(BaseHandler):
             self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname,aikotoba=rule)
 
     def sparse(self):
-        if date.weekday(datetime.now()) == 6:
+        day = date.weekday(datetime.now())
+        if day in [2,6]:
             table = self.application.db['temp']
-            if table.count() > 0:
-                table.remove()
+            query = {'$nin':[2,6]}
+            item = table.find({'date':query})
+            if item.count > 0:
+                table.remove({'date':query})
 
 class LoginHandler(BaseHandler):
     def get(self):
