@@ -23,6 +23,7 @@ class BaseHandler(web.RequestHandler):
 
 class IndexHandler(BaseHandler):
     def get(self,dbname,page='0'):
+        dbname = escape.url_unescape(dbname)
         params = self.application.db['params'].find_one({'app':'bbs'})
         if params['mentenance'] == True:
             self.render('mentenance.htm',title=params['title'],db=dbname)
@@ -528,8 +529,7 @@ class ListApi(web.RequestHandler):
         if response == None:
             response = {}
         self.write(json.dumps(response,ensure_ascii=False))
-           
- 
+
 class WebHookHandler(web.RequestHandler):        
     def main(self, no):
         #pz = pytz.timezone('Asia/Tokyo')
@@ -689,7 +689,7 @@ class TokenHandler(web.RequestHandler):
             table.insert(data)
         self.finish()
 
-    @web.asynchronous   
+    #@web.asynchronous
     def get(self):
         url = 'https://api.line.me/v2/oauth/accessToken'
         headers = 'application/x-www-form-urlencoded'
@@ -698,8 +698,8 @@ class TokenHandler(web.RequestHandler):
         req = httpclient.HTTPRequest(url=url,method='POST',headers=headers,body=body)
         http = httpclient.AsyncHTTPClient()
         http.fetch(req, callback=self.on_response)
-    
-class Application(web.Application):  
+
+class Application(web.Application):
     id = os.environ['Bot_Id']  
     ch = os.environ['Channel_Secret']
     uri = os.environ['MONGODB_URI']
@@ -709,12 +709,12 @@ class Application(web.Application):
     def __init__(self):
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),
-                    (r'/write/api/([a-zA-Z0-9_]+)/()/()/()',ArticleApi),(r'/list/api/([a-zA-Z0-9]+)',ListApi),
+                    (r'/write/api/([a-zA-Z0-9_%]+)/()/()/()',ArticleApi),(r'/list/api/([a-zA-Z0-9_%]+)',ListApi),
                     (r'/help',HelpHandler),(r'/master',MasterHandler),(r'/alert',AlertHandler),(r'/jump',JumpHandler),
                     (r'/callback',WebHookHandler),(r'/init',InitHandler),(r'/search',SearchHandler),(r'/clean',CleanHandler),(r'/token',TokenHandler),
-                    (r'/([a-zA-Z0-9_]+)',IndexHandler),(r'/([a-zA-Z0-9_]+)/([0-9]+)/',IndexHandler),
-                    (r'/([a-zA-Z0-9_]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_]+)/userdel',UserHandler),
-                    (r'/([a-zA-Z0-9_]+)/search',SearchHandler),(r'/([a-zA-Z0-9_]+)/regist',RegistHandler)]
+                    (r'/([a-zA-Z0-9_%]+)',IndexHandler),(r'/([a-zA-Z0-9_%]+)/([0-9]+)/',IndexHandler),
+                    (r'/([a-zA-Z0-9_%]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_%]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_%]+)/userdel',UserHandler),
+                    (r'/([a-zA-Z0-9_%]+)/search',SearchHandler),(r'/([a-zA-Z0-9_%]+)/regist',RegistHandler)]
         settings = {'template_path':os.path.join(os.path.dirname(__file__),'templates'),
                         'static_path':os.path.join(os.path.dirname(__file__),'static'),
                         'ui_modules':{'Footer':FooterModule},
