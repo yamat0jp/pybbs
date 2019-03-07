@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 import os,re,glob
 from tornado import escape,web,ioloop,httpserver,httpclient
-from pyquery import PyQuery as pq
 import pymongo, urllib
 from datetime import datetime,date
 import json
