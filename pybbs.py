@@ -326,8 +326,9 @@ class AdminConfHandler(BaseHandler):
           
 class UserHandler(web.RequestHandler):
     def get(self,dbname):
+        tb = self.application.db[dbname]
         q = self.get_query_argument('job','0',strip=True)
-        num = self.page(int(q))        
+        num = self.page(tb,int(q))
         if num == '':
             self.redirect('/{0}#{1}'.format(dbname,q))           
         else:
