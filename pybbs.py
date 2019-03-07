@@ -305,7 +305,8 @@ class AdminConfHandler(BaseHandler):
 class UserHandler(web.RequestHandler):
     def get(self,dbname):
         q = self.get_query_argument('job','0',strip=True)
-        num = self.page(dbname,int(q))
+        tb = self.application.db[dbname]
+        num = self.page(tb,int(q))
         self.redirect('/{0}{1}#{2}'.format(dbname,num,q))
         
     def post(self,dbname):
@@ -322,15 +323,14 @@ class UserHandler(web.RequestHandler):
             obj = table.find_one({'number':num})
             if obj and(obj['password'] == pas):
                 table.update({'number':num},{'$set':{'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>','raw':''}})
-                self.redirect('/'+dbname+self.page(dbname,num)+'#'+number)
+                self.redirect('/'+dbname+self.page(table,num)+'#'+number)
             else:
                 self.redirect('/'+dbname)
                 
     def page(self,table,number):
-        tb = self.application.db[table]
-        rec = tb.find({'number':{'$lte':number}}).count()
+        rec = table.find({'number':{'$lte':number}}).count()
         conf = self.application.db['params'].find_one({'app':'bbs'})
-        if tb.find().count()-rec >= conf['count']:
+        if table.find().count()-rec >= conf['count']:
             return '/'+str(1+rec//conf['count'])+'/'
         else:
             return ''
@@ -438,10 +438,11 @@ class AlertHandler(UserHandler):
     def get(self):
         db = self.get_query_argument('db')
         num = self.get_query_argument('num')
-        tb = self.application.db[db].find_one({'number':int(num)})
+        table = self.application.db[db]
+        tb = table.find_one({'number':int(num)})
         com = tb['comment']
         time = datetime.now().strftime('%Y/%m/%d')
-        s = self.page(db,int(num))
+        s = self.page(table,int(num))
         link = '/'+db+s+'#'+num  
         jump = '<p><a href={0}>{0}</a>'.format(link)
         d = date.weekday(datetime.now())
