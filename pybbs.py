@@ -325,9 +325,7 @@ class AdminConfHandler(BaseHandler):
                     table.insert_multiple(bak.table(x).all())
           
 class UserHandler(web.RequestHandler):
-    table = None
     def get(self,dbname):
-        self.table = self.application.db.table(dbname)
         q = self.get_query_argument('job','0',strip=True)
         num = self.page(int(q))        
         if num == '':
@@ -339,28 +337,27 @@ class UserHandler(web.RequestHandler):
         number = self.get_argument('number')
         if number.isdigit() == True:
             num = int(number)
-            self.table = self.application.db.table(dbname)
+            table = self.application.db.table(dbname)
             if 'password' in self.request.arguments.keys():
                 pas = self.get_argument('password')
             else:
-                self.redirect('/{0}{1}#{2}'.format(dbname,self.page(num),number))
+                self.redirect('/{0}{1}#{2}'.format(dbname,self.page(table,num),number))
                 return
             qwr = Query()
-            obj = self.table.get(qwr.number == num)
+            obj = table.get(qwr.number == num)
             if obj and obj['password'] == pas:
-                self.table.update({'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>','raw':''},qwr.number == num)
-                self.redirect('/{0}{1}#{2}'.format(dbname,self.page(num),number))
+                table.update({'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>','raw':''},qwr.number == num)
+                self.redirect('/{0}{1}#{2}'.format(dbname,self.page(table,num),number))
             else:
                 self.redirect('/'+dbname)
                 
-    def page(self,number):
-        if self.table != None:
-            rec = self.table.count(where('number') <= number)
-            conf = self.application.db.get(where('kinds') == 'conf')
-            if len(self.table)-rec >= conf['count']:
-                return '/'+str(1+rec//conf['count'])+'/'
-            else:
-                return ''
+    def page(self,tb,num):
+        rec = tb.count(where('number') <= num)
+        conf = self.application.db.get(where('kinds') == 'conf')
+        if len(tb)-rec >= conf['count']:
+            return '/'+str(1+rec//conf['count'])+'/'
+        else:
+            return ''
       
 class SearchHandler(web.RequestHandler):       
     def post(self,dbname=''):
@@ -493,15 +490,17 @@ class AlertHandler(UserHandler):
     def get(self):
         db = self.get_query_argument('db')
         num = self.get_query_argument('num')
-        self.table = self.application.db.table(db)
-        tb = self.table.get(where('number') == int(num))
-        s = self.page(int(num))
+        table = self.application.db.table(db)
+        tb = table.get(where('number') == int(num))
+        s = self.page(table,int(num))
         jump = '/'+db+s+'#'+num
         link = '<p><a href={0}>{0}</a>'.format(jump)
         time = datetime.now()
+        d = date.weekday(time)
         data = {'comment':tb['comment']+link,'time':time.strftime('%Y/%m/%d'),
-                'link':jump,'date':date.weekday(time),'db':db,'num':int(num)}
+                'link':jump,'date':d,'db':db,'num':int(num)}
         id = self.application.db.table('temp').insert(data)
+        table.remove(where('date') != d)
         self.render('alert.htm',com=data['comment'],num=id)
     
     def post(self):
@@ -510,7 +509,6 @@ class AlertHandler(UserHandler):
         tb = table.get(eid=id)
         link = tb['link']
         table.remove(eids=[id])
-        table.remove(where('date') != date.weekday(datetime.now()))
         if self.get_argument('admit','') == 'ok':
             com = self.get_argument('com')
             tb['comment'] = com+tb['comment']
