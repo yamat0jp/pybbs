@@ -79,7 +79,7 @@ class LoginHandler(BaseHandler):
             qs = query[1:]
         else:
             qs = query[1:i+1]
-        self.render('login.htm',db=qs)
+        self.render('login.htm',db=escape.url_unescape(qs))
         
     def post(self):
         pw = self.application.db['params'].find_one({'app':'bbs'})
