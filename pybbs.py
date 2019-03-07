@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import os,re,glob
 from tornado import escape,web,ioloop,httpserver,httpclient
+from pyquery import PyQuery as pq
 import pymongo, urllib
 from datetime import datetime,date
 import json
@@ -23,7 +24,6 @@ class BaseHandler(web.RequestHandler):
 
 class IndexHandler(BaseHandler):
     def get(self,dbname,page='0'):
-        self.sparse()
         dbname = escape.url_unescape(dbname)
         params = self.application.db['params'].find_one({'app':'bbs'})
         if params['mentenance'] == True:
@@ -71,15 +71,6 @@ class IndexHandler(BaseHandler):
             self.render('modules/info.htm',position=pos,records=rec,data=params,db=dbname)
         else:
             self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname,aikotoba=rule)
-
-    def sparse(self):
-        day = date.weekday(datetime.now())
-        if day in [2,6]:
-            table = self.application.db['temp']
-            query = {'$nin':[2,6]}
-            item = table.find({'date':query})
-            if item.count > 0:
-                table.remove({'date':query})
 
 class LoginHandler(BaseHandler):
     def get(self):
@@ -453,9 +444,11 @@ class AlertHandler(UserHandler):
         s = self.page(db,int(num))
         link = '/'+db+s+'#'+num  
         jump = '<p><a href={0}>{0}</a>'.format(link)
-        result = self.application.db['temp'].insert(
-            {'comment':com+jump,'time':time,'link':link,
-             'date':date.weekday(datetime.now()),'db':db,'num':num})
+        d = date.weekday(datetime.now())
+        table = self.application.db['temp']
+        table.remove({'date':{'$ne':d}})
+        result = table.insert(
+            {'comment':com+jump,'time':time,'link':link,'date':d,'db':db,'num':num})
         self.render('alert.htm',com=com+jump,num=str(result))
         
     def post(self):
@@ -465,7 +458,6 @@ class AlertHandler(UserHandler):
         link = tb['link']
         com = self.get_argument('com')
         table.remove({'_id':id})
-        table.remove({'date':{'$ne':date.weekday(datetime.now())}})
         if self.get_argument('cancel','') == 'cancel':
             self.redirect(link)
             return
