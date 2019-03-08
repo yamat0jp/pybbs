@@ -1,10 +1,9 @@
 ﻿#coding=utf-8
 import os.path
-import shutil,re
+import shutil
 from tornado import escape,web,httpserver,ioloop
 from tinydb import TinyDB,Query,where
-from tinydb.operations import delete
-from datetime import datetime,date
+from datetime import date
 import json
 from botmod import *
 import dbjson
@@ -22,13 +21,14 @@ class BaseHandler(web.RequestHandler):
 
 class IndexHandler(BaseHandler):
     def get(self,dbname,page='0'):
-        self.sparse()
         dbname = escape.url_unescape(dbname)
         params = self.application.db.get(where('kinds') == 'conf')
         if params['mentenance'] == True:
             self.render('mentenance.htm',title=params['title'],db=dbname)
             return
-        if self.application.collection(dbname) == False:
+        names = list(self.application.collection())
+        names.append(params['info name'])
+        if dbname not in names:
             if self.current_user == b'admin':
                 self.application.db.table(dbname)
             else:
@@ -56,23 +56,15 @@ class IndexHandler(BaseHandler):
                 start = 0
         bool = (dbname == params['info name'])
         rec = sorted(table.all(),key=lambda x: x['number'])[start:start+i]
-        if bool == True:
+        if bool is True:
             rec = rec[::-1]
         if len(table) >= 10*i:
             self.render('modules/full.htm',position=pos,records=rec,data=params,db=dbname)
             return
-        if (bool == True)and(self.current_user != b'admin'):
+        if bool is True and self.current_user != b'admin':
             self.render('modules/info.htm',position=pos,records=rec,data=params,db=dbname)
         else:
             self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname,aikotoba=rule)
-
-    def sparse(self):
-        if date.weekday(datetime.now()) in [2,6]:
-            table = self.application.db.table('temp')
-            query = Query()
-            item = table.all(query.date in [2,6])
-            if len(item) > 0:
-                table.remove(query.date in [2,6])
 
 class LoginHandler(BaseHandler):
     def get(self):
@@ -82,7 +74,7 @@ class LoginHandler(BaseHandler):
             qs = query[1:]
         else:
             qs = query[1:i+1]  
-        self.render('login.htm',db=qs)
+        self.render('login.htm',db=escape.url_unescape(qs))
         
     def post(self):
         pw = self.application.db.get(where('kinds') == 'conf')
@@ -92,7 +84,7 @@ class LoginHandler(BaseHandler):
         if dbname == 'master':
             self.redirect('/master')
         else:
-            if self.application.collection(dbname) == False:
+            if dbname not in self.application.collection():
                 self.application.db.table(dbname)
             self.redirect('/'+dbname+'/admin/0/')
         
@@ -103,12 +95,16 @@ class LogoutHandler(BaseHandler):
         
 class NaviHandler(web.RequestHandler):
     def get(self):
-        if self.application.db.get(where('kinds') == 'conf') == None:
+        data = self.application.db.get(where('kinds') == 'conf')
+        if not data:
             item = {"mentenance":False,"out_words":[u"阿保",u"馬鹿",u"死ね"],"password":"admin",
                     "title2":"<h1 style=color:gray;text-align:center>pybbs</h1>",
                     "bad_words":["<style","<link","<script","<img"],"count":30,
                     "title":"pybbs","info name":"info","kinds":"conf"}
             self.application.db.insert(item)
+        elif data['mentenance'] is True:
+            self.render('mentenance.htm',title=data['title'],db=data['info name'])
+            return
         col,na = self.name()
         self.render('top.htm',coll=col,name=na,full=self.full)
         
@@ -176,7 +172,7 @@ class TitleHandler(NaviHandler):
         
 class RegistHandler(web.RequestHandler):
     def post(self,dbname):
-        if self.application.collection(dbname) == False:
+        if dbname not in self.application.collection():
             raise web.HTTPError(404)
             return
         self.database = dbname
@@ -265,9 +261,11 @@ class AdminHandler(BaseHandler):
     def get(self,dbname,page):
         if dbname == '':
             dbname = self.get_argument('record','')
-        if self.application.collection(dbname) == False:
-            raise web.HTTPError(404)
-            return
+        if dbname not in self.application.collection():
+            params = self.application.db.get(where('kinds') == 'conf')
+            if params['info name'] != dbname:
+                raise web.HTTPError(404)
+                return
         table = self.application.db.table(dbname) 
         rec = sorted(table.all(),key=lambda x: x['number'])                   
         mente = self.application.db.get(where('kinds') == 'conf')
@@ -318,7 +316,7 @@ class AdminConfHandler(BaseHandler):
         database = self.application.db
         bak = TinyDB(st.bak)
         for x in database.tables():
-            if self.application.collection(x) == True:
+            if x in self.application.collection():
                 database.purge_table(x)
                 if x in bak.tables():
                     table = database.table(x)
@@ -368,17 +366,20 @@ class SearchHandler(web.RequestHandler):
         self.andor = self.get_argument('type')    
         if dbname == '':
             rec = []
-            for x in self.application.db.tables():
-                if self.application.collection(x):
-                    for y in sorted(self.search(x),key=lambda k: k['number']):
-                        y['dbname'] = x
-                        rec.append(y)        
+            for x in self.application.collection():
+                for y in sorted(self.search(x),key=lambda k: k['number']):
+                    y['dbname'] = x
+                    rec.append(y)
         else:
             rec = sorted(self.search(dbname),key=lambda x: x['number'])
         self.render('modules/search.htm',records=rec,word1=arg,db=dbname)
     
     def get(self,dbname=''):
-        if dbname != '' and self.application.collection(dbname) == False:
+        names = list(self.application.collection())
+        info = self.application.db.get(where('kinds') == 'conf')['info name']
+        if info == dbname:
+            dbname = info
+        elif dbname != '' and dbname not in names:
             raise web.HTTPError(404)
             return
         self.render('modules/search.htm',records=[],word1='',db=dbname)
@@ -442,7 +443,7 @@ class HeadlineApi(web.RequestHandler):
         
 class ArticleApi(web.RequestHandler):
     def get(self,dbname,number):
-        if self.application.collection(dbname) == True:
+        if dbname in self.application.collection():
             table = self.application.db.table(dbname)
             response = table.get(where('number') == int(number))
             if response == None:
@@ -561,12 +562,12 @@ class Application(web.Application):
             pos = 0
         return pos
     
-    def collection(self,name):
-        names = ['master','info','_default']
-        if name in self.db.tables() and not name in names and name[-3:] != '_bot':
-            return True
-        else:
-            return False
+    def collection(self):
+        info = self.db.get(where('kinds') == 'conf')['info name']
+        names = ['master','_default',info]
+        for name in self.db.tables() - set(names):
+            if name[-3:] != '_bot':
+                yield name
 
 if __name__ == '__main__':
     st = dbjson.static()
