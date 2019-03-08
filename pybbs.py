@@ -311,35 +311,27 @@ class UserHandler(web.RequestHandler):
     def get(self,dbname):
         q = self.get_query_argument('job','0',strip=True)
         tb = self.application.db[dbname]
-        num = self.page(tb,int(q))
+        num = self.application.page(tb,int(q))
         self.redirect('/{0}{1}#{2}'.format(dbname,num,q))
         
     def post(self,dbname):
         number = self.get_argument('number')
-        if number.isdigit() == True:
+        if number.isdigit() is True:
             num = int(number)
             if 'password' in self.request.arguments.keys():
                 pas = self.get_argument('password')
             else:
-                num = self.page(dbname,num)
+                num = self.application.page(dbname,num)
                 self.redirect('/{0}{1}#{2}'.format(dbname, num, number))
                 return
             table = self.application.db[dbname]
             obj = table.find_one({'number':num})
             if obj and(obj['password'] == pas):
                 table.update({'number':num},{'$set':{'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>','raw':''}})
-                self.redirect('/'+dbname+self.page(table,num)+'#'+number)
+                self.redirect('/'+dbname+self.application.page(table,num)+'#'+number)
             else:
                 self.redirect('/'+dbname)
-                
-    def page(self,table,number):
-        rec = table.find({'number':{'$lte':number}}).count()
-        conf = self.application.db['params'].find_one({'app':'bbs'})
-        if table.find().count()-rec >= conf['count']:
-            return '/'+str(1+rec//conf['count'])+'/'
-        else:
-            return ''
-      
+
 class SearchHandler(web.RequestHandler):       
     def post(self,dbname=''):
         arg = self.get_argument('word1')
@@ -438,15 +430,15 @@ class MasterHandler(BaseHandler):
         else:
             raise web.HTTPError(404)
     
-class AlertHandler(UserHandler):
-    def get(self,db):
+class AlertHandler(web.RequestHandler):
+    def get(self):
         db = self.get_query_argument('db')
         num = self.get_query_argument('num')
         table = self.application.db[db]
         tb = table.find_one({'number':int(num)})
         com = tb['comment']
         time = datetime.now().strftime('%Y/%m/%d')
-        s = self.page(table,int(num))
+        s = self.application.page(table,int(num))
         link = '/'+db+s+'#'+num  
         jump = '<p><a href={0}>{0}</a>'.format(link)
         d = datetime.now().weekday()
@@ -456,7 +448,7 @@ class AlertHandler(UserHandler):
             {'comment':com+jump,'time':time,'link':link,'date':d,'db':db,'num':num})
         self.render('alert.htm',com=com+jump,num=str(result))
         
-    def post(self,db):
+    def post(self):
         id = ObjectId(self.get_argument('num'))
         table = self.application.db['temp']
         tb = table.find_one({'_id':id})      
@@ -742,6 +734,14 @@ class Application(web.Application):
         elif (pos-1)*params['count'] >= self.db[dbname].count():
             pos = 0
         return pos
+
+    def page(self,table,number):
+        rec = table.find({'number':{'$lte':number}}).count()
+        conf = self.db['params'].find_one({'app':'bbs'})
+        if table.find().count() - rec >= conf['count']:
+            return '/'+str(1+rec//conf['count'])+'/'
+        else:
+            return ''
     
     def collection(self,name):
         if name in self.db.collection_names():
