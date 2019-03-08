@@ -114,7 +114,7 @@ class NaviHandler(web.RequestHandler):
                     "title":"pybbs","info name":"info",'app':'bbs'}       
             self.application.db['params'].insert(item)
             self.application.db['info']
-        table = self.application.db['params']
+        table = self.application.db['params'].find_one({'app':'bbs'})
         if table['mentenance'] is True:
             self.render('mentenance.htm',title=table['title'],db=table['info name'])
             return
