@@ -73,7 +73,8 @@ class IndexHandler(BaseHandler):
 
 class LoginHandler(BaseHandler):
     def get(self):
-        query = self.get_query_argument('next','')            
+        info = self.application.db['params'].find_one({'app':'bbs'})
+        query = self.get_query_argument('next',info['info name'])
         i = query[1:].find('/')
         if i == -1:
             qs = query[1:]
@@ -82,10 +83,13 @@ class LoginHandler(BaseHandler):
         self.render('login.htm',db=escape.url_unescape(qs))
         
     def post(self):
+        dbname = self.get_argument('record','')
+        if dbname == '':
+            self.redirect('/login')
+            return
         pw = self.application.db['params'].find_one({'app':'bbs'})
         if self.get_argument('password') == pw['password']:
             self.set_current_user('admin')
-        dbname = self.get_argument('record')
         if dbname == 'master':
             self.redirect('/master')
         else:
@@ -109,6 +113,7 @@ class NaviHandler(web.RequestHandler):
                     "bad_words":["<style","<link","<script","<img"],"count":30,
                     "title":"pybbs","info name":"info",'app':'bbs'}       
             self.application.db['params'].insert(item)
+            self.application.db['info']
         coll,na = self.name()                
         self.render('top.htm',coll=coll,name=na,full=self.full)
                   
