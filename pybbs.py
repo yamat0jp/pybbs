@@ -73,19 +73,24 @@ class LoginHandler(BaseHandler):
         if i == -1:
             qs = query[1:]
         else:
-            qs = query[1:i+1]  
-        self.render('login.htm',db=escape.url_unescape(qs))
+            qs = query[1:i+1]
+        if qs == '':
+            qs = self.application.db.get(where('kinds') == 'conf')['info name']
+        else:
+            qs = escape.url_unescape(qs)
+        self.render('login.htm',db=qs)
         
     def post(self):
+        dbname = self.get_argument('record','')
+        if dbname == '':
+            self.redirect('/login')
+            return
         pw = self.application.db.get(where('kinds') == 'conf')
         if self.get_argument('password') == pw['password']:
             self.set_current_user('admin')
-        dbname = self.get_argument('record')
         if dbname == 'master':
             self.redirect('/master')
         else:
-            if dbname not in self.application.collection():
-                self.application.db.table(dbname)
             self.redirect('/'+dbname+'/admin/0/')
         
 class LogoutHandler(BaseHandler):
@@ -102,6 +107,7 @@ class NaviHandler(web.RequestHandler):
                     "bad_words":["<style","<link","<script","<img"],"count":30,
                     "title":"pybbs","info name":"info","kinds":"conf"}
             self.application.db.insert(item)
+            self.application.db.table('info')
         elif data['mentenance'] is True:
             self.render('mentenance.htm',title=data['title'],db=data['info name'])
             return
@@ -427,8 +433,7 @@ class FooterModule(web.UIModule):
 class HeadlineApi(web.RequestHandler):
     def get(self):
         response = {}
-        for x in self.application.db.tables():
-            if (x != '_default')and(x != 'master'):
+        for x in serlf.application.collection():
                 response[x] = self.get_data(x)
         self.write(json.dumps(response,ensure_ascii=False))
     
