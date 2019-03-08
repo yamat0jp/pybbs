@@ -74,7 +74,7 @@ class IndexHandler(BaseHandler):
 class LoginHandler(BaseHandler):
     def get(self):
         info = self.application.db['params'].find_one({'app':'bbs'})
-        query = self.get_query_argument('next',info['info name'])
+        query = self.get_query_argument('next','/'+info['info name'])
         i = query[1:].find('/')
         if i == -1:
             qs = query[1:]
