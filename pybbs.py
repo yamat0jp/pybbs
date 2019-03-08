@@ -117,6 +117,7 @@ class NaviHandler(web.RequestHandler):
         table = self.application.db['params']
         if table['mentenance'] is True:
             self.render('mentenance.htm',title=table['title'],db=table['info name'])
+            return
         coll,na = self.name()                
         self.render('top.htm',coll=coll,name=na,full=self.full)
                   
