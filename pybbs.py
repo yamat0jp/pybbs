@@ -453,7 +453,7 @@ class AlertHandler(UserHandler):
         s = self.page(table,int(num))
         link = '/'+db+s+'#'+num  
         jump = '<p><a href={0}>{0}</a>'.format(link)
-        d = date.weekday(datetime.date())
+        d = datetime.now().weekday()
         table = self.application.db['temp']
         table.remove({'date':{'$ne':d}})
         result = table.insert(
