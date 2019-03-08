@@ -106,14 +106,17 @@ class JumpHandler(BaseHandler):
         self.redirect('/')
         
 class NaviHandler(web.RequestHandler):
-    def get(self):  
-        if self.application.collection('params') == False:
+    def get(self):
+        if self.application.collection('params') is False:
             item = {"mentenance":False,"out_words":[u"阿保",u"馬鹿",u"死ね"],"password":"admin",
                     "title2":"<h1 style=color:gray;text-align:center>pybbs</h1>",
                     "bad_words":["<style","<link","<script","<img"],"count":30,
                     "title":"pybbs","info name":"info",'app':'bbs'}       
             self.application.db['params'].insert(item)
             self.application.db['info']
+        table = self.application.db['params']
+        if table['mentenance'] is True:
+            self.render('mentenance.htm',title=table['title'],db=table['info name'])
         coll,na = self.name()                
         self.render('top.htm',coll=coll,name=na,full=self.full)
                   
