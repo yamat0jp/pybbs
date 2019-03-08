@@ -2,7 +2,7 @@
 import os,re,glob
 from tornado import escape,web,ioloop,httpserver,httpclient
 import pymongo, urllib
-from datetime import datetime,date
+from datetime import datetime
 import json
 from bson.objectid import ObjectId #don't remove
 from linebot.api import LineBotApi
@@ -25,17 +25,16 @@ class IndexHandler(BaseHandler):
     def get(self,dbname,page='0'):
         dbname = escape.url_unescape(dbname)
         params = self.application.db['params'].find_one({'app':'bbs'})
-        if params['mentenance'] == True:
+        if params['mentenance'] is True:
             self.render('mentenance.htm',title=params['title'],db=dbname)
             return
-        if self.application.collection(dbname) == False:
+        if self.application.collection(dbname) is False:
             if self.current_user == b'admin':
                 coll = self.application.db[dbname]
                 coll.insert({})
                 coll.remove({})
             else:
                 raise web.HTTPError(404)
-                return
         key = self.get_argument('key','')
         if key:
             table = self.application.db[dbname]
@@ -58,7 +57,7 @@ class IndexHandler(BaseHandler):
                 start = 0
         rec = table.find()
         bool = (dbname == params['info name']) 
-        if bool == True:
+        if bool is True:
             rec.sort('number',-1)
         else:
             rec.sort('number')
@@ -66,7 +65,7 @@ class IndexHandler(BaseHandler):
         if table.count() >= 10*i:
             self.render('modules/full.htm',position=pos,records=rec,data=params,db=dbname)
             return
-        if (bool == True)and(self.current_user != b'admin'):
+        if bool is True and self.current_user != b'admin':
             self.render('modules/info.htm',position=pos,records=rec,data=params,db=dbname)
         else:
             self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname,aikotoba=rule)
@@ -177,9 +176,8 @@ class TitleHandler(NaviHandler):
         
 class RegistHandler(web.RequestHandler):
     def post(self,dbname):
-        if self.application.collection(dbname) == False:
+        if self.application.collection(dbname) is False:
             raise web.HTTPError(404)
-            return
         self.database = dbname
         rec = self.application.db['params'].find_one({'app':'bbs'})
         words = rec['bad_words']
@@ -224,11 +222,11 @@ class RegistHandler(web.RequestHandler):
         s = ''
         for x in url:
             s = s+'<tr><td><a href={0} class=livepreview target=_blank>{0}</a></td></tr>'.format(x)
-        if s:         
-            text = text+'<table><tr><td>検出url:</td></tr>'+s+'</table>';
+        if s != '':
+            text = text+'<table><tr><td>検出url:</td></tr>'+s+'</table>'
         pw = self.get_argument('password')
         if i > 1000:
-            error += +u'文字数が1,000をこえました.'
+            error += u'文字数が1,000をこえました.'
         if na == '':
             na = u'誰かさん'
         if sub == '':
@@ -267,13 +265,12 @@ class AdminHandler(BaseHandler):
     def get(self,dbname,page='0'):
         if dbname == '':
             dbname = self.get_argument('record','')
-        if self.application.collection(dbname) == False:
+        if self.application.collection(dbname) is False:
             raise web.HTTPError(404)
-            return
         table = self.application.db[dbname] 
         rec = table.find().sort('number')                   
         mente = self.application.db['params'].find_one({'app':'bbs'})
-        if mente['mentenance'] == True:
+        if mente['mentenance'] is True:
             check = 'checked=checked'
         else:
             check = ''
@@ -361,9 +358,8 @@ class SearchHandler(web.RequestHandler):
         self.render('modules/search.htm',records=rec,word1=arg,db=dbname)
 
     def get(self,dbname=''):
-        if self.application.collection(dbname) == False and dbname != '':
+        if self.application.collection(dbname) is False and dbname != '':
             raise web.HTTPError(404)
-            return
         self.render('modules/search.htm',records=[],word1='',db=dbname)
     
     def search(self,dbname):
@@ -443,7 +439,7 @@ class MasterHandler(BaseHandler):
             raise web.HTTPError(404)
     
 class AlertHandler(UserHandler):
-    def get(self):
+    def get(self,db):
         db = self.get_query_argument('db')
         num = self.get_query_argument('num')
         table = self.application.db[db]
@@ -460,7 +456,7 @@ class AlertHandler(UserHandler):
             {'comment':com+jump,'time':time,'link':link,'date':d,'db':db,'num':num})
         self.render('alert.htm',com=com+jump,num=str(result))
         
-    def post(self):
+    def post(self,db):
         id = ObjectId(self.get_argument('num'))
         table = self.application.db['temp']
         tb = table.find_one({'_id':id})      
@@ -515,10 +511,11 @@ class HeadlineApi(web.RequestHandler):
         
 class ArticleApi(web.RequestHandler):
     def get(self,dbname,number):
+        response = None
         if self.application.collection(dbname) == True:
             table = self.application.db[dbname]
             response = table.find_one({'number':int(number)})      
-        if response == None:
+        if not response:
            response = {}
         else:
             del response['_id']
@@ -532,12 +529,13 @@ class ArticleApi(web.RequestHandler):
         
 class ListApi(web.RequestHandler):
     def get(self,dbname):
-        if self.application.collection(dbname) == True:
+        response = None
+        if self.application.collection(dbname) is True:
             table = self.application.db[dbname]
             response = {}
             for data in table.find().sort('number'):
                 response[data['number']] = data['raw'][0:20]
-        if response == None:
+        if not response:
             response = {}
         self.write(json.dumps(response,ensure_ascii=False))
 
