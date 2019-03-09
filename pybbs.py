@@ -735,7 +735,7 @@ class Application(web.Application):
         s = self.db['params'].find_one({'app':'bbs'})
         conf = int(s['count'])
         if table.find().count() - rec >= conf:
-            return '/'+dbname+'/'+str(1+rec//conf)+'#'+number
+            return '/'+dbname+'/'+str(1+rec//conf)+'/#'+number
         else:
             return '/'+dbname+'#'+number
     
