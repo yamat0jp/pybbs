@@ -734,14 +734,14 @@ class Application(web.Application):
             pos = 0
         return pos
 
-    def page(self,table,number):
-        rec = table.find({'number':{'$lte':number}}).count()
+    def page(self,dbname,number):
+        rec = self.db[dbname].find({'number':{'$lte':int(number)}}).count()
         s = self.db['params'].find_one({'app':'bbs'})
         conf = int(s['count'])
         if table.find().count() - rec >= conf:
-            return '/'+str(1+rec//conf)+'/'
+            return '/'+dbname+'/'+str(1+rec//conf)+'#'+number
         else:
-            return ''
+            return '/'+dbname+'#'+number
     
     def collection(self,name):
         if name in self.db.collection_names():
