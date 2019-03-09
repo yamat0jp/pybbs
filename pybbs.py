@@ -326,17 +326,17 @@ class AdminConfHandler(BaseHandler):
           
 class UserHandler(web.RequestHandler):
     def get(self,dbname):
-        tb = self.application.db[dbname]
         q = self.get_query_argument('job','0',strip=True)
-        self.redirect(self.applicatuib,page(tb,q))
+        self.redirect(self.application,page(dbname,q))
         
     def post(self,dbname):
         number = self.get_argument('number')
-        if number.isdigit() == True:
+        if number.isdigit() is True:
+            url = self.application.page(dbname,number)
             if 'password' in self.request.arguments.keys():
                 pas = self.get_argument('password')
             else:
-                self.redirect(self.application.page(dbname,number))
+                self.redirect(url)
                 return
             qwr = Query()
             table = self.application.db.table(dbname)
@@ -344,9 +344,9 @@ class UserHandler(web.RequestHandler):
             obj = table.get(qwr.number == num)
             if obj and obj['password'] == pas:
                 table.update({'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>','raw':''},qwr.number == num)
-                self.redirect(self.application.page(dbname,number))
-            else:
-                self.redirect('/'+dbname)
+                self.redirect(url)
+                return
+         self.redirect('/'+dbname)
 
 class SearchHandler(web.RequestHandler):       
     def post(self,dbname=''):
@@ -481,7 +481,7 @@ class AlertHandler(web.RequestHandler):
     def get(self):
         db = self.get_query_argument('db')
         num = self.get_query_argument('num')
-        s = self.application.page(table,num)
+        s = self.application.page(db,num)
         n = int(num)
         table = self.application.db.table(db)
         tb = table.get(where('number') == n)
