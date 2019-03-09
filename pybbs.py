@@ -315,18 +315,19 @@ class UserHandler(web.RequestHandler):
         number = self.get_argument('number')
         if number.isdigit() is True:
             num = int(number)
+            url = self.application.page(dbname,number)
             if 'password' in self.request.arguments.keys():
                 pas = self.get_argument('password')
             else:
-                self.redirect(self.application.page(dbname,number))
+                self.redirect(url)
                 return
             table = self.application.db[dbname]
             obj = table.find_one({'number':num})
             if obj and(obj['password'] == pas):
                 table.update({'number':num},{'$set':{'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>','raw':''}})
-                self.redirect(self.application.page(dbname,number))
-            else:
-                self.redirect('/'+dbname)
+                self.redirect(url)
+                return
+        self.redirect('/'+dbname)
 
 class SearchHandler(web.RequestHandler):       
     def post(self,dbname=''):
