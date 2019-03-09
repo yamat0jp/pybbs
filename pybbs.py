@@ -309,9 +309,7 @@ class AdminConfHandler(BaseHandler):
 class UserHandler(web.RequestHandler):
     def get(self,dbname):
         q = self.get_query_argument('job','0',strip=True)
-        tb = self.application.db[dbname]
-        num = self.application.page(tb,int(q))
-        self.redirect('/{0}{1}#{2}'.format(dbname,num,q))
+        self.redirect(self.application.page(dbname,q))
         
     def post(self,dbname):
         number = self.get_argument('number')
@@ -320,14 +318,13 @@ class UserHandler(web.RequestHandler):
             if 'password' in self.request.arguments.keys():
                 pas = self.get_argument('password')
             else:
-                num = self.application.page(dbname,num)
-                self.redirect('/{0}{1}#{2}'.format(dbname, num, number))
+                self.redirect(self.application.page(dbname,number))
                 return
             table = self.application.db[dbname]
             obj = table.find_one({'number':num})
             if obj and(obj['password'] == pas):
                 table.update({'number':num},{'$set':{'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>','raw':''}})
-                self.redirect('/'+dbname+self.application.page(table,num)+'#'+number)
+                self.redirect(self.application.page(dbname,number))
             else:
                 self.redirect('/'+dbname)
 
@@ -437,8 +434,7 @@ class AlertHandler(web.RequestHandler):
         tb = table.find_one({'number':int(num)})
         com = tb['comment']
         time = datetime.now().strftime('%Y/%m/%d')
-        s = self.application.page(table,int(num))
-        link = '/'+db+s+'#'+num  
+        link = self.application.page(db,num)
         jump = '<p><a href={0}>{0}</a>'.format(link)
         d = datetime.now().weekday()
         table = self.application.db['temp']
