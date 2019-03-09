@@ -337,13 +337,13 @@ class UserHandler(web.RequestHandler):
             if 'password' in self.request.arguments.keys():
                 pas = self.get_argument('password')
             else:
-                self.redirect(self.application.page(table,num))
+                self.redirect(self.application.page(table,number))
                 return
             qwr = Query()
-            obj = table.get(qwr.number == int(num))
+            obj = table.get(qwr.number == int(number))
             if obj and obj['password'] == pas:
                 table.update({'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>','raw':''},qwr.number == num)
-                self.redirect(self.application.page(table,num))
+                self.redirect(self.application.page(table,number))
             else:
                 self.redirect('/'+dbname)
 
