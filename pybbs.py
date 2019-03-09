@@ -33,7 +33,6 @@ class IndexHandler(BaseHandler):
                 self.application.db.table(dbname)
             else:
                 raise web.HTTPError(404)
-                return
         key = self.get_argument('key','')
         if key:
             table = self.application.db.table(dbname)
@@ -43,7 +42,6 @@ class IndexHandler(BaseHandler):
                 return
             else:
                 raise web.HTTPError(404)
-                return
         i = params['count']      
         rule = escape.url_unescape(self.get_cookie('aikotoba',''))
         na = escape.url_unescape(self.get_cookie("username",u"誰かさん"))
@@ -180,7 +178,6 @@ class RegistHandler(web.RequestHandler):
     def post(self,dbname):
         if dbname not in self.application.collection():
             raise web.HTTPError(404)
-            return
         self.database = dbname
         rec = self.application.db.get(where('kinds') == 'conf')
         words = rec['bad_words']
@@ -355,15 +352,7 @@ class UserHandler(web.RequestHandler):
                 self.redirect('/{0}{1}#{2}'.format(dbname,self.page(table,num),number))
             else:
                 self.redirect('/'+dbname)
-                
-    def page(self,tb,num):
-        rec = tb.count(where('number') <= num)
-        conf = self.application.db.get(where('kinds') == 'conf')
-        if len(tb)-rec >= conf['count']:
-            return '/'+str(1+rec//conf['count'])+'/'
-        else:
-            return ''
-      
+
 class SearchHandler(web.RequestHandler):       
     def post(self,dbname=''):
         arg = self.get_argument('word1')
@@ -387,12 +376,12 @@ class SearchHandler(web.RequestHandler):
             dbname = info
         elif dbname != '' and dbname not in names:
             raise web.HTTPError(404)
-            return
         self.render('modules/search.htm',records=[],word1='',db=dbname)
         
     def search(self,dbname):
         table = self.application.db.table(dbname)    
-        andor = self.andor == 'OR'    
+        andor = self.andor == 'OR'
+        color = ''
         element = self.word.split()
         if len(element) == 0:
             element = ['']
@@ -433,7 +422,7 @@ class FooterModule(web.UIModule):
 class HeadlineApi(web.RequestHandler):
     def get(self):
         response = {}
-        for x in serlf.application.collection():
+        for x in self.application.collection():
                 response[x] = self.get_data(x)
         self.write(json.dumps(response,ensure_ascii=False))
     
@@ -493,7 +482,7 @@ class MasterHandler(BaseHandler):
         else:
             raise web.HTTPError(404)
         
-class AlertHandler(UserHandler):
+class AlertHandler(web.RequestHandler):
     def get(self):
         db = self.get_query_argument('db')
         num = self.get_query_argument('num')
@@ -566,7 +555,16 @@ class Application(web.Application):
         elif (pos-1)*params['count'] >= len(self.db.table(dbname)):
             pos = 0
         return pos
-    
+
+    def page(self, tb, num):
+        rec = tb.count(where('number') <= num)
+        s = self.application.db.get(where('kinds') == 'conf')
+        conf = int(s['count'])
+        if len(tb) - rec >= conf:
+            return '/' + str(1 + rec // conf) + '/'
+        else:
+            return ''
+
     def collection(self):
         info = self.db.get(where('kinds') == 'conf')['info name']
         names = ['master','_default',info]
