@@ -36,15 +36,14 @@ class IndexHandler(BaseHandler):
             else:
                 raise web.HTTPError(404)
         key = self.get_argument('key','')
-        if key:
+        if key != '':
             table = self.application.db[dbname]
             rec = table.find_one({'number':int(key)})
             if rec:
                 self.render('article.htm',record=rec)
                 return
             else:
-                web.HTTPError(404)
-                return
+                raise web.HTTPError(404)
         i = params['count']      
         rule = escape.url_unescape(self.get_cookie('aikotoba',''))
         na = escape.url_unescape(self.get_cookie('username',u'誰かさん'))
@@ -737,9 +736,10 @@ class Application(web.Application):
 
     def page(self,table,number):
         rec = table.find({'number':{'$lte':number}}).count()
-        conf = self.db['params'].find_one({'app':'bbs'})
-        if table.find().count() - rec >= conf['count']:
-            return '/'+str(1+rec//conf['count'])+'/'
+        s = self.db['params'].find_one({'app':'bbs'})
+        conf = int(s['count'])
+        if table.find().count() - rec >= conf:
+            return '/'+str(1+rec//conf)+'/'
         else:
             return ''
     
