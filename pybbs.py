@@ -333,17 +333,18 @@ class UserHandler(web.RequestHandler):
     def post(self,dbname):
         number = self.get_argument('number')
         if number.isdigit() == True:
-            table = self.application.db.table(dbname)
             if 'password' in self.request.arguments.keys():
                 pas = self.get_argument('password')
             else:
-                self.redirect(self.application.page(table,number))
+                self.redirect(self.application.page(dbname,number))
                 return
             qwr = Query()
-            obj = table.get(qwr.number == int(number))
+            table = self.application.db.table(dbname)
+            num = int(number)
+            obj = table.get(qwr.number == num)
             if obj and obj['password'] == pas:
                 table.update({'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>','raw':''},qwr.number == num)
-                self.redirect(self.application.page(table,number))
+                self.redirect(self.application.page(dbname,number))
             else:
                 self.redirect('/'+dbname)
 
@@ -551,14 +552,15 @@ class Application(web.Application):
             pos = 0
         return pos
 
-    def page(self, tb, num):
-        rec = tb.count(where('number') <= int(num))
-        s = self.application.db.get(where('kinds') == 'conf')
+    def page(self, dbname, number):
+        tb = self.db.table(dbname)
+        rec = tb.count(where('number') <= int(number))
+        s = self.db.get(where('app') == 'bbs')
         conf = int(s['count'])
-        if len(tb) - rec >= conf:
-            return '/' + str(1 + rec // conf) + '/#'+num
+        if len(tb.all()) - rec >= conf:
+            return '/'+ dbname + str(1 + rec // conf) + '#'+number
         else:
-            return ''
+            return '/'+dbname+'#'+number
 
     def collection(self):
         info = self.db.get(where('kinds') == 'conf')['info name']
