@@ -732,7 +732,8 @@ class Application(web.Application):
         return pos
 
     def page(self,dbname,number):
-        rec = self.db[dbname].find({'number':{'$lte':int(number)}}).count()
+        table = self.db[dbname]
+        rec = table.find({'number':{'$lte':int(number)}}).count()
         s = self.db['params'].find_one({'app':'bbs'})
         conf = int(s['count'])
         if table.find().count() - rec >= conf:
