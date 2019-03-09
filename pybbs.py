@@ -346,7 +346,7 @@ class UserHandler(web.RequestHandler):
                 table.update({'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>','raw':''},qwr.number == num)
                 self.redirect(url)
                 return
-         self.redirect('/'+dbname)
+        self.redirect('/'+dbname)
 
 class SearchHandler(web.RequestHandler):       
     def post(self,dbname=''):
