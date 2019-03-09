@@ -268,7 +268,6 @@ class AdminHandler(BaseHandler):
             params = self.application.db.get(where('kinds') == 'conf')
             if params['info name'] != dbname:
                 raise web.HTTPError(404)
-                return
         table = self.application.db.table(dbname) 
         rec = sorted(table.all(),key=lambda x: x['number'])                   
         mente = self.application.db.get(where('kinds') == 'conf')
@@ -329,27 +328,22 @@ class UserHandler(web.RequestHandler):
     def get(self,dbname):
         tb = self.application.db[dbname]
         q = self.get_query_argument('job','0',strip=True)
-        num = self.page(tb,int(q))
-        if num == '':
-            self.redirect('/{0}#{1}'.format(dbname,q))           
-        else:
-            self.redirect('/{0}{1}#{2}'.format(dbname,num,q))
+        self.redirect(self.applicatuib,page(tb,q))
         
     def post(self,dbname):
         number = self.get_argument('number')
         if number.isdigit() == True:
-            num = int(number)
             table = self.application.db.table(dbname)
             if 'password' in self.request.arguments.keys():
                 pas = self.get_argument('password')
             else:
-                self.redirect('/{0}{1}#{2}'.format(dbname,self.page(table,num),number))
+                self.redirect(self.application.page(table,num))
                 return
             qwr = Query()
-            obj = table.get(qwr.number == num)
+            obj = table.get(qwr.number == int(num))
             if obj and obj['password'] == pas:
                 table.update({'title':u'削除されました','name':'','comment':u'<i><b>投稿者により削除されました</b></i>','raw':''},qwr.number == num)
-                self.redirect('/{0}{1}#{2}'.format(dbname,self.page(table,num),number))
+                self.redirect(self.application.page(table,num))
             else:
                 self.redirect('/'+dbname)
 
@@ -486,15 +480,16 @@ class AlertHandler(web.RequestHandler):
     def get(self):
         db = self.get_query_argument('db')
         num = self.get_query_argument('num')
+        s = self.application.page(table,num)
+        n = int(num)
         table = self.application.db.table(db)
-        tb = table.get(where('number') == int(num))
-        s = self.page(table,int(num))
+        tb = table.get(where('number') == n)
         jump = '/'+db+s+'#'+num
         link = '<p><a href={0}>{0}</a>'.format(jump)
         time = datetime.now()
         d = date.weekday(time)
         data = {'comment':tb['comment']+link,'time':time.strftime('%Y/%m/%d'),
-                'link':jump,'date':d,'db':db,'num':int(num)}
+                'link':jump,'date':d,'db':db,'num':n}
         id = self.application.db.table('temp').insert(data)
         table.remove(where('date') != d)
         self.render('alert.htm',com=data['comment'],num=id)
@@ -557,11 +552,11 @@ class Application(web.Application):
         return pos
 
     def page(self, tb, num):
-        rec = tb.count(where('number') <= num)
+        rec = tb.count(where('number') <= int(num))
         s = self.application.db.get(where('kinds') == 'conf')
         conf = int(s['count'])
         if len(tb) - rec >= conf:
-            return '/' + str(1 + rec // conf) + '/'
+            return '/' + str(1 + rec // conf) + '/#'+num
         else:
             return ''
 
