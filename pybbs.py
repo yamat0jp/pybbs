@@ -500,8 +500,9 @@ class HeadlineApi(web.RequestHandler):
 class ArticleApi(web.RequestHandler):
     def get(self,dbname,number):
         response = None
-        if self.application.collection(dbname) == True:
-            table = self.application.db[dbname]
+        db = escape.url_unescape(dbname)
+        if self.application.collection(db) is True:
+            table = self.application.db[db]
             response = table.find_one({'number':int(number)})      
         if not response:
             response = {}
