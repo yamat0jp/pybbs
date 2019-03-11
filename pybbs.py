@@ -418,7 +418,7 @@ class HeadlineApi(web.RequestHandler):
     def get(self):
         response = {}
         for x in self.application.collection():
-                response[x] = self.get_data(x)
+            response[x] = self.get_data(x)
         self.write(json.dumps(response,ensure_ascii=False))
     
     def get_data(self,dbname):
@@ -435,13 +435,14 @@ class ArticleApi(web.RequestHandler):
         if dbname in self.application.collection():
             table = self.application.db.table(dbname)
             response = table.get(where('number') == int(number))
-            if response == None:
+            if not response:
                 response = {}
             else:
                 del response['comment']
+                del response['password']
             self.write(json.dumps(response,ensure_ascii=False))
         else:
-            web.HTTPError(404)
+            raise web.HTTPError(404)
     
     def post(self,dbname):
         name = self.get_argument('name',u'誰かさん')
