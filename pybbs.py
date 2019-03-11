@@ -522,7 +522,7 @@ class ListApi(web.RequestHandler):
             response = {}
         self.write(json.dumps(response,ensure_ascii=False))
 
-class WebHookHandler(web.RequestHandler):        
+class WebHookHandler(web.RequestHandler):
     def main(self, no):
         #pz = pytz.timezone('Asia/Tokyo')
         now = datetime.now()#pz)
@@ -700,7 +700,7 @@ class Application(web.Application):
     db = pymongo.MongoClient(uri)[ac]
     def __init__(self):
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
-                    (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_]+)/([0-9]+)',ArticleApi),
+                    (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_?]+)/([0-9]+)',ArticleApi),
                     (r'/write/api/([a-zA-Z0-9_%]+)/()/()/()',ArticleApi),(r'/list/api/([a-zA-Z0-9_%]+)',ListApi),
                     (r'/help',HelpHandler),(r'/master',MasterHandler),(r'/alert',AlertHandler),(r'/jump',JumpHandler),
                     (r'/callback',WebHookHandler),(r'/init',InitHandler),(r'/search',SearchHandler),(r'/clean',CleanHandler),(r'/token',TokenHandler),
