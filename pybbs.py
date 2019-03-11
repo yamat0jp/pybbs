@@ -512,7 +512,7 @@ class ArticleApi(web.RequestHandler):
         self.write(json.dumps(response,ensure_ascii=False))      
             
     def post(self,dbname,name,title,article):
-        coll = self.application.db[dbname] 
+        coll = self.application.db[escape.url_unescape(dbname)]
         coll.insert({'name':name,'title':title,'comment':article})
         
 class ListApi(web.RequestHandler):
