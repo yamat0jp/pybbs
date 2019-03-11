@@ -28,7 +28,7 @@ class IndexHandler(BaseHandler):
         if params['mentenance'] is True:
             self.render('mentenance.htm',title=params['title'],db=dbname)
             return
-        if self.application.collection(dbname) is False:
+        if dbname not in self.application.coll():
             if self.current_user == b'admin':
                 coll = self.application.db[dbname]
                 coll.insert({})
@@ -105,7 +105,7 @@ class JumpHandler(BaseHandler):
         
 class NaviHandler(web.RequestHandler):
     def get(self):
-        if self.application.collection('params') is False:
+        if 'params' not in self.application.coll():
             item = {"mentenance":False,"out_words":[u"阿保",u"馬鹿",u"死ね"],"password":"admin",
                     "title2":"<h1 style=color:gray;text-align:center>pybbs</h1>",
                     "bad_words":["<style","<link","<script","<img"],"count":30,
@@ -175,9 +175,8 @@ class TitleHandler(NaviHandler):
         
 class RegistHandler(web.RequestHandler):
     def post(self,dbname):
-        if self.application.collection(dbname) is False:
+        if dbname not in self.application.coll():
             raise web.HTTPError(404)
-        self.database = dbname
         rec = self.application.db['params'].find_one({'app':'bbs'})
         words = rec['bad_words']
         out = rec['out_words']
@@ -264,7 +263,7 @@ class AdminHandler(BaseHandler):
     def get(self,dbname,page='0'):
         if dbname == '':
             dbname = self.get_argument('record','')
-        if self.application.collection(dbname) is False:
+        if dbname not in self.application.coll():
             raise web.HTTPError(404)
         table = self.application.db[dbname] 
         rec = table.find().sort('number')                   
@@ -329,7 +328,7 @@ class UserHandler(web.RequestHandler):
                 return
         self.redirect('/'+dbname)
 
-class SearchHandler(web.RequestHandler):       
+class SearchHandler(web.RequestHandler):
     def post(self,dbname=''):
         arg = self.get_argument('word1')
         self.word = arg[:]
@@ -347,7 +346,7 @@ class SearchHandler(web.RequestHandler):
         self.render('modules/search.htm',records=rec,word1=arg,db=dbname)
 
     def get(self,dbname=''):
-        if self.application.collection(dbname) is False and dbname != '':
+        if dbname not in self.application.coll() and dbname != '':
             raise web.HTTPError(404)
         self.render('modules/search.htm',records=[],word1='',db=dbname)
     
@@ -500,9 +499,8 @@ class HeadlineApi(web.RequestHandler):
 class ArticleApi(web.RequestHandler):
     def get(self,dbname,number):
         response = None
-        db = escape.url_unescape(dbname)
-        if self.application.collection(db) is True:
-            table = self.application.db[db]
+        if dbname in self.application.coll():
+            table = self.application.db[dbname]
             response = table.find_one({'number':int(number)})      
         if not response:
             response = {}
@@ -511,15 +509,11 @@ class ArticleApi(web.RequestHandler):
             del response['comment']
             del response['password']
         self.write(json.dumps(response,ensure_ascii=False))      
-            
-    def post(self,dbname,name,title,article):
-        coll = self.application.db[escape.url_unescape(dbname)]
-        coll.insert({'name':name,'title':title,'comment':article})
-        
+
 class ListApi(web.RequestHandler):
     def get(self,dbname):
         response = None
-        if self.application.collection(dbname) is True:
+        if dbname in self.application.coll():
             table = self.application.db[dbname]
             response = {}
             for data in table.find().sort('number'):
@@ -741,12 +735,6 @@ class Application(web.Application):
             return '/'+dbname+'/'+str(1+rec//conf)+'/#'+number
         else:
             return '/'+dbname+'#'+number
-    
-    def collection(self,name):
-        if name in self.db.collection_names():
-            return True
-        else:
-            return False
 
     def coll(self):
         name = self.db.collection_names()
