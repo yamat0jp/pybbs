@@ -504,7 +504,7 @@ class ArticleApi(web.RequestHandler):
             table = self.application.db[dbname]
             response = table.find_one({'number':int(number)})      
         if not response:
-           response = {}
+            response = {}
         else:
             del response['_id']
             del response['comment']
