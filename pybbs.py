@@ -23,7 +23,7 @@ class IndexHandler(BaseHandler):
     def get(self,dbname,page='0'):
         dbname = escape.url_unescape(dbname)
         params = self.application.db.get(where('kinds') == 'conf')
-        if params['mentenance'] == True:
+        if params['mentenance'] is True:
             self.render('mentenance.htm',title=params['title'],db=dbname)
             return
         names = list(self.application.collection())
@@ -73,7 +73,7 @@ class LoginHandler(BaseHandler):
         else:
             qs = query[1:i+1]
         if qs == '':
-            qs = self.application.db.get(where('kinds') == 'conf')['info name']
+            qs = self.application.db.get(where('app') == 'bbs')['info name']
         else:
             qs = escape.url_unescape(qs)
         self.render('login.htm',db=qs)
@@ -83,7 +83,7 @@ class LoginHandler(BaseHandler):
         if dbname == '':
             self.redirect('/login')
             return
-        pw = self.application.db.get(where('kinds') == 'conf')
+        pw = self.application.db.get(where('app') == 'bbs')
         if self.get_argument('password') == pw['password']:
             self.set_current_user('admin')
         if dbname == 'master':
@@ -115,7 +115,7 @@ class NaviHandler(web.RequestHandler):
 
     def full(self,dbname):
         if dbname in self.application.db.tables():
-            i = 10*self.application.db.get(where('kinds') == 'conf')['count']
+            i = 10*self.application.db.get(where('app') == 'bbs')['count']
             table = self.application.db.table(dbname)
             if len(table) >= i:
                 return True
@@ -160,8 +160,7 @@ class RegistHandler(web.RequestHandler):
     def post(self,dbname):
         if dbname not in self.application.collection():
             raise web.HTTPError(404)
-        self.database = dbname
-        rec = self.application.db.get(where('kinds') == 'conf')
+        rec = self.application.db.get(where('app') == 'bbbs')
         words = rec['bad_words']
         out = rec['out_words']
         na = self.get_argument('name')
@@ -246,31 +245,30 @@ class AdminHandler(BaseHandler):
     def get(self,dbname,page):
         if dbname == '':
             dbname = self.get_argument('record','')
-        if dbname not in self.application.collection():
-            params = self.application.db.get(where('kinds') == 'conf')
-            if params['info name'] != dbname:
-                raise web.HTTPError(404)
+        params = self.application.db.get(where('app') == 'bbs')
+        if dbname not in self.application.collection() and params['info name'] != dbname:
+            raise web.HTTPError(404)
         table = self.application.db.table(dbname) 
-        rec = sorted(table.all(),key=lambda x: x['number'])                   
-        mente = self.application.db.get(where('kinds') == 'conf')
-        if mente['mentenance'] == True:
+        rec = sorted(table.all(),key=lambda x: x['number'])
+        if params['mentenance'] is True:
             check = 'checked=checked'
         else:
             check = ''
         pos = self.application.gpos(dbname,page)
-        i = mente['count']
+        i = params['count']
         start = (pos-1)*i
         if start < 0:
             start = len(table)-i
             if start < 0:
                 start = 0
-        self.render('modules/admin.htm',position=pos,records=rec[start:start+i],mente=check,password=mente['password'],db=dbname)
+        self.render('modules/admin.htm',position=pos,
+            records=rec[start:start+i],mente=check,password=params['password'],db=dbname)
 
 class AdminConfHandler(BaseHandler):
     @web.authenticated
     def post(self,dbname,func):
         if func == 'set':
-            param = self.application.db.get(where('kinds') == 'conf')['mentenance']
+            param = self.application.db.get(where('app') == 'bbs')['mentenance']
             if self.get_argument('mente','') == 'on':
                 mente = True
                 if param != mente:
@@ -348,7 +346,7 @@ class SearchHandler(web.RequestHandler):
     
     def get(self,dbname=''):
         names = list(self.application.collection())
-        info = self.application.db.get(where('kinds') == 'conf')['info name']
+        info = self.application.db.get(where('app') == 'bbs')['info name']
         if info == dbname:
             dbname = info
         elif dbname != '' and dbname not in names:
