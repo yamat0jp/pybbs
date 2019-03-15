@@ -106,11 +106,13 @@ class NaviHandler(web.RequestHandler):
                     "title":"pybbs","info name":"info","kinds":"conf","app":"bbs"}
             self.application.db.insert(item)
             self.application.db.table('info')
+            na = 'info name'
         elif data['mentenance'] is True:
             self.render('mentenance.htm',title=data['title'],db=data['info name'])
             return
+        else:
+            na = data['info name']
         col = self.application.collection()
-        na = data['info name']
         self.render('top.htm',coll=col,name=na,full=self.full)
 
     def full(self,dbname):
@@ -160,7 +162,7 @@ class RegistHandler(web.RequestHandler):
     def post(self,dbname):
         if dbname not in self.application.collection():
             raise web.HTTPError(404)
-        rec = self.application.db.get(where('app') == 'bbbs')
+        rec = self.application.db.get(where('app') == 'bbs')
         words = rec['bad_words']
         out = rec['out_words']
         na = self.get_argument('name')
@@ -462,18 +464,18 @@ class AlertHandler(web.RequestHandler):
     def get(self):
         db = self.get_query_argument('db')
         num = self.get_query_argument('num')
-        s = self.application.page(db,num)
+        jump = self.application.page(db,num)
         n = int(num)
         table = self.application.db.table(db)
-        tb = table.get(where('number') == n)
-        jump = '/'+db+s+'#'+num
+        item = table.get(where('number') == n)
         link = '<p><a href={0}>{0}</a>'.format(jump)
         time = datetime.now()
         d = date.weekday(time)
-        data = {'comment':tb['comment']+link,'time':time.strftime('%Y/%m/%d'),
+        data = {'comment':item['comment']+link,'time':time.strftime('%Y/%m/%d'),
                 'link':jump,'date':d,'db':db,'num':n}
-        id = self.application.db.table('temp').insert(data)
-        table.remove(where('date') != d)
+        temp = self.application.db.table('temp')
+        id = temp.insert(data)
+        temp.remove(where('date') != d)
         self.render('alert.htm',com=data['comment'],num=id)
     
     def post(self):

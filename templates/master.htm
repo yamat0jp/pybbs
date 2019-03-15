@@ -15,5 +15,6 @@
 <p>削除済みだけを<input type=submit value='削除'>（要望も消えます）</form>
 <form action=/clean?all=true method=post>{% module xsrf_form_html() %}
 <p>全ての報告を<input type=submit value='削除'></form>
+<p>(item count {% raw len(com) %})</p>
 </body>
 </html>
