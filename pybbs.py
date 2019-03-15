@@ -555,5 +555,5 @@ class Application(web.Application):
 if __name__ == '__main__':
     st = dbjson.static()
     http_server = httpserver.HTTPServer(Application())
-    http_server.listen(8000)
+    http_server.listen(5000)
     ioloop.IOLoop.instance().start()
