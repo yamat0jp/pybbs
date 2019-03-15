@@ -98,7 +98,7 @@ class LogoutHandler(BaseHandler):
         
 class NaviHandler(web.RequestHandler):
     def get(self):
-        data = self.application.db.get(where('kinds') == 'conf')
+        data = self.application.db.get(where('app') == 'bbs')
         if not data:
             item = {"mentenance":False,"out_words":[u"阿保",u"馬鹿",u"死ね"],"password":"admin",
                     "title2":"<h1 style=color:gray;text-align:center>pybbs</h1>",
@@ -109,24 +109,10 @@ class NaviHandler(web.RequestHandler):
         elif data['mentenance'] is True:
             self.render('mentenance.htm',title=data['title'],db=data['info name'])
             return
-        col,na = self.name()
+        col = self.application.collection()
+        na = data['info name']
         self.render('top.htm',coll=col,name=na,full=self.full)
-        
-    def name(self):
-        names = self.application.db.tables()
-        na = self.application.db.get(where('kinds') == 'conf')['info name']
-        s = set(['_default','master','temp'])
-        if na in names:
-            s.add(na)
-        else:
-            na = ''
-        names = names - s
-        item = []
-        for x in names:
-            if x[-4:] != '_bot':
-                item.append(x)
-        return sorted(item),na
-                
+
     def full(self,dbname):
         if dbname in self.application.db.tables():
             i = 10*self.application.db.get(where('kinds') == 'conf')['count']
@@ -141,11 +127,7 @@ class TitleHandler(NaviHandler):
         self.render('title.htm',coll=rec,full=self.full)  
         
     def title(self):
-        names = self.application.db.tables()
-        for s in ['_default','master','temp']:
-            if s in names:
-                names.remove(s)
-        for x in names:
+        for x in self.application.collection():
             item = {}
             item['name'] = x
             table = self.application.db.table(x)
@@ -545,7 +527,7 @@ class Application(web.Application):
         web.Application.__init__(self,handlers,**settings)
  
     def gpos(self,dbname,page):
-        params = self.db.get(where('kinds') == 'conf')
+        params = self.db.get(where('app') == 'bbs')
         pos = int(page)
         if pos <= 0:
             pos = 0
@@ -564,8 +546,8 @@ class Application(web.Application):
             return '/'+dbname+'#'+number
 
     def collection(self):
-        info = self.db.get(where('kinds') == 'conf')['info name']
-        names = ['master','_default',info]
+        info = self.db.get(where('app') == 'bbs')['info name']
+        names = ['master','_default','temp',info]
         for name in self.db.tables() - set(names):
             if name[-3:] != '_bot':
                 yield name
