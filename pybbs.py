@@ -106,13 +106,13 @@ class NaviHandler(web.RequestHandler):
                     "title":"pybbs","info name":"info","kinds":"conf","app":"bbs"}
             self.application.db.insert(item)
             self.application.db.table('info')
-            na = 'info name'
+            na = 'info'
         elif data['mentenance'] is True:
             self.render('mentenance.htm',title=data['title'],db=data['info name'])
             return
         else:
             na = data['info name']
-        col = self.application.collection()
+        col = sorted(self.application.collection())
         self.render('top.htm',coll=col,name=na,full=self.full)
 
     def full(self,dbname):
@@ -444,7 +444,7 @@ class HelpHandler(web.RequestHandler):
             text +='<p>'+line
         table = self.application.db.table('master')
         time = datetime.now()
-        table.insert({'comment':text,'time':time.strftime('%Y/%m/%d %H:%M')})
+        table.insert({'db':'','comment':text,'time':time.strftime('%Y/%m/%d %H:%M')})
         if com == '':
             req = ''
         else:
@@ -466,8 +466,7 @@ class AlertHandler(web.RequestHandler):
         num = self.get_query_argument('num')
         jump = self.application.page(db,num)
         n = int(num)
-        table = self.application.db.table(db)
-        item = table.get(where('number') == n)
+        item = self.application.db.table(db).get(where('number') == n)
         link = '<p><a href={0}>{0}</a>'.format(jump)
         time = datetime.now()
         d = date.weekday(time)
@@ -482,8 +481,8 @@ class AlertHandler(web.RequestHandler):
         id = int(self.get_argument('num'))
         table = self.application.db.table('temp')
         tb = table.get(eid=id)
-        link = tb['link']
         table.remove(eids=[id])
+        link = tb['link']
         if self.get_argument('admit','') == 'ok':
             com = self.get_argument('com')
             tb['comment'] = com+tb['comment']
@@ -499,7 +498,10 @@ class CleanHandler(web.RequestHandler):
         if bool == 'true':
             table.purge()
         elif bool == 'false':
-            for x in table:
+            for x in table.all():
+                if x['db'] == '':
+                    table.remove(doc_ids=[x.doc_id])
+                    continue
                 tb = self.application.db.table(x['db'])
                 item = tb.get(where('number') == x['num'])
                 if not item or item['raw'] == '':
