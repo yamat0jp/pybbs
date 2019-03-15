@@ -111,25 +111,17 @@ class NaviHandler(web.RequestHandler):
                     "bad_words":["<style","<link","<script","<img"],"count":30,
                     "title":"pybbs","info name":"info",'app':'bbs'}       
             self.application.db['params'].insert(item)
-            self.application.db['info']
+            self.application.db['info'].find({})
         table = self.application.db['params'].find_one({'app':'bbs'})
         if table['mentenance'] is True:
             self.render('mentenance.htm',title=table['title'],db=table['info name'])
             return
-        coll,na = self.name()                
+        coll = self.application.coll()
+        na = table['info name']
         self.render('top.htm',coll=coll,name=na,full=self.full)
-                  
-    def name(self):
-        coll = sorted(self.application.coll(),key=str.lower)
-        na = self.application.db['params'].find_one({'app':'bbs'})['info name']
-        if na in coll:
-            coll.remove(na)
-        else:
-            na = ''
-        return coll,na
-            
+
     def full(self,dbname):
-        if dbname in self.application.db.collection_names():
+        if dbname in self.application.coll():
             i = 10*self.application.db['params'].find_one({'app':'bbs'})['count']
             table = self.application.db[dbname]
             if table.count() >= i:
@@ -142,8 +134,7 @@ class TitleHandler(NaviHandler):
         self.render('title.htm',coll=rec,full=self.full)  
         
     def title(self):
-        name = self.application.coll()
-        for x in name:
+        for x in self.application.coll():
             item = {}
             item['name'] = x
             table = self.application.db[x]
@@ -738,6 +729,8 @@ class Application(web.Application):
 
     def coll(self):
         name = self.db.collection_names()
+        item = self.db['params'].find_one({'app':'bbs'})
+        name -= item['info name']
         for x in ['objectlabs-system.admin.collections','objectlabs-system','system.indexes',
                   'params','master','temp']:
             if x in name:
