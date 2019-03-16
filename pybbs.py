@@ -105,13 +105,13 @@ class NaviHandler(web.RequestHandler):
                     "bad_words":["<style","<link","<script","<img"],"count":30,
                     "title":"pybbs","info name":"info","kinds":"conf","app":"bbs"}
             self.application.db.insert(item)
-            self.application.db.table('info')
+            self.application.db.table('info').all()
             na = 'info'
-        elif data['mentenance'] is True:
-            self.render('mentenance.htm',title=data['title'],db=data['info name'])
-            return
         else:
             na = data['info name']
+            if data['mentenance'] is True:
+                self.render('mentenance.htm',title=data['title'],db=na)
+                return
         col = sorted(self.application.collection())
         self.render('top.htm',coll=col,name=na,full=self.full)
 
@@ -248,7 +248,9 @@ class AdminHandler(BaseHandler):
         if dbname == '':
             dbname = self.get_argument('record','')
         params = self.application.db.get(where('app') == 'bbs')
-        if dbname not in self.application.collection() and params['info name'] != dbname:
+        group = set()
+        group += self.application.collection()+dbname
+        if dbname not in group:
             raise web.HTTPError(404)
         table = self.application.db.table(dbname) 
         rec = sorted(table.all(),key=lambda x: x['number'])
