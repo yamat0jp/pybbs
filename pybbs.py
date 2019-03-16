@@ -135,7 +135,7 @@ class TitleHandler(NaviHandler):
             table = self.application.db.table(x)
             i = len(table)
             item['count'] = i            
-            if table.contains(where('number') == 1) == True:
+            if table.contains(where('number') == 1) is True:
                 s = table.get(where('number') == 1)['title']
             else:
                 s = ''
@@ -248,8 +248,8 @@ class AdminHandler(BaseHandler):
         if dbname == '':
             dbname = self.get_argument('record','')
         params = self.application.db.get(where('app') == 'bbs')
-        group = set()
-        group += self.application.collection()+dbname
+        group = list(self.application.collection())
+        group.append(params['info name'])
         if dbname not in group:
             raise web.HTTPError(404)
         table = self.application.db.table(dbname) 
@@ -311,7 +311,7 @@ class AdminConfHandler(BaseHandler):
 class UserHandler(web.RequestHandler):
     def get(self,dbname):
         q = self.get_query_argument('job','0',strip=True)
-        self.redirect(self.application,page(dbname,q))
+        self.redirect(self.application.page(dbname,q))
         
     def post(self,dbname):
         number = self.get_argument('number')
