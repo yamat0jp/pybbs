@@ -728,13 +728,11 @@ class Application(web.Application):
             return '/'+dbname+'#'+number
 
     def coll(self):
-        name = self.db.collection_names()
+        name = list(self.db.collection_names(False))
         item = self.db['params'].find_one({'app':'bbs'})
-        name = name.remove(item['info name'])
-        for x in ['objectlabs-system.admin.collections','objectlabs-system','system.indexes',
-                  'params','master','temp']:
-            if x in name:
-                name.remove(x)
+        name.remove(item['info name'])
+        for x in ['params','master','temp']:
+            name.remove(x)
         for x in name:
             if x[-4:] == '_bot':
                 name.remove(x)
