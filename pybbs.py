@@ -116,7 +116,7 @@ class NaviHandler(web.RequestHandler):
         if table['mentenance'] is True:
             self.render('mentenance.htm',title=table['title'],db=table['info name'])
             return
-        coll = sorted(self.application.coll())
+        coll = self.application.coll()
         na = table['info name']
         self.render('top.htm',coll=coll,name=na,full=self.full)
 
@@ -327,7 +327,7 @@ class SearchHandler(web.RequestHandler):
         self.radiobox = self.get_argument('filter')       
         if dbname == '':
             rec = []
-            for x in sorted(self.application.coll()):
+            for x in self.application.coll():
                 moji = self.search(x)
                 for y in sorted(moji,key=lambda k: k['number']):
                     y['dbname'] = x
@@ -477,7 +477,7 @@ class FooterModule(web.UIModule):
 class HeadlineApi(web.RequestHandler):
     def get(self):
         response = {}
-        for coll in sorted(self.application.coll()):
+        for coll in self.application.coll():
             table = self.application.db[coll]
             if table.count() == 0:
                 mydict = {}
