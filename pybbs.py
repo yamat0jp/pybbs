@@ -728,7 +728,7 @@ class Application(web.Application):
             return '/'+dbname+'#'+number
 
     def coll(self):
-        name = list(self.db.collection_names(False))
+        name = list(self.db.collection_names(include_system_collections=False))
         item = self.db['params'].find_one({'app':'bbs'})
         name.remove(item['info name'])
         for x in ['params','master','temp']:
