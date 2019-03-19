@@ -31,8 +31,7 @@ class IndexHandler(BaseHandler):
         if dbname not in self.application.coll():
             if self.current_user == b'admin':
                 coll = self.application.db[dbname]
-                coll.insert({})
-                coll.remove({})
+                coll.find()
             else:
                 raise web.HTTPError(404)
         key = self.get_argument('key','')
@@ -728,7 +727,7 @@ class Application(web.Application):
             return '/'+dbname+'#'+number
 
     def coll(self):
-        name = self.db.database_names(include_system_collections=False).sort()
+        name = self.db.collection_names(include_system_collections=False).sort()
         if not name:
             return []
         item = self.db['params'].find_one({'app':'bbs'})
