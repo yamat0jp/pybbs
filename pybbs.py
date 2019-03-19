@@ -130,7 +130,8 @@ class NaviHandler(web.RequestHandler):
 
 class TitleHandler(NaviHandler):
     def get(self):
-        rec = sorted(self.title(),key=lambda x: x['date2'])
+        title = list(self.title())
+        rec = sorted(title,key=lambda x: x['date2'])
         self.render('title.htm',coll=rec,full=self.full)  
         
     def title(self):
