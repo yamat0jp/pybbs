@@ -105,7 +105,7 @@ class JumpHandler(BaseHandler):
         
 class NaviHandler(web.RequestHandler):
     def get(self):
-        if 'params' not in self.application.coll():
+        if 'params' not in self.application.db.collection_names():
             item = {"mentenance":False,"out_words":[u"阿保",u"馬鹿",u"死ね"],"password":"admin",
                     "title2":"<h1 style=color:gray;text-align:center>pybbs</h1>",
                     "bad_words":["<style","<link","<script","<img"],"count":30,
@@ -116,7 +116,7 @@ class NaviHandler(web.RequestHandler):
         if table['mentenance'] is True:
             self.render('mentenance.htm',title=table['title'],db=table['info name'])
             return
-        coll = self.application.coll()
+        coll = sorted(self.application.coll())
         na = table['info name']
         self.render('top.htm',coll=coll,name=na,full=self.full)
 
@@ -327,7 +327,7 @@ class SearchHandler(web.RequestHandler):
         self.radiobox = self.get_argument('filter')       
         if dbname == '':
             rec = []
-            for x in self.application.coll():
+            for x in sorted(self.application.coll()):
                 moji = self.search(x)
                 for y in sorted(moji,key=lambda k: k['number']):
                     y['dbname'] = x
@@ -477,7 +477,7 @@ class FooterModule(web.UIModule):
 class HeadlineApi(web.RequestHandler):
     def get(self):
         response = {}
-        for coll in self.application.coll():
+        for coll in sorted(self.application.coll()):
             table = self.application.db[coll]
             if table.count() == 0:
                 mydict = {}
@@ -728,7 +728,7 @@ class Application(web.Application):
             return '/'+dbname+'#'+number
 
     def coll(self):
-        name = list(self.db.collection_names(include_system_collections=False))
+        name = self.db.collection_names(include_system_collections=False)
         item = self.db['params'].find_one({'app':'bbs'})
         name.remove(item['info name'])
         for x in ['params','master','temp']:
@@ -736,7 +736,7 @@ class Application(web.Application):
         for x in name:
             if x[-4:] == '_bot':
                 name.remove(x)
-        return sorted(name)
+        return name
    
 if __name__ == '__main__':
     app = Application()
