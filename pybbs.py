@@ -730,7 +730,7 @@ class Application(web.Application):
     def coll(self):
         name = self.db.collection_names()
         item = self.db['params'].find_one({'app':'bbs'})
-        name -= item['info name']
+        name = name.remove(item['info name'])
         for x in ['objectlabs-system.admin.collections','objectlabs-system','system.indexes',
                   'params','master','temp']:
             if x in name:
