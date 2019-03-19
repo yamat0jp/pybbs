@@ -130,8 +130,7 @@ class NaviHandler(web.RequestHandler):
 
 class TitleHandler(NaviHandler):
     def get(self):
-        title = list(self.title())
-        rec = sorted(title,key=lambda x: x['date2'])
+        rec = sorted(self.title(),key=lambda x: x['date2'])
         self.render('title.htm',coll=rec,full=self.full)  
         
     def title(self):
@@ -729,7 +728,7 @@ class Application(web.Application):
             return '/'+dbname+'#'+number
 
     def coll(self):
-        name = self.db.collection_names(include_system_collections=False)
+        name = self.db.collection_names(include_system_collections=False).sort()
         item = self.db['params'].find_one({'app':'bbs'})
         name.remove(item['info name'])
         for x in ['params','master','temp']:
