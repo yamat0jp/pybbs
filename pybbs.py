@@ -111,7 +111,7 @@ class NaviHandler(web.RequestHandler):
                     "bad_words":["<style","<link","<script","<img"],"count":30,
                     "title":"pybbs","info name":"info",'app':'bbs'}       
             self.application.db['params'].insert(item)
-            self.application.db['info'].find({})
+            self.application.db['info'].find()
         table = self.application.db['params'].find_one({'app':'bbs'})
         if table['mentenance'] is True:
             self.render('mentenance.htm',title=table['title'],db=table['info name'])
@@ -703,7 +703,7 @@ class Application(web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':os.environ['cookie'],
                         'xsrf_cookies':False,
-                        #'debug':True,
+                        'debug':True,
                         'login_url':'/login'
                         }
         super().__init__(handlers,**settings)
@@ -728,7 +728,9 @@ class Application(web.Application):
             return '/'+dbname+'#'+number
 
     def coll(self):
-        name = self.db.collection_names(include_system_collections=False).sort()
+        name = self.db.database_names(include_system_collections=False).sort()
+        if not name:
+            return []
         item = self.db['params'].find_one({'app':'bbs'})
         name.remove(item['info name'])
         for x in ['params','master','temp']:
