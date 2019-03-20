@@ -552,7 +552,7 @@ class WebHookHandler(web.RequestHandler):
         s = '-*-database names-*-\n'
         out = ['objectlabs-system','objectlabs-system.admin.collections','users_bot']
         for x in self.application.mylist():
-            if not x in out and x[-4:] == '_bot' and x != '_bot':
+            if x not in out and x[-4:] == '_bot' and x != '_bot':
                 s += x[:-4]+'\n'
         return s
     
@@ -727,15 +727,17 @@ class Application(web.Application):
             return '/'+dbname+'#'+number
 
     def mylist(self):
-        return self.db.list_collection_names()
+        return self.db.list_collection_names()[:]
 
     def coll(self):
         name = self.mylist()
         item = self.db['params'].find_one({'app':'bbs'})
         target = ['objectlabs-system', 'objectlabs-system.admin.collections', 'system.indexes',
             'params', 'master', 'temp', item['info name']]
+        for x in target:
+            name.remove(x)
         for x in name:
-            if (x[-4:] == '_bot')or(x in target):
+            if x[-4:] == '_bot':
                 name.remove(x)
         return sorted(name)
    
