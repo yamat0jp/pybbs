@@ -727,20 +727,15 @@ class Application(web.Application):
             return '/'+dbname+'#'+number
 
     def mylist(self):
-        for x in self.db.collection_names(include_system_collections=False):
-            yield x
-        else:
-            return []
+        return self.db.list_collection_names()
 
     def coll(self):
-        name = list(self.mylist())
+        name = self.mylist()
         item = self.db['params'].find_one({'app':'bbs'})
-        name.remove(item['info name'])
-        for x in ['objectlabs-system','objectlabs-system.admin.collections',
-            'params','master','temp']:
-            name.remove(x)
+        target = ['objectlabs-system', 'objectlabs-system.admin.collections', 'system.indexes',
+            'params', 'master', 'temp', item['info name']]
         for x in name:
-            if x[-4:] == '_bot':
+            if x[-4:] == '_bot' or x in target:
                 name.remove(x)
         return name.sort()
    
