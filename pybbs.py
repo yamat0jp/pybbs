@@ -737,7 +737,7 @@ class Application(web.Application):
         for x in name:
             if x[-4:] == '_bot' or x in target:
                 name.remove(x)
-        return name.sort()
+        return sorted(name)
    
 if __name__ == '__main__':
     app = Application()
