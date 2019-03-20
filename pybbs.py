@@ -28,7 +28,7 @@ class IndexHandler(BaseHandler):
         if params['mentenance'] is True:
             self.render('mentenance.htm',title=params['title'],db=dbname)
             return
-        if dbname not in self.application.coll():
+        if dbname not in self.application.coll() and dbname != params['info name']:
             if self.current_user == b'admin':
                 coll = self.application.db[dbname]
                 coll.find()
@@ -253,11 +253,11 @@ class AdminHandler(BaseHandler):
     def get(self,dbname,page='0'):
         if dbname == '':
             dbname = self.get_argument('record','')
-        if dbname not in self.application.coll():
+        mente = self.application.db['params'].find_one({'app':'bbs'})
+        if dbname not in self.application.coll() and dbname != mente['info name']:
             raise web.HTTPError(404)
         table = self.application.db[dbname] 
         rec = table.find().sort('number')                   
-        mente = self.application.db['params'].find_one({'app':'bbs'})
         if mente['mentenance'] is True:
             check = 'checked=checked'
         else:
