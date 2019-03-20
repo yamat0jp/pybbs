@@ -730,7 +730,7 @@ class Application(web.Application):
         return self.db.list_collection_names()
 
     def coll(self):
-        name = self.mylist()
+        name = list(self.mylist())
         item = self.db['params'].find_one({'app':'bbs'})
         target = ['objectlabs-system', 'objectlabs-system.admin.collections', 'system.indexes',
             'params', 'master', 'temp', item['info name']]
