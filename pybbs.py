@@ -104,7 +104,7 @@ class JumpHandler(BaseHandler):
         
 class NaviHandler(web.RequestHandler):
     def get(self):
-        if 'params' not in self.application.db.collection_names():
+        if 'params' not in self.application.mylist():
             item = {"mentenance":False,"out_words":[u"阿保",u"馬鹿",u"死ね"],"password":"admin",
                     "title2":"<h1 style=color:gray;text-align:center>pybbs</h1>",
                     "bad_words":["<style","<link","<script","<img"],"count":30,
@@ -551,14 +551,14 @@ class WebHookHandler(web.RequestHandler):
     def help(self):
         s = '-*-database names-*-\n'
         out = ['objectlabs-system','objectlabs-system.admin.collections','users_bot']
-        for x in self.application.db.collection_names(include_system_collections=False):
+        for x in self.application.mylist():
             if not x in out and x[-4:] == '_bot' and x != '_bot':
                 s += x[:-4]+'\n'
         return s
     
     def setting(self, dbname):
         dbname = dbname.lower()+'_bot'
-        ca = self.application.db.collection_names(include_system_collections=False)
+        ca = self.application.mylist()
         if 'users_bos' in ca:
             ca.remove('users_bot')
         if dbname in ca:
@@ -607,7 +607,7 @@ class WebHookHandler(web.RequestHandler):
                     token = item['access_token']
                 else:      
                     token =self.application.tk
-                if not bot in self.application.db.collection_names() or not self.application.db[bot].find_one({'name':self.uid}):
+                if bot not in self.application.mylist() or not self.application.db[bot].find_one({'name':self.uid}):
                     db = self.application.db[bot]
                     db.insert({'name':self.uid, 'dbname':de})
                 x = event['message']['text']     
@@ -624,7 +624,7 @@ class InitHandler(web.RequestHandler):
     def get(self):        
         de = self.get_argument('default', '')     
         if de == '':
-            names = self.application.db.collection_names()
+            names = self.application.mylist()
             db = []
             for x in names:
                 if x[-4:] == '_bot' and x != 'users_bot':
@@ -685,7 +685,7 @@ class Application(web.Application):
     id = os.environ['Bot_Id']  
     ch = os.environ['Channel_Secret']
     uri = os.environ['MONGODB_URI']
-    ac = os.environ['ACCOUNT']   
+    ac = os.environ['ACCOUNT']
     tk = os.environ['long_token']
     db = pymongo.MongoClient(uri)[ac]
     def __init__(self):
@@ -702,7 +702,7 @@ class Application(web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':os.environ['cookie'],
                         'xsrf_cookies':False,
-                        'debug':True,
+                        #'debug':True,
                         'login_url':'/login'
                         }
         super().__init__(handlers,**settings)
@@ -726,18 +726,23 @@ class Application(web.Application):
         else:
             return '/'+dbname+'#'+number
 
-    def coll(self):
-        name = self.db.collection_names(include_system_collections=False).sort()
-        if not name:
+    def mylist(self):
+        for x in self.db.collection_names(include_system_collections=False):
+            yield x
+        else:
             return []
+
+    def coll(self):
+        name = list(self.mylist())
         item = self.db['params'].find_one({'app':'bbs'})
         name.remove(item['info name'])
-        for x in ['params','master','temp']:
+        for x in ['objectlabs-system','objectlabs-system.admin.collections',
+            'params','master','temp']:
             name.remove(x)
         for x in name:
             if x[-4:] == '_bot':
                 name.remove(x)
-        return name
+        return name.sort()
    
 if __name__ == '__main__':
     app = Application()
