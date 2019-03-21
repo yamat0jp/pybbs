@@ -176,7 +176,7 @@ class RegistHandler(web.RequestHandler):
             if word in com:
                 error = error + u'禁止ワード.'
                 break
-        for line in com.splitlines(True):
+        for line in com.splitlines():
             if error != '':
                 break
             for word in words:
@@ -195,9 +195,9 @@ class RegistHandler(web.RequestHandler):
                     break
             line = line.replace(' ','&nbsp;',j)
             if line == '':
-                text += '<br>'
+                text += '<p><br>\n</p>'
             else:
-                text += '<p>'+self.link(line)+'</p>'
+                text += '<p>'+self.link(line,dbname)+'\n</p>'
         s = ''
         for x in url:
             s += '<tr><td><a class=livepreview target=_blank href={0}>{0}</a></td></tr>'.format(x)
@@ -230,12 +230,12 @@ class RegistHandler(web.RequestHandler):
         else:
             self.render('regist.htm',content=error)
     
-    def link(self,command):
+    def link(self,command,database):
         i = 0
         text = ''
         obj = re.finditer('>>[0-9]+',command)
         for x in obj:
-            s = '<a class=minpreview data-preview-url=/{0}?key={1} href=/{0}/userdel?job={1}>>>{1}</a>'.format(self.database,x.group()[2:])
+            s = '<a class=minpreview data-preview-url=/{0}?key={1} href=/{0}/userdel?job={1}>>>{1}</a>'.format(database,x.group()[2:])
             text += command[i:x.start()]+s
             i = x.end()
         else:
