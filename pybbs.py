@@ -205,9 +205,9 @@ class RegistHandler(web.RequestHandler):
             if j > 0: 
                 line = line.replace(' ','&nbsp;',j)     
             if len(line) == 0:
-                text += '<br>'
+                text += '<p><br>\n</p>'
             else:
-                text += '<p>'+self.link(line,dbname)+'</p>'
+                text += '<p>'+self.link(line,dbname)+'\n</p>'
         s = ''
         for x in url:
             s = s+'<tr><td><a href={0} class=livepreview target=_blank>{0}</a></td></tr>'.format(x)
