@@ -681,7 +681,6 @@ class TokenHandler(web.RequestHandler):
         http.fetch(req, callback=self.on_response)
 
 class Application(web.Application):
-    id = os.environ['Bot_Id']  
     ch = os.environ['Channel_Secret']
     uri = os.environ['MONGODB_URI']
     ac = os.environ['ACCOUNT']
