@@ -207,7 +207,7 @@ class RegistHandler(web.RequestHandler):
             if len(line) == 0:
                 text += '<br>'
             else:
-                text += '<p>'+self.link(line)+'</p>'
+                text += '<p>'+self.link(line,dbname)+'</p>'
         s = ''
         for x in url:
             s = s+'<tr><td><a href={0} class=livepreview target=_blank>{0}</a></td></tr>'.format(x)
@@ -237,12 +237,12 @@ class RegistHandler(web.RequestHandler):
         else:
             self.render('regist.htm',content=error)
     
-    def link(self,command):
+    def link(self,command,database):
         i = 0
         text = ''
         obj = re.finditer('>>[0-9]+',command)
         for x in obj:
-            s = '<a class=minpreview data-preview-url=/{0}?key={1} href=/{0}/userdel?job={1}>>>{1}</a>'.format(self.database,x.group()[2:])
+            s = '<a class=minpreview data-preview-url=/{0}?key={1} href=/{0}/userdel?job={1}>>>{1}</a>'.format(database,x.group()[2:])
             text = text+command[i:x.start()]+s
             i = x.end()
         else:
