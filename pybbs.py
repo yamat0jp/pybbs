@@ -166,9 +166,9 @@ class TitleHandler(NaviHandler):
         
 class RegistHandler(web.RequestHandler):
     def post(self,dbname):
-        if dbname not in self.application.coll():
-            raise web.HTTPError(404)
         rec = self.application.db['params'].find_one({'app':'bbs'})
+        if dbname not in self.application.coll() and dbname != rec['info name']:
+            raise web.HTTPError(404)
         words = rec['bad_words']
         out = rec['out_words']
         rule = self.get_argument('aikotoba')
