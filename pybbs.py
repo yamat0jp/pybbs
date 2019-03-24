@@ -195,7 +195,8 @@ class RegistHandler(IndexHandler):
                         break
             for word in words:
                 if word in line.lower():
-                    error += u'タグ違反.('+word+')<br>'
+                    tag = escape.xhtml_escape(word)
+                    error += u'タグ違反.('+tag+')<br>'
             i += len(line)
             obj = re.finditer('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
             for x in obj:
