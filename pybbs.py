@@ -178,17 +178,15 @@ class RegistHandler(IndexHandler):
         i = 0
         url = []
         error = ''
-        for word in out:
-            if word in com:
-                error = error + u'禁止ワード.\n'
-                break
         for line in com.splitlines():
-            if error != '':
-                break
+            for word in out:
+                if word in line:
+                    error = error + u'禁止ワード.<br>'
+                    break
             for word in words:
                 if word in line.lower():
                     tag = escape.xhtml_escape(word)
-                    error = error + u'タグ違反.('+tag+')\n'
+                    error = error + u'タグ違反.('+tag+')<br>'
             i += len(line)   
             obj = re.finditer('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
             for x in obj:
@@ -204,7 +202,7 @@ class RegistHandler(IndexHandler):
             if line == '':
                 text += '<p><br>\n</p>'
             else:
-                text += '<p>'+self.link(line,dbname)+'\n</p>'
+                text += '<p>'+self.link(line,dbname)+'<br>\n</p>'
         s = ''
         for x in url:
             s += '<tr><td><a class=livepreview target=_blank href={0}>{0}</a></td></tr>'.format(x)
@@ -212,11 +210,12 @@ class RegistHandler(IndexHandler):
             text += '<table><tr><td>検出URL:</td></tr>'+s+'</table>'
         pw = self.get_argument('password')
         if i == 0:
-            error = error + u'本文がありません.\n'
+            error = error + u'本文がありません.<br>'
         elif i > 1000:
-            error = error +u'文字数が1,000をこえました.\n'
-        if escape.url_unescape(self.get_argument('aikotoba')) != u'げんき':
-            error = error + u'合言葉未入力.\n'
+            error = error +u'文字数が1,000をこえました.<br>'
+        self.rule = escape.url_unescape(self.get_argument('aikotoba'))
+        if self.rule != u'げんき':
+            error = error + u'合言葉未入力.<br>'
         article = self.application.db.table(dbname)
         if len(article) == 0:
             no = 1
