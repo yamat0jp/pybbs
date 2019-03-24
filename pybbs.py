@@ -72,7 +72,7 @@ class IndexHandler(BaseHandler):
             self.render('modules/info.htm',position=self.pos,records=self.rec,data=params,db=dbname,error='')
         else:
             self.render('modules/index.htm',position=self.pos,records=self.rec,data=params,username=self.na,
-            comment='',db=dbname,aikotoba=self.rule,error='')
+            comment='',db=dbname,aikotoba=self.rule,error='',check='checked')
 
 class LoginHandler(BaseHandler):
     def get(self):
@@ -236,6 +236,11 @@ class RegistHandler(IndexHandler):
             item = items.sort('number')[article.count()-1]
             no = item['number']+1
         if error == '':
+            if self.get_argument('show','false') == 'true':
+                error = '<p style=font-size:2.5em;collor:blue>↓↓プレビュー↓↓<br></p>'+text
+        else:
+            error = '<p style=color:red>'+error+'</p>'
+        if error == '':
             self.set_cookie('aikotoba',escape.url_escape(rule))
             s = datetime.now()
             reg = {'number':no,'name':na,'title':sub,'comment':text,'raw':com,'password':pw,'date':s.strftime('%Y/%m/%d %H:%M')}
@@ -245,7 +250,7 @@ class RegistHandler(IndexHandler):
         else:
             error = '<p style=color:red>'+error+'</p>'
             self.render('modules/index.htm',position=0,records=self.rec,data=params,
-                username=na,comment=com,db=dbname,aikotoba=rule,error=error)
+                username=na,comment=com,db=dbname,aikotoba=rule,error=error,check='')
     
     def link(self,command,database):
         i = 0
