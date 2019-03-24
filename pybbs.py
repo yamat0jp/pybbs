@@ -54,8 +54,8 @@ class IndexHandler(BaseHandler):
             if start < 0:
                 start = 0
         rec = table.find()
-        bool = (dbname == params['info name']) 
-        if bool is True:
+        self.bool = (dbname == params['info name'])
+        if self.bool is True:
             rec.sort('number',-1)
         else:
             rec.sort('number')
@@ -68,8 +68,7 @@ class IndexHandler(BaseHandler):
         params = db['params'].find_one({'app':'bbs'})
         if table.count() >= 10*params['count']:
             self.render('modules/full.htm',position=self.pos,records=self.rec,data=params,db=dbname)
-        self.bool = bool is True and self.current_user != b'admin'
-        if self.bool:
+        if self.bool is True and self.current_user != b'admin':
             self.render('modules/info.htm',position=self.pos,records=self.rec,data=params,db=dbname,error='')
         else:
             self.render('modules/index.htm',position=self.pos,records=self.rec,data=params,username=self.na,
@@ -171,7 +170,6 @@ class TitleHandler(NaviHandler):
             yield item
         
 class RegistHandler(IndexHandler):
-
     def post(self,dbname):
         self.main(dbname,'0')
         params = self.application.db['params'].find_one({'app':'bbs'})
