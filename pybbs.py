@@ -237,7 +237,7 @@ class RegistHandler(IndexHandler):
             no = item['number']+1
         if error == '':
             if self.get_argument('show','false') == 'true':
-                error = '<p style=font-size:2.5em;collor:blue>↓↓プレビュー↓↓<br></p>'+text
+                error = '<p style=font-size:2.5em;color:blue>↓↓プレビュー↓↓<br></p>'+text
         else:
             error = '<p style=color:red>'+error+'</p>'
         if error == '':
@@ -248,7 +248,6 @@ class RegistHandler(IndexHandler):
             self.set_cookie('username',escape.url_escape(na))
             self.redirect('/'+dbname+'#article')
         else:
-            error = '<p style=color:red>'+error+'</p>'
             self.render('modules/index.htm',position=0,records=self.rec,data=params,
                 username=na,comment=com,db=dbname,aikotoba=rule,error=error,check='')
     
