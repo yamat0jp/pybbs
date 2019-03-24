@@ -185,15 +185,12 @@ class RegistHandler(IndexHandler):
         i = 0
         url = []
         error = ''
-        if rule != u'げんき':
-            error = u'合言葉未入力.<br>'
-        for word in out:
-            if word in com:
-                error += u'禁止ワード.<br>'
-                break
         for line in com.splitlines():
-            if error:
-                break
+            if error == '':
+                for word in out:
+                    if word in line:
+                        error += u'禁止ワード.<br>'
+                        break
             for word in words:
                 if word in line.lower():
                     error += u'タグ違反.('+word+')<br>'
@@ -214,6 +211,8 @@ class RegistHandler(IndexHandler):
                 text += '<p><br>\n</p>'
             else:
                 text += '<p>'+self.link(line,dbname)+'\n</p>'
+        if rule != u'げんき':
+            error += u'合言葉未入力.<br>'
         s = ''
         for x in url:
             s = s+'<tr><td><a href={0} class=livepreview target=_blank>{0}</a></td></tr>'.format(x)
