@@ -32,7 +32,7 @@
         </td></tr>
         <tr><td>
           <label><p>本文<span>必須</span><br></p>
-            <textarea name="comment" cols=30 required placeholder="コメントなどを入力してください."></textarea></label>
+            <textarea name="comment" cols=30 required placeholder="コメントなどを入力してください.">{{comment}}</textarea></label>
         </td></tr>
         <tr><td>
           <label><p>パスワード</p><input name="password" class=password type="password" placeholder="削除用"></label>
@@ -43,6 +43,7 @@
     </form>
     <button>open</button>
     </header>
+    {% raw error %}
     <hr size="1" width="100%">
     <form action=/{{db}}/userdel method="post" id=search>
       {% module xsrf_form_html() %}

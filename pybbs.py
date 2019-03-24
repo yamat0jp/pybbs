@@ -22,8 +22,7 @@ class BaseHandler(web.RequestHandler):
         self.clear_cookie('admin_user')
 
 class IndexHandler(BaseHandler):
-    def get(self,dbname,page='0'):
-        dbname = escape.url_unescape(dbname)
+    def main(self,dbname,page):
         params = self.application.db['params'].find_one({'app':'bbs'})
         if params['mentenance'] is True:
             self.render('mentenance.htm',title=params['title'],db=dbname)
@@ -44,12 +43,12 @@ class IndexHandler(BaseHandler):
                 return
             else:
                 raise web.HTTPError(404)
-        i = params['count']      
-        rule = escape.url_unescape(self.get_cookie('aikotoba',''))
-        na = escape.url_unescape(self.get_cookie('username',u'誰かさん'))
-        pos = self.application.gpos(dbname,page)
+        self.rule = escape.url_unescape(self.get_cookie('aikotoba',''))
+        self.na = escape.url_unescape(self.get_cookie('username',u'誰かさん'))
+        self.pos = self.application.gpos(dbname,page)
         table = self.application.db[dbname]
-        start = (pos-1)*i
+        i = params['count']
+        start = (self.pos-1)*i
         if start < 0:
             start = table.count()-i
             if start < 0:
@@ -60,14 +59,21 @@ class IndexHandler(BaseHandler):
             rec.sort('number',-1)
         else:
             rec.sort('number')
-        rec.skip(start).limit(i)
-        if table.count() >= 10*i:
-            self.render('modules/full.htm',position=pos,records=rec,data=params,db=dbname)
-            return
-        if bool is True and self.current_user != b'admin':
-            self.render('modules/info.htm',position=pos,records=rec,data=params,db=dbname)
+        self.rec = rec.skip(start).limit(i)
+
+    def get(self,dbname,page='0'):
+        self.main(dbname,page)
+        db = self.application.db
+        table = db[dbname].find()
+        params = db['params'].find_one({'app':'bbs'})
+        if table.count() >= 10*params['count']:
+            self.render('modules/full.htm',position=self.pos,records=self.rec,data=params,db=dbname)
+        self.bool = bool is True and self.current_user != b'admin'
+        if self.bool:
+            self.render('modules/info.htm',position=self.pos,records=self.rec,data=params,db=dbname,error='')
         else:
-            self.render('modules/index.htm',position=pos,records=rec,data=params,username=na,db=dbname,aikotoba=rule)
+            self.render('modules/index.htm',position=self.pos,records=self.rec,data=params,username=self.na,
+            comment='',db=dbname,aikotoba=self.rule,error='')
 
 class LoginHandler(BaseHandler):
     def get(self):
@@ -164,13 +170,15 @@ class TitleHandler(NaviHandler):
                 item['date2'] = j+31*(i.month-1)+i.day
             yield item
         
-class RegistHandler(web.RequestHandler):
+class RegistHandler(IndexHandler):
+
     def post(self,dbname):
-        rec = self.application.db['params'].find_one({'app':'bbs'})
-        if dbname not in self.application.coll() and dbname != rec['info name']:
+        self.main(dbname,'0')
+        params = self.application.db['params'].find_one({'app':'bbs'})
+        if dbname not in self.application.coll() and dbname != params['info name']:
             raise web.HTTPError(404)
-        words = rec['bad_words']
-        out = rec['out_words']
+        words = params['bad_words']
+        out = params['out_words']
         rule = self.get_argument('aikotoba')
         na = self.get_argument('name')
         sub = self.get_argument('title')
@@ -180,17 +188,17 @@ class RegistHandler(web.RequestHandler):
         url = []
         error = ''
         if rule != u'げんき':
-            error = u'合言葉未入力.'
+            error = u'合言葉未入力.<br>'
         for word in out:
             if word in com:
-                error += u'禁止ワード.'
+                error += u'禁止ワード.<br>'
                 break
         for line in com.splitlines():
             if error:
                 break
             for word in words:
                 if word in line.lower():
-                    error += u'タグ違反.('+word+')'       
+                    error += u'タグ違反.('+word+')<br>'
             i += len(line)
             obj = re.finditer('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
             for x in obj:
@@ -215,7 +223,7 @@ class RegistHandler(web.RequestHandler):
             text = text+'<table><tr><td>検出url:</td></tr>'+s+'</table>'
         pw = self.get_argument('password')
         if i > 1000:
-            error += u'文字数が1,000をこえました.'
+            error += u'文字数が1,000をこえました.<br>'
         if na == '':
             na = u'誰かさん'
         if sub == '':
@@ -235,7 +243,9 @@ class RegistHandler(web.RequestHandler):
             self.set_cookie('username',escape.url_escape(na))
             self.redirect('/'+dbname+'#article')
         else:
-            self.render('regist.htm',content=error)
+            error = '<p style=color:red>'+error+'</p>'
+            self.render('modules/index.htm',position=0,records=self.rec,data=params,
+                username=na,comment=com,db=dbname,aikotoba=rule,error=error)
     
     def link(self,command,database):
         i = 0
