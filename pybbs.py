@@ -224,7 +224,7 @@ class RegistHandler(IndexHandler):
             no = item['number']+1
         if error == '':
             if self.get_argument('show','false') == 'true':
-                error = '<p style=color:blue;font-size:2.5em>↓↓プレビュー↓↓<br></p><p>'+com+'</p>'
+                error = '<p style=color:blue;font-size:2.5em>↓↓プレビュー↓↓<br></p><p>'+text+'</p>'
         else:
             error = '<p style=color:red>'+error+'</p>'
         if error == '':
