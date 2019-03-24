@@ -185,11 +185,13 @@ class RegistHandler(IndexHandler):
         i = 0
         url = []
         error = ''
+        kinsi = False
         for line in com.splitlines():
-            if error == '':
+            if kinsi is False:
                 for word in out:
                     if word in line:
                         error += u'禁止ワード.<br>'
+                        kinsi = True
                         break
             for word in words:
                 if word in line.lower():
