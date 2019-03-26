@@ -222,13 +222,15 @@ class RegistHandler(IndexHandler):
         else:
             item = sorted(article.all(),key=lambda x: x['number'])[len(article)-1]
             no = item['number']+1
-        ch = ''
-        if error == '':
-            if self.get_argument('show','false') == 'true':
-                error = '<p style=color:blue;font-size:2.5em>↓↓プレビュー↓↓</p>\n<p>'+text+'</p>'
+        if self.get_argument('show', 'false') == 'true':
+            ch = 'checked'
+        else:
+            ch = ''
+        if error == '' and ch == 'checked':
+            ch = ''
+            error = '<p style=color:blue;font-size:2.5em>↓↓プレビュー↓↓</p>\n<p>'+text+'</p>'
         else:
             error = '<p style=color:red>'+error+'</p>'
-            ch = 'checked'
         if error == '':
             if not na:
                 na = u'誰かさん'
