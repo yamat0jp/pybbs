@@ -222,11 +222,13 @@ class RegistHandler(IndexHandler):
         else:
             item = sorted(article.all(),key=lambda x: x['number'])[len(article)-1]
             no = item['number']+1
+        ch = ''
         if error == '':
             if self.get_argument('show','false') == 'true':
-                error = '<p style=color:blue;font-size:2.5em>↓↓プレビュー↓↓<br></p><p>'+text+'</p>'
+                error = '<p style=color:blue;font-size:2.5em>↓↓プレビュー↓↓</p>\n<p>'+text+'</p>'
         else:
             error = '<p style=color:red>'+error+'</p>'
+            ch = 'checked'
         if error == '':
             if not na:
                 na = u'誰かさん'
@@ -240,7 +242,7 @@ class RegistHandler(IndexHandler):
             self.redirect('/'+dbname+'#article')
         else:
             self.render('modules/index.htm',position=self.pos,records=self.rec,
-                username=self.na,comment=com,data=rec,db=dbname,aikotoba=self.rule,error=error,check='')
+                username=self.na,comment=com,data=rec,db=dbname,aikotoba=self.rule,error=error,check=ch)
     
     def link(self,command,database):
         i = 0
