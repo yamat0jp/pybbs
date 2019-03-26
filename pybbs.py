@@ -242,6 +242,7 @@ class RegistHandler(IndexHandler):
         if error == '':
             if ch == 'checked':
                 error = '<p style=font-size:2.5em;color:blue>↓↓プレビュー↓↓</p>\n' + text
+                ch = ''
             else:
                 self.set_cookie('aikotoba', escape.url_escape(rule))
                 s = datetime.now()
