@@ -251,6 +251,7 @@ class RegistHandler(IndexHandler):
             return
         else:
             error = '<p style=color:red>' + error + '</p>'
+            ch = ''
         self.render('modules/index.htm', position=0, records=self.rec, data=params,
             username=na, comment=com, db=dbname, aikotoba=rule, error=error, check=ch)
 
