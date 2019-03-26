@@ -235,9 +235,11 @@ class RegistHandler(IndexHandler):
             items = article.find()
             item = items.sort('number')[article.count()-1]
             no = item['number']+1
+        ch = 'checked'
         if error == '':
             if self.get_argument('show','false') == 'true':
                 error = '<p style=font-size:2.5em;color:blue>↓↓プレビュー↓↓</p>\n'+text
+                ch = ''
             else:
                 self.set_cookie('aikotoba',escape.url_escape(rule))
                 s = datetime.now()
@@ -248,7 +250,7 @@ class RegistHandler(IndexHandler):
                 return
         error = '<p style=color:red>' + error + '</p>'
         self.render('modules/index.htm', position=0, records=self.rec, data=params,
-            username=na, comment=com, db=dbname, aikotoba=rule, error=error, check='')
+            username=na, comment=com, db=dbname, aikotoba=rule, error=error, check=ch)
 
     def link(self,command,database):
         i = 0
