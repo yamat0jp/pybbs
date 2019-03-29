@@ -6,7 +6,9 @@ from tinydb import TinyDB,Query,where
 from datetime import date
 import json
 from botmod import *
-import dbjson
+
+
+st = static()
 
 class BaseHandler(web.RequestHandler):
     def get_current_user(self):
@@ -348,7 +350,7 @@ class UserHandler(web.RequestHandler):
                 return
         self.redirect('/'+dbname)
 
-class SearchHandler(web.RequestHandler):       
+class SearchHandler(web.RequestHandler):
     def post(self,dbname=''):
         arg = self.get_argument('word1')
         self.word = arg[:]
@@ -573,7 +575,6 @@ class Application(web.Application):
                 yield name
 
 if __name__ == '__main__':
-    st = dbjson.static()
     http_server = httpserver.HTTPServer(Application())
     http_server.listen(5000)
     ioloop.IOLoop.instance().start()

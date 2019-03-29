@@ -10,12 +10,17 @@ import tornado.web
 import tornado.escape
 import os, re, glob
 from tinydb import *
-import dbjson
 from datetime import datetime
+import linebot
 from linebot import LineBotApi, WebhookParser
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import TextSendMessage
 
+
+class static():
+    base = os.path.dirname(__file__)
+    json = os.path.join(base,'static/db/db.json')
+    bak = os.path.join(base,'static/db/bak.json')
 
 class WebHookHandler(tornado.web.RequestHandler):        
     def main(self, no):
@@ -96,7 +101,7 @@ class WebHookHandler(tornado.web.RequestHandler):
         for event in dic['events']:
             if 'replyToken' in event.keys():
                 self.uid = event['source']['userId']
-                self.database = TinyDB(st.json) 
+                self.database = TinyDB(static().json)
                 bot = 'users_bot'      
                 tb = self.database.table(bot)         
                 if event['type'] == 'unfollow':
@@ -126,7 +131,7 @@ class InitHandler(tornado.web.RequestHandler):
         if de == '':
             self.write('set default db name')
             return
-        self.db = TinyDB(st.json)
+        self.db = TinyDB(static().json)
         self.db['params'].insert({'app':'bot', 'default':de+'_bot'})
         for x in glob.glob('./*.txt'):
             f = open(x)
@@ -160,8 +165,3 @@ class VarParam():
         elif str[:14] == 'Channel_Secret':
             ch = str[15:]
         str = file.readline()
-
-var = VarParam()
-st = dbjson.static()
-
-    
