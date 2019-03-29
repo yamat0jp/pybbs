@@ -228,9 +228,10 @@ class RegistHandler(IndexHandler):
             ch = 'checked'
         else:
             ch = ''
-        if error == '' and ch == 'checked':
-            ch = ''
-            error = '<p style=color:blue;font-size:2.5em>↓↓プレビュー↓↓</p>\n<p>'+text+'</p>'
+        if error == '':
+            if ch == 'checked':
+                ch = ''
+                error = '<p style=color:blue;font-size:2.5em>↓↓プレビュー↓↓</p>\n<p>'+text+'</p>'
         else:
             error = '<p style=color:red>'+error+'</p>'
         if error == '':
