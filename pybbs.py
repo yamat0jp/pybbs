@@ -172,9 +172,9 @@ class TitleHandler(NaviHandler):
 class RegistHandler(IndexHandler):
     def post(self,dbname):
         self.main(dbname,'0')
-        params = self.application.db['params'].find_one({'app':'bbs'})
-        if dbname not in self.application.coll() and dbname != params['info name']:
+        if dbname not in self.application.coll(info=True):
             raise web.HTTPError(404)
+        params = self.application.db['params'].find_one({'app':'bbs'})
         words = params['bad_words']
         out = params['out_words']
         rule = self.get_argument('aikotoba')
@@ -355,7 +355,7 @@ class SearchHandler(web.RequestHandler):
         self.render('modules/search.htm',records=rec,word1=arg,db=dbname)
 
     def get(self,dbname=''):
-        if dbname not in self.application.coll() and dbname != '':
+        if dbname not in self.application.coll(info=True) and dbname != '':
             raise web.HTTPError(404)
         self.render('modules/search.htm',records=[],word1='',db=dbname)
     
@@ -747,11 +747,13 @@ class Application(web.Application):
     def mylist(self):
         return self.db.list_collection_names()[:]
 
-    def coll(self):
+    def coll(self,info=False):
         name = self.mylist()
         item = self.db['params'].find_one({'app':'bbs'})
         target = ['objectlabs-system', 'objectlabs-system.admin.collections', 'system.indexes',
-            'params', 'master', 'temp', item['info name']]
+            'params', 'master', 'temp']
+        if info is False:
+            target.append(item['info name'])
         for x in target:
             name.remove(x)
         for x in name:
