@@ -70,7 +70,7 @@ class IndexHandler(BaseHandler):
         if dbname == params['info name'] and self.current_user != b'admin':
             self.render('modules/info.htm',position=self.pos,records=self.rec,data=params,db=dbname)
         else:
-            self.render('modules/index.htm',position=self.pos,records=self.rec,data=params,
+            self.render('modules/index.htm',position=self.pos,records=self.rec,data=params,title='',
                 username=self.na,comment='',db=dbname,aikotoba=self.rule,error='',check='checked')
 
 class LoginHandler(BaseHandler):
@@ -246,7 +246,7 @@ class RegistHandler(IndexHandler):
             self.set_cookie('aikotoba',escape.url_escape(u'げんき'))
             self.redirect('/'+dbname+'#article')
         else:
-            self.render('modules/index.htm',position=self.pos,records=self.rec,
+            self.render('modules/index.htm',position=self.pos,records=self.rec,title=sub,
                 username=self.na,comment=com,data=rec,db=dbname,aikotoba=self.rule,error=error,check=ch)
     
     def link(self,command,database):
