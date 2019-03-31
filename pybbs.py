@@ -111,7 +111,7 @@ class NaviHandler(web.RequestHandler):
         if not data:
             item = {"mentenance":False,"out_words":[u"阿保",u"馬鹿",u"死ね"],"password":"admin",
                     "title2":"<h1 style=color:gray;text-align:center>pybbs</h1>",
-                    "bad_words":["<style","<link","<script","<img"],"count":30,
+                    "bad_words":["<style","<link","<script","<img","<a"],"count":30,
                     "title":"pybbs","info name":"info","kinds":"conf","app":"bbs"}
             self.application.db.insert(item)
             self.application.db.table('info').all()
