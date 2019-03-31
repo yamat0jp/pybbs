@@ -113,7 +113,7 @@ class NaviHandler(web.RequestHandler):
         if 'params' not in self.application.mylist():
             item = {"mentenance":False,"out_words":[u"阿保",u"馬鹿",u"死ね"],"password":"admin",
                     "title2":"<h1 style=color:gray;text-align:center>pybbs</h1>",
-                    "bad_words":["<style","<link","<script","<img"],"count":30,
+                    "bad_words":["<style","<link","<script","<img","<a"],"count":30,
                     "title":"pybbs","info name":"info",'app':'bbs'}       
             self.application.db['params'].insert(item)
             self.application.db['info'].find()
