@@ -71,7 +71,7 @@ class IndexHandler(BaseHandler):
         if self.bool is True and self.current_user != b'admin':
             self.render('modules/info.htm',position=self.pos,records=self.rec,data=params,db=dbname,error='')
         else:
-            self.render('modules/index.htm',position=self.pos,records=self.rec,data=params,username=self.na,
+            self.render('modules/index.htm',position=self.pos,records=self.rec,data=params,username=self.na,title='',
             comment='',db=dbname,aikotoba=self.rule,error='',check='checked')
 
 class LoginHandler(BaseHandler):
@@ -254,7 +254,7 @@ class RegistHandler(IndexHandler):
                 return
         else:
             error = '<p style=color:red>' + error + '</p>'
-        self.render('modules/index.htm', position=0, records=self.rec, data=params,
+        self.render('modules/index.htm', position=0, records=self.rec, data=params,title=sub,
             username=na, comment=com, db=dbname, aikotoba=rule, error=error, check=ch)
 
     def link(self,command,database):
