@@ -73,10 +73,10 @@ $(function(){
 		});
 
 		$container.on({
-		    mouseenter: stopTimer;
+		    mouseenter: stopTimer,
 		    mouseleave: startTimer
 		});
-		
+
 
 
 		goToSlide(currentIndex);
