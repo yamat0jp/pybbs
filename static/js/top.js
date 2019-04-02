@@ -49,7 +49,7 @@ $(function(){
 		function startTimer(){
 		    timer = setInterval(function(){
 	            var nextIndex = (currentIndex + 1) % slideCount;
-	            gotoSlide(nextIndex);
+	            goToSlide(nextIndex);
             }, interval)
 		}
 
@@ -75,7 +75,7 @@ $(function(){
 
 		$container.on({
 		    mouseenter: stopTimer,
-		    mouseenter: startTimer
+		    mouseleave: startTimer
 		});
 
 			
