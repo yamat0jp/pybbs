@@ -112,7 +112,7 @@ class NaviHandler(web.RequestHandler):
             item = {"mentenance":False,"out_words":[u"阿保",u"馬鹿",u"死ね"],"password":"admin",
                     "title2":"<h1 style=color:maroon;font-style:italic;text-align:center>とるね～ど号</h1>",
                     "bad_words":["<style","<link","<script","<img","<a"],"count":30,
-                    "title":"pybbs","info name":"info","kinds":"conf","app":"bbs"}
+                    "title":u"とるね～ど号","info name":"info","kinds":"conf","app":"bbs"}
             self.application.db.insert(item)
             self.application.db.table('info').all()
             na = 'info'
