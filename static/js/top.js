@@ -44,7 +44,18 @@ $(function(){
 			$indicator.find('a').removeClass('active')
 				.eq(currentIndex).addClass('active');
 		}
-			
+
+        function startTimer(){
+            timer = startInterval(function(){
+                var nextIndex = (currentIndex + 1) % slideCount;
+                goToSlide(nextIndex);
+            }, interval);
+        }
+
+        function stopTimer(){
+            clearInterval(timer);
+        }
+
 		$nav.on('click','a',function(event){
 			event.preventDefault();
 			if ($(this).hasClass('prev')){
@@ -62,6 +73,8 @@ $(function(){
 		});
 			
 		goToSlide(currentIndex);
+
+		startTimer();
 		
 	});
 	
