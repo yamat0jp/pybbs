@@ -71,7 +71,14 @@ $(function(){
 				goToSlide($(this).index());
 			}
 		});
-			
+
+		$container.on({
+		    mouseenter: stopTimer;
+		    mouseleave: startTimer
+		});
+		
+
+
 		goToSlide(currentIndex);
 
 		startTimer();
