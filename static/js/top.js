@@ -45,6 +45,17 @@ $(function(){
 			$indicator.find('a').removeClass('active')
 				.eq(currentIndex).addClass('active');
 		}
+
+		function startTimer(){
+		    timer = setInterval(function(){
+	            var nextIndex = (currentIndex + 1) % slideCount;
+	            gotoSlide(nextIndex);
+            }, interval)
+		}
+
+		function stopTimer(){
+		    clearInterval(timer);
+		}
 			
 		$nav.on('click','a',function(event){
 			event.preventDefault();
@@ -61,8 +72,16 @@ $(function(){
 				goToSlide($(this).index());
 			}
 		});
+
+		$container.on({
+		    mouseenter: stopTimer,
+		    mouseenter: startTimer
+		});
+
 			
 		goToSlide(currentIndex);
+
+		startTimer();
 		
 	});
 	
