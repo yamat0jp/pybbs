@@ -46,7 +46,7 @@ $(function(){
 		}
 
         function startTimer(){
-            timer = startInterval(function(){
+            timer = setInterval(function(){
                 var nextIndex = (currentIndex + 1) % slideCount;
                 goToSlide(nextIndex);
             }, interval);
