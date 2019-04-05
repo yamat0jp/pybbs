@@ -3,7 +3,7 @@ import os.path
 import shutil
 from tornado import escape,web,httpserver,ioloop
 from tinydb import TinyDB,Query,where
-from datetime import date
+from datetime import date,timedelta
 import json
 from botmod import *
 
@@ -228,6 +228,11 @@ class RegistHandler(IndexHandler):
             ch = 'checked'
         else:
             ch = ''
+        s = datetime.now()
+        k = '%Y%m%d %H:%M:%S'
+        t = self.get_cookie('time')
+        if not ch and t and s - datetime.strptime(escape.url_unescape(t), k) < timedelta(seconds=10):
+            error += u'二重送信です.'
         if error == '':
             if ch == 'checked':
                 ch = ''
@@ -239,11 +244,11 @@ class RegistHandler(IndexHandler):
                 na = u'誰かさん'
             if sub == '':
                 sub = u'タイトルなし.'
-            s = datetime.now()
             reg = {'number':no,'name':na,'title':sub,'comment':text,'raw':com,'password':pw,'date':s.strftime('%Y/%m/%d %H:%M')}
             article.insert(reg)
             self.set_cookie('username',escape.url_escape(na))
             self.set_cookie('aikotoba',escape.url_escape(u'げんき'))
+            self.set_cookie('time', escape.url_escape(s.strftime(k)))
             self.redirect('/'+dbname+'#article')
         else:
             self.render('modules/index.htm',position=self.pos,records=self.rec,title=sub,
