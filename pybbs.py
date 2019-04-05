@@ -2,7 +2,7 @@
 import os,re,glob
 from tornado import escape,web,ioloop,httpserver,httpclient
 import pymongo, urllib
-from datetime import datetime
+from datetime import datetime,timedelta
 import json
 from bson.objectid import ObjectId #don't remove
 from linebot.api import LineBotApi
@@ -235,21 +235,26 @@ class RegistHandler(IndexHandler):
             items = article.find()
             item = items.sort('number')[article.count()-1]
             no = item['number']+1
+        s = datetime.now()
+        k = '%Y%m%d%H%M%S'
         if self.get_argument('show', 'false') == 'true':
             ch = 'checked'
         else:
             ch = ''
+            t = self.get_cookie('time')
+            if t and s - datetime.strptime(escape.url_unescape(t),k) < timedelta(seconds=10):
+                error += u'二重送信.'
         if error == '':
             if ch == 'checked':
                 error = '<p style=font-size:2.5em;color:blue>↓↓プレビュー↓↓</p>\n' + text
                 ch = ''
             else:
-                self.set_cookie('aikotoba', escape.url_escape(rule))
-                s = datetime.now()
                 reg = {'number': no, 'name': na, 'title': sub, 'comment': text, 'raw': com, 'password': pw,
                     'date': s.strftime('%Y/%m/%d %H:%M')}
                 article.insert(reg)
+                self.set_cookie('aikotoba', escape.url_escape(rule))
                 self.set_cookie('username', escape.url_escape(na))
+                self.set_cookie('time',escape.url_escape(s.strftime(k)))
                 self.redirect('/' + dbname + '#article')
                 return
         else:
