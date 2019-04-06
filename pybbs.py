@@ -71,8 +71,12 @@ class IndexHandler(BaseHandler):
         if self.bool is True and self.current_user != b'admin':
             self.render('modules/info.htm',position=self.pos,records=self.rec,data=params,db=dbname,error='')
         else:
+            if self.current_user == b'admin':
+                s = '<label><p>URL </p><input name="url" placeholder="src=http://"></label>'
+            else:
+                s = ''
             self.render('modules/index.htm',position=self.pos,records=self.rec,data=params,username=self.na,title='',
-            comment='',db=dbname,aikotoba=self.rule,error='',check='checked')
+            comment='',db=dbname,aikotoba=self.rule,error='',check='checked',admin=s)
 
 class LoginHandler(BaseHandler):
     def get(self):
@@ -193,11 +197,10 @@ class RegistHandler(IndexHandler):
                         error += u'禁止ワード.<br>'
                         kinsi = True
                         break
-            if self.current_user != b'admin':
-                for word in words:
-                    if word in line.lower():
-                       tag = escape.xhtml_escape(word)
-                       error += u'タグ違反.('+tag+')<br>'
+            for word in words:
+                if word in line.lower():
+                    tag = escape.xhtml_escape(word)
+                    error += u'タグ違反.('+tag+')<br>'
             i += len(line)
             obj = re.finditer('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
             for x in obj:
