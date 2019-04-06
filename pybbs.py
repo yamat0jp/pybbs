@@ -77,7 +77,7 @@ class IndexHandler(BaseHandler):
         t = self.get_argument('img','')
         params = self.application.db['params'].find_one({'app':'bbs'})
         if self.current_user == b'admin':
-            s = '<label><p>URL </p><input name="img" placeholder="src=http://" value=' + t + '></label>'
+            s = '<label><p>URL </p><input name="img" placeholder="src=http://～" value=' + t + '></label>'
         else:
             s = '<input type=hidden>'
         self.render('modules/index.htm',position=self.pos,records=self.rec,data=params,username=self.na,title=title,
