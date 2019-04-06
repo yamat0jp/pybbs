@@ -250,15 +250,15 @@ class RegistHandler(IndexHandler):
         else:
             error = '<p style=color:red>'+error+'</p'
         img = self.get_argument('img','')
+        if img:
+            img = '<p><img src="' + escape.url_unescape(img) + '">'
         if error == '':
             if not na:
                 na = u'誰かさん'
             if sub == '':
                 sub = u'タイトルなし.'
-            if img:
-                img = '<p><img src="' + escape.url_unescape(img) + '">'
-                com += img
-                text += img
+            com += img
+            text += img
             reg = {'number':no,'name':na,'title':sub,'comment':text,'raw':com,'password':pw,'date':s.strftime('%Y/%m/%d %H:%M')}
             article.insert(reg)
             self.set_cookie('username',escape.url_escape(na))
