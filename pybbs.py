@@ -247,13 +247,16 @@ class RegistHandler(IndexHandler):
                 ch = ''
                 error = '<p style=color:blue;font-size:2.5em>↓↓プレビュー↓↓</p>\n<p>' + text
         else:
-            error = '<p style=color:red>'+error+'</p'
+            error = '<p style=color:red>'+error+'</p>'
         img = self.get_argument('img','')
         if img:
-            img = '<p><img src="' + escape.url_unescape(img) + '">'
+            img = '<div style=text-align:center><img src="' + escape.url_unescape(img) + '"/></div>'
         if error == '':
             if not na:
-                na = u'誰かさん'
+                if self.current_user == b'admin':
+                    na = u'管理人'
+                else:
+                    na = u'誰かさん'
             if sub == '':
                 sub = u'タイトルなし.'
             com += img
