@@ -269,6 +269,7 @@ class RegistHandler(IndexHandler):
             error = '<p style=color:red>' + error + '</p>'
         self.na = na
         self.pos = 0
+        img = '<img src="' + escape.url_unescape(self.get_argument('img','')) + '">'
         self.render_admin(dbname,title=sub,com=com,er=error,ch=ch,img=img)
 
     def link(self,command,database):
