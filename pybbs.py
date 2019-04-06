@@ -267,6 +267,7 @@ class RegistHandler(IndexHandler):
             self.redirect('/'+dbname+'#article')
         else:
             self.na = na
+            self.pos = 0
             self.render_admin(dbname,com=com,title=sub,ch=ch,er=error,img=img)
     
     def link(self,command,database):
