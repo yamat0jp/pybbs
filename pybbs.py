@@ -234,7 +234,10 @@ class RegistHandler(IndexHandler):
         if i > 1000:
             error += u'文字数が1,000をこえました.<br>'
         if na == '':
-            na = u'誰かさん'
+            if self.current_user == b'admin':
+                na = u'管理人'
+            else:
+                na = u'誰かさん'
         if sub == '':
             sub = u'タイトルなし.'
         article = self.application.db[dbname]
@@ -255,7 +258,7 @@ class RegistHandler(IndexHandler):
                 error += u'二重送信.'
         img = self.get_argument('img','')
         if img:
-            img = '<img src="' + escape.url_unescape(img) + '">'
+            img = '<div style=text-align:center><img src="' + escape.url_unescape(img) + '"/></div>'
         if error == '':
             if ch == 'checked':
                 error = '<p style=font-size:2.5em;color:blue>↓↓プレビュー↓↓</p>\n' + text
