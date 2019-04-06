@@ -253,11 +253,16 @@ class RegistHandler(IndexHandler):
             t = self.get_cookie('time')
             if t and s - datetime.strptime(escape.url_unescape(t),k) < timedelta(seconds=10):
                 error += u'二重送信.'
+        img = self.get_argument('img','')
+        if img:
+            img = '<img src="' + escape.url_unescape(img) + '">'
         if error == '':
             if ch == 'checked':
                 error = '<p style=font-size:2.5em;color:blue>↓↓プレビュー↓↓</p>\n' + text
                 ch = ''
             else:
+                com += img
+                text += img
                 reg = {'number': no, 'name': na, 'title': sub, 'comment': text, 'raw': com, 'password': pw,
                     'date': s.strftime('%Y/%m/%d %H:%M')}
                 article.insert(reg)
@@ -269,10 +274,8 @@ class RegistHandler(IndexHandler):
         else:
             error = '<p style=color:red>' + error + '</p>'
         self.na = na
+        self.rule = rule
         self.pos = 0
-        img = self.get_argument('img','')
-        if img:
-            img = '<img src="' + escape.url_unescape(img) + '">'
         self.render_admin(dbname,title=sub,com=com,er=error,ch=ch,img=img)
 
     def link(self,command,database):
