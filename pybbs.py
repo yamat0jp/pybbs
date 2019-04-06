@@ -70,8 +70,17 @@ class IndexHandler(BaseHandler):
         if dbname == params['info name'] and self.current_user != b'admin':
             self.render('modules/info.htm',position=self.pos,records=self.rec,data=params,db=dbname)
         else:
-            self.render('modules/index.htm',position=self.pos,records=self.rec,data=params,title='',
-                username=self.na,comment='',db=dbname,aikotoba=self.rule,error='',check='checked')
+            self.render_admin(dbname)
+
+    def render_admin(self,dbname,title='',com='',ch='checked',er='',img=''):
+        params = self.application.db.get(where('app') == 'bbs')
+        t = self.get_argument('img','')
+        if self.current_user == b'admin':
+            s = '<label>URL <input name=img type=text placeholder="src=http://～" value=' + t + '></lbael>'
+        else:
+            s = '<input type=hidden value=' + t + '>'
+        self.render('modules/index.htm',position=self.pos,records=self.rec,data=params,title=title,
+            username=self.na,comment=com,db=dbname,aikotoba=self.rule,error=er+img,check=ch,admin=s)
 
 class LoginHandler(BaseHandler):
     def get(self):
@@ -237,14 +246,19 @@ class RegistHandler(IndexHandler):
         if error == '':
             if ch == 'checked':
                 ch = ''
-                error = '<p style=color:blue;font-size:2.5em>↓↓プレビュー↓↓</p>\n<p>'+text+'</p>'
+                error = '<p style=color:blue;font-size:2.5em>↓↓プレビュー↓↓</p>\n<p>' + text
         else:
-            error = '<p style=color:red>'+error+'</p>'
+            error = '<p style=color:red>'+error+'</p'
+        img = self.get_argument('img','')
         if error == '':
             if not na:
                 na = u'誰かさん'
             if sub == '':
                 sub = u'タイトルなし.'
+            if img:
+                img = '<p><img src="' + escape.url_unescape(img) + '">'
+                com += img
+                text += img
             reg = {'number':no,'name':na,'title':sub,'comment':text,'raw':com,'password':pw,'date':s.strftime('%Y/%m/%d %H:%M')}
             article.insert(reg)
             self.set_cookie('username',escape.url_escape(na))
@@ -252,8 +266,8 @@ class RegistHandler(IndexHandler):
             self.set_cookie('time', escape.url_escape(s.strftime(k)))
             self.redirect('/'+dbname+'#article')
         else:
-            self.render('modules/index.htm',position=self.pos,records=self.rec,title=sub,
-                username=self.na,comment=com,data=rec,db=dbname,aikotoba=self.rule,error=error,check=ch)
+            self.na = na
+            self.render_admin(dbname,com=com,title=sub,ch=ch,er=error,img=img)
     
     def link(self,command,database):
         i = 0
