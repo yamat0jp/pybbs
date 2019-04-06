@@ -71,12 +71,16 @@ class IndexHandler(BaseHandler):
         if self.bool is True and self.current_user != b'admin':
             self.render('modules/info.htm',position=self.pos,records=self.rec,data=params,db=dbname,error='')
         else:
-            if self.current_user == b'admin':
-                s = '<label><p>URL </p><input name="url" placeholder="src=http://"></label>'
-            else:
-                s = ''
-            self.render('modules/index.htm',position=self.pos,records=self.rec,data=params,username=self.na,title='',
-            comment='',db=dbname,aikotoba=self.rule,error='',check='checked',admin=s)
+            self.render_admin(dbname)
+
+    def render_admin(self,dbname,title='',com='',er='',img='',ch='checked'):
+        t = self.get_argument('img','')
+        if self.current_user == b'admin':
+            s = '<label><p>URL </p><input name="img" placeholder="src=http://" value=' + t + '></label>'
+        else:
+            s = '<input type=hidden>'
+        self.render('modules/index.htm',position=self.pos,records=self.rec,data=params,username=self.na,title=title,
+            comment=com,db=dbname,aikotoba=self.rule,error=er+img,check=ch,admin=s)
 
 class LoginHandler(BaseHandler):
     def get(self):
@@ -263,8 +267,9 @@ class RegistHandler(IndexHandler):
                 return
         else:
             error = '<p style=color:red>' + error + '</p>'
-        self.render('modules/index.htm', position=0, records=self.rec, data=params,title=sub,
-            username=na, comment=com, db=dbname, aikotoba=rule, error=error, check=ch)
+        self.na = na
+        self.pos = 0
+        self.render_admin(dbname,title=sub,com=com,er=error,ch=ch,img=img)
 
     def link(self,command,database):
         i = 0
