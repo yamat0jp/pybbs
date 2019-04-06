@@ -193,10 +193,11 @@ class RegistHandler(IndexHandler):
                         error += u'禁止ワード.<br>'
                         kinsi = True
                         break
-            for word in words:
-                if word in line.lower():
-                    tag = escape.xhtml_escape(word)
-                    error += u'タグ違反.('+tag+')<br>'
+            if self.current_user != b'admin':
+                for word in words:
+                    if word in line.lower():
+                       tag = escape.xhtml_escape(word)
+                       error += u'タグ違反.('+tag+')<br>'
             i += len(line)
             obj = re.finditer('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
             for x in obj:

@@ -33,9 +33,9 @@
 	{% end %}
 	{% set d += 1 %}
 	{% if full(x) == True %}
-	<p><a href=/{{x}} style=color:red>{{x}}</a>
+	<p><a href=/{{x}} style=color:red target=_blank>{{x}}</a>
 	{% else %}
-	<p><a href=/{{x}}>{{x}}</a>
+	<p><a href=/{{x}} target=_blank>{{x}}</a>
 	{% end %}
 	{% if d % i == 0 %}
 		</div>
