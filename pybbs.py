@@ -75,6 +75,7 @@ class IndexHandler(BaseHandler):
 
     def render_admin(self,dbname,title='',com='',er='',img='',ch='checked'):
         t = self.get_argument('img','')
+        params = self.application.db['params'].find_one({'app':'bbs'})
         if self.current_user == b'admin':
             s = '<label><p>URL </p><input name="img" placeholder="src=http://" value=' + t + '></label>'
         else:
@@ -269,7 +270,9 @@ class RegistHandler(IndexHandler):
             error = '<p style=color:red>' + error + '</p>'
         self.na = na
         self.pos = 0
-        img = '<img src="' + escape.url_unescape(self.get_argument('img','')) + '">'
+        img = self.get_argument('img','')
+        if img:
+            img = '<img src="' + escape.url_unescape(img) + '">'
         self.render_admin(dbname,title=sub,com=com,er=error,ch=ch,img=img)
 
     def link(self,command,database):
