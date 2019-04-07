@@ -8,9 +8,9 @@
 <body>
 {% for x in coll %}
 	{% if full(x['name']) == True %}
-	<a href=/{{x['name']}}> style=color:red>{{x['name']}}</a>
+	<a href=/{{x['name']}} target="_blank" style=color:red>{{x['name']}}</a>
 	{% else %}
-	<a href=/{{x['name']}}>{{x['name']}}</a>
+	<a href=/{{x['name']}} target="_blank">{{x['name']}}</a>
 	{% end %}
 	↓
 	<div>タイトル:{{x['title']}},記事数:{{x['count']}},更新時刻:{{x['date']}}</div>
