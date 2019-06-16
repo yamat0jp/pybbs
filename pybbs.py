@@ -149,7 +149,8 @@ class NaviHandler(web.RequestHandler):
                 return False
             rec = sorted(table.all(),key=lambda x:x['number'])
             time = rec[i-1]['date']
-            return datetime.now()-datetime.strptime(time,'%Y/%m/%d %H:$M') < 1
+            delta = datetime.now()-datetime.strptime(time,'%Y/%m/%d %H:%M')
+            return delta.total_seconds() < 3600*24
 
 class TitleHandler(NaviHandler):
     def get(self):
