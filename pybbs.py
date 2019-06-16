@@ -131,7 +131,7 @@ class NaviHandler(web.RequestHandler):
                 self.render('mentenance.htm',title=data['title'],db=na)
                 return
         col = sorted(self.application.collection())
-        self.render('top.htm',coll=col,name=na,full=self.full)
+        self.render('top.htm',coll=col,name=na,full=self.full,new=self.new)
 
     def full(self,dbname):
         if dbname in self.application.db.tables():
@@ -140,6 +140,16 @@ class NaviHandler(web.RequestHandler):
             if len(table) >= i:
                 return True
         return False
+
+    def new(self,dbname):
+        if dbname in self.application.db.tables():
+            table = self.application.db.table(dbname)
+            i = len(table)
+            if i == 0:
+                return False
+            rec = sorted(table.all(),key=lambda x:x['number'])
+            time = rec[i-1]['date']
+            return datetime.now()-datetime.strptime(time,'%Y/%m/%d %H:$M') < 1
 
 class TitleHandler(NaviHandler):
     def get(self):

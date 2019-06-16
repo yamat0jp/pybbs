@@ -32,11 +32,15 @@
 	<img src={{static_url('img/slide{0}.jpg'.format(1+d//i))}} style=float:right;height:465px>
 	{% end %}
 	{% set d += 1 %}
-	{% if full(x) == True %}
-	<p><a href=/{{x}} style=color:red target=_blank>{{x}}</a>
+	{% if new(x) == True %}
+		{% set s = "background-color:aqua;" %}
 	{% else %}
-	<p><a href=/{{x}} target=_blank>{{x}}</a>
+		{% set s = "" %}
 	{% end %}
+	{% if full(x) == True %}
+		{% set s = s + "color:red;" %}
+	{% end %}
+	<p><a href=/{{x}} style={{s}} target=_blank>{{x}}</a>
 	{% if d % i == 0 %}
 		</div>
 	{% end %}
@@ -51,6 +55,7 @@
 	</div>
 	<div class=slideshow-indicator></div>
 </div>
+<p><div style="background-color:aqua">　　　　</div>・・・new!
 {% if name != '' %}
 	<p>[ <a href=/{{name}}>{{name}}</a> ] <=お知らせ
 {% end %}
