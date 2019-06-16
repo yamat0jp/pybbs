@@ -132,7 +132,7 @@ class NaviHandler(web.RequestHandler):
             return
         coll = self.application.coll()
         na = table['info name']
-        self.render('top.htm',coll=coll,name=na,full=self.full)
+        self.render('top.htm',coll=coll,name=na,full=self.full,new=self.new)
 
     def full(self,dbname):
         if dbname in self.application.coll():
@@ -141,6 +141,17 @@ class NaviHandler(web.RequestHandler):
             if table.count() >= i:
                 return True
         return False
+
+    def new(self,dbname):
+        if dbname in self.application.coll():
+            table = self.application.db[dbname]
+            i = table.count()
+            if i == 0:
+                return False
+            rec = sorted(table.find(),key=lambda x:x['date'])
+            time = rec[i-1]['date']
+            delta = datetime.now()-datetime.strptime(time,'%Y/%m/%d %H:%M')
+            return delta.total_seconds() < 24*3600
 
 class TitleHandler(NaviHandler):
     def get(self):
