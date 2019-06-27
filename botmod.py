@@ -25,11 +25,7 @@ class static():
 class WebHookHandler(tornado.web.RequestHandler):        
     def main(self, no):
         #pz = pytz.timezone('Asia/Tokyo')
-        now = datetime.now()#pz)
-        t = now.hour
-        w = now.weekday()
-        if (w < 5)and(t >= 9)and(t < 16):
-            return u'仕事中.'
+        now = datetime.now()
         table, na = self.users()
         item = table.find({'no':re.compile(no,re.IGNORECASE)})
         if item.count() == 1:
