@@ -749,7 +749,7 @@ class Application(web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':os.environ['cookie'],
                         'xsrf_cookies':False,
-                        'debug':True,
+                        #'debug':True,
                         'login_url':'/login'
                         }
         super().__init__(handlers,**settings)
