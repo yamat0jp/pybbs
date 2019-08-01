@@ -730,10 +730,10 @@ class TokenHandler(web.RequestHandler):
         http.fetch(req, callback=self.on_response)
 
 class Application(web.Application):
-    #ch = os.environ['Channel_Secret']
+    ch = os.environ['Channel_Secret']
     uri = os.environ['MONGODB_URI']
     ac = os.environ['ACCOUNT']
-    #tk = os.environ['Access_Token']
+    tk = os.environ['Access_Token']
     db = pymongo.MongoClient(uri)[ac]
     def __init__(self):
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
@@ -749,7 +749,7 @@ class Application(web.Application):
                         'ui_modules':{'Footer':FooterModule},
                         'cookie_secret':os.environ['cookie'],
                         'xsrf_cookies':False,
-                        #'debug':True,
+                        'debug':True,
                         'login_url':'/login'
                         }
         super().__init__(handlers,**settings)
