@@ -730,17 +730,17 @@ class TokenHandler(web.RequestHandler):
         http.fetch(req, callback=self.on_response)
 
 class Application(web.Application):
-    ch = os.environ['Channel_Secret']
+    #ch = os.environ['Channel_Secret']
     uri = os.environ['MONGODB_URI']
     ac = os.environ['ACCOUNT']
-    tk = os.environ['Access_Token']
+    #tk = os.environ['Access_Token']
     db = pymongo.MongoClient(uri)[ac]
     def __init__(self):
         handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_%]+)/([0-9]+)',ArticleApi),
                     (r'/write/api/([a-zA-Z0-9_%]+)/()/()/()',ArticleApi),(r'/list/api/([a-zA-Z0-9_%]+)',ListApi),
                     (r'/help',HelpHandler),(r'/master',MasterHandler),(r'/alert',AlertHandler),(r'/jump',JumpHandler),
-                    ''''(r'/callback',WebHookHandler),'''(r'/init',InitHandler),(r'/search',SearchHandler),(r'/clean',CleanHandler),(r'/token',TokenHandler),
+                    (r'/callback',WebHookHandler),(r'/init',InitHandler),(r'/search',SearchHandler),(r'/clean',CleanHandler),(r'/token',TokenHandler),
                     (r'/([a-zA-Z0-9_%]+)',IndexHandler),(r'/([a-zA-Z0-9_%]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_%]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_%]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_%]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_%]+)/search',SearchHandler),(r'/([a-zA-Z0-9_%]+)/regist',RegistHandler)]
