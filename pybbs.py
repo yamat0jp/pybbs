@@ -740,7 +740,7 @@ class Application(web.Application):
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_%]+)/([0-9]+)',ArticleApi),
                     (r'/write/api/([a-zA-Z0-9_%]+)/()/()/()',ArticleApi),(r'/list/api/([a-zA-Z0-9_%]+)',ListApi),
                     (r'/help',HelpHandler),(r'/master',MasterHandler),(r'/alert',AlertHandler),(r'/jump',JumpHandler),
-                    (r'/callback',WebHookHandler),(r'/init',InitHandler),(r'/search',SearchHandler),(r'/clean',CleanHandler),(r'/token',TokenHandler),
+                    ''''(r'/callback',WebHookHandler),'''(r'/init',InitHandler),(r'/search',SearchHandler),(r'/clean',CleanHandler),(r'/token',TokenHandler),
                     (r'/([a-zA-Z0-9_%]+)',IndexHandler),(r'/([a-zA-Z0-9_%]+)/([0-9]+)/',IndexHandler),
                     (r'/([a-zA-Z0-9_%]+)/admin/([0-9]+)/*',AdminHandler),(r'/([a-zA-Z0-9_%]+)/admin/([a-z]+)/*',AdminConfHandler),(r'/([a-zA-Z0-9_%]+)/userdel',UserHandler),
                     (r'/([a-zA-Z0-9_%]+)/search',SearchHandler),(r'/([a-zA-Z0-9_%]+)/regist',RegistHandler)]
