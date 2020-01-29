@@ -4,13 +4,8 @@
 	<meta charset=utf-8 name="google-site-verification"  content="5KOTJTKv1HgTtIt0zVGzuyAkADCwXRme-RiiKJ03l3s" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>Top Page</title>
-	<link rel=stylesheet href={{static_url('css/top.css')}}>
-	<link rel=stylesheet href={{static_url('css/normalize.css')}}>
 	<link rel="shortcut icon" href={{static_url('img/favicon64.ico')}}>
-	<script src={{static_url('js/jquery-1.10.2.min.js')}}></script>
-	<script src={{static_url('js/top.js')}}></script>
-	<script src={{static_url('js/modernizr.custom.min.js')}}></script>
-	<script src={{static_url('js/jquery-ui-1.10.3.custom.min.js')}}></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 </head>
 <body>
 <div id="fb-root"></div>
@@ -24,37 +19,54 @@
 <header><h1 style=text-align:center>無料電子掲示板へようこそ</h1></header>
 {% set d = 0 %}
 {% set i = 7 %}
-<div class=slideshow>
-	<div class=slideshow-slides>
-{% for x in coll %}
+<div id="slide-1" class="carousel slide" data-ride="true">
+	<ol class="carousel-indicators">
+	{% for x in range(len(coll)//i+1) %}
+		{% if x == 0 %}
+		<li data-target="#slide-1" data-slide-to="0" class="active"></li>
+		{% else %}
+		<li data-target="#slide-1" data-slide-to="{{x}}"></li>
+		{% end %}
+	{% end %}
+	</ol>
+	<div class="carousel-inner bg-dark">	{% for x in coll %}
 	{% if d % i == 0 %}
-		<div class=slide>
+		{% if d == 0 %}
+			<div class="carousel-item active">
+		{% else %}
+			<div class="carousel-item">
+		{% end %}
 	<img src={{static_url('img/slide{0}.jpg'.format(1+d//i))}} style=float:right;height:465px>
+	<div class="carousel-caption text-left" style="font-size:1.5rem;">
 	{% end %}
-	{% set d += 1 %}
-	{% if new(x) == True %}
-		{% set s = "background-color:aqua;" %}
-	{% else %}
-		{% set s = "" %}
-	{% end %}
-	{% if full(x) == True %}
-		{% set s = s + "color:red;" %}
-	{% end %}
-	<p><a href=/{{x}} style=;{{s}} target=_blank>{{x}}</a>
+		{% set d += 1 %}
+		{% if new(x) == True %}
+			{% set s = "background-color:aqua;" %}
+		{% else %}
+			{% set s = "" %}
+		{% end %}
+		{% if full(x) == True %}
+			{% set s = s + "color:red;" %}	
+		{% end %}
+	<p><a href=/{{x}} style=;{{s}} target=_blank>{{x}}</a>	
 	{% if d % i == 0 %}
-		</div>
+		</div></div>
 	{% end %}
-{% end %}
-{% if d % i != 0 %}
-	</div>
-{% end %}
-	</div>
-	<div class=slideshow-nav>
-	<a href=# class=prev>prev</a>
-	<a href=# class=next>next</a>
-	</div>
-	<div class=slideshow-indicator></div>
+	{% end %}
+	{% if d % i != 0 %}
+		</div></div>
+	{% end %}
+	<a class="carousel-control-prev" href="#slide-1" role="button" data-slide="prev">
+		<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+		<span class="sr-only">Previouse</span>
+	</a>	
+	<a class="carousel-control-next" href="#slide-1" role="button" data-slide="next">
+		<span class="carousel-control-next-icon" aria-hidden="true"></span>
+		<span class="sr-only">Next</span>
+	</a>
+	</div>	
 </div>
+<p>
 <p>　<em style="background-color:aqua">　　　　</em>・・・new!
 {% if name != '' %}
 	<p>[ <a href=/{{name}}>{{name}}</a> ] <=お知らせ
