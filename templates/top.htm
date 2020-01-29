@@ -3,17 +3,15 @@
 <head>
 	<meta charset=utf-8 name="google-site-verification"  content="5KOTJTKv1HgTtIt0zVGzuyAkADCwXRme-RiiKJ03l3s" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Top Page</title>	
-	<link rel=stylesheet href={{static_url('css/top.css')}}>
-	<link rel=stylesheet href={{static_url('css/normalize.css')}}>
+	<title>Top Page</title>
 	<link rel="shortcut icon" href={{static_url('img/favicon64.ico')}}>
-	<script src={{static_url('js/jquery-1.10.2.min.js')}}></script>
-	<script src={{static_url('js/top.js')}}></script>
-	<script src={{static_url('js/modernizr.custom.min.js')}}></script>
-	<script src={{static_url('js/jquery-ui-1.10.3.custom.min.js')}}></script>
-</head>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+ /head>
 <body>
-<div id="fb-root"></div>
+   	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+<<div id="fb-root"></div>
 <script>(function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
@@ -24,56 +22,73 @@
 <header><h1 style=text-align:center>無料電子掲示板へようこそ</h1></header>
 {% set d = 0 %}
 {% set i = 7 %}
-<div class=slideshow>
-	<div class=slideshow-slides>
-{% for x in coll %}
+<div id="slide-1" class="carousel slide" data-ride="carousel">
+	<ol class="carousel-indicators">
+	{% for x in range(len(coll)//i+1) %}
+		{% if x == 0 %}
+		<li data-target="#slide-1" data-slide-to="0" class="active"></li>
+		{% else %}
+		<li data-target="#slide-1" data-slide-to="{{x}}"></li>
+		{% end %}
+	{% end %}
+	</ol>
+	<div class="carousel-inner bg-dark">	
+	{% for x in coll %}
 	{% if d % i == 0 %}
-		<div class=slide>
-	<img src={{static_url('img/slide{0}.jpg'.format(1+d//i))}} style=float:right;height:465px>
+		{% if d == 0 %}
+			<div class="carousel-item active">
+		{% else %}
+			<div class="carousel-item">
+		{% end %}
+	<img src={{static_url('img/slide{0}.jpg'.format(1+d//i))}} style="float:right;height:465px">
+	<div class="carousel-caption text-left" style="font-size:1.5rem;">
 	{% end %}
-	{% set d += 1 %}
-	{% if new(x) == True %}
-	{% set s = "background-color:aqua" %}
-	{% else %}
-	{% set s = "" %}
-	{% end %}
-	{% if full(x) == True %}
-	{% set s = s + "color:red;" %}
-	{% end %}
-	<p><a href=/{{x}} style=;{{s}} target=_blank>{{x}}</a>
+		{% set d += 1 %}
+		{% if new(x) == True %}
+			{% set s = "background-color:aqua;" %}
+		{% else %}
+			{% set s = "" %}
+		{% end %}
+		{% if full(x) == True %}
+			{% set s = s + "color:red;" %}	
+		{% end %}
+	<p><a href=/{{x}} style=;{{s}} target=_blank>{{x}}</a>	
 	{% if d % i == 0 %}
+		</div></div>
+	{% end %}
+	{% end %}
+	{% if d % i != 0 %}
 		</div>
 	{% end %}
-{% end %}
-{% if d % i != 0 %}
 	</div>
-{% end %}
+	<a class="carousel-control-prev" href="#slide-1" role="button" data-slide="prev">
+		<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+		<span class="sr-only">Previouse</span>
+	</a>
+	<a class="carousel-control-next" href="#slide-1" role="button" data-slide="next">
+		<span class="carousel-control-next-icon" aria-hidden="true"></span>
+		<span class="sr-only">Next</span>
+	</a>
 	</div>
-	<div class=slideshow-nav>
-	<a href=# class=prev>prev</a>
-	<a href=# class=next>next</a>
-	</div>
-	<div class=slideshow-indicator></div>
 </div>
-<p>　<em style="background-color:aqua">　　　　</em>・・・・new!
+<p>
+<p>　<em style="background-color:aqua">　　　　</em>・・・new!
 {% if name != '' %}
 	<p>[ <a href=/{{name}}>{{name}}</a> ] <=お知らせ
 {% end %}
 <p>[ <a href=/master>master</a> ] <=管理人
-<div class="fb-like" data-href="http://pybbs.herokuapp.com" data-layout="box_count" data-action="like" data-size="small" data-show-faces="true" data-share="false"></div>
-<p><a href="http://www.xn--gckj5d1ktb3488cn4q.jp/" target="_blank"><img alt="無料カウンター" src="http://www.xn--gckj5d1ktb3488cn4q.jp/counter.php?id=pybbs" border="0"></a>
-<p align="center">リンクフリー</p>
-<p align="center"><img src={{static_url('img/BBS_bn.jpg')}}></p>
-<footer>
-<p><br>
+<div class="fb-like" data-href="http://pybbs.herokuapp.com" data-layout="box_count" data-action="like" data-size="small" data-show-faces="true" data-share="false"></div><footer>
+<p align="center">リンクフリー
+	<p align="center"><img src="{{static_url('img/BBS_bn.jpg')}}">
 <p><a href=/search>全体検索</a>
 <p><a href=/title>タイトル表示</a>
 <p><a href=/help>使い方案内</a>
 <p>PR リンク
 <br>
-<p><a href=https://www.amazon.co.jp/%E9%AB%98%E6%A0%A1%E5%8D%92%E6%A5%AD%E3%81%BE%E3%81%A7%E3%81%AE%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%E6%88%A6%E8%A1%93-sanuki_kainushi-ebook/dp/B00AXBM08Q/ref=sr_1_7?ie=UTF8&qid=1479369992&sr=8-7&keywords=sanuki_kainushi target="_blank">高校卒業までのサッカー戦術</a><br>
+<p><a href=https://www.amazon.co.jp/%E9%AB%98%E6%A0%A1%E5%8D%92%E6%A5%AD%E3%81%BE%E3%81%A7%E3%81%AE%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%E6%88%A6%E8%A1%93-sanuki_kainushi-ebook/dp/B00AXBM08Q/ref=sr_1_7?ie=UTF8&qid=1479369992&sr=8-7&keywords=sanuki_kainushi>高校卒業までのサッカー戦術</a><br>
 amazon kindle</p>
-<p><a href=https://www.amazon.co.jp/%E4%B8%AD%E5%AD%A6%E5%8D%92%E6%A5%AD%E3%81%BE%E3%81%A7%E3%81%AE%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%E6%88%A6%E8%A1%93-sanuki_kainushi-ebook/dp/B014X0S874/ref=sr_1_3?s=digital-text&ie=UTF8&qid=1479370246&sr=1-3 target="_blank">中学卒業までのサッカー戦術</a><br>
+<p>
+<p><a href=https://www.amazon.co.jp/%E4%B8%AD%E5%AD%A6%E5%8D%92%E6%A5%AD%E3%81%BE%E3%81%A7%E3%81%AE%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%E6%88%A6%E8%A1%93-sanuki_kainushi-ebook/dp/B014X0S874/ref=sr_1_3?s=digital-text&ie=UTF8&qid=1479370246&sr=1-3>中学卒業までのサッカー戦術</a><br>
 amazon kindle</p>
 </footer>
 </body>
