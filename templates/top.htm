@@ -6,9 +6,12 @@
 	<title>Top Page</title>
 	<link rel="shortcut icon" href={{static_url('img/favicon64.ico')}}>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-</head>
+ /head>
 <body>
-<div id="fb-root"></div>
+   	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+<<div id="fb-root"></div>
 <script>(function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
@@ -19,7 +22,7 @@
 <header><h1 style=text-align:center>無料電子掲示板へようこそ</h1></header>
 {% set d = 0 %}
 {% set i = 7 %}
-<div id="slide-1" class="carousel slide" data-ride="true">
+<div id="slide-1" class="carousel slide" data-ride="carousel">
 	<ol class="carousel-indicators">
 	{% for x in range(len(coll)//i+1) %}
 		{% if x == 0 %}
@@ -29,14 +32,15 @@
 		{% end %}
 	{% end %}
 	</ol>
-	<div class="carousel-inner bg-dark">	{% for x in coll %}
+	<div class="carousel-inner bg-dark">	
+	{% for x in coll %}
 	{% if d % i == 0 %}
 		{% if d == 0 %}
 			<div class="carousel-item active">
 		{% else %}
 			<div class="carousel-item">
 		{% end %}
-	<img src={{static_url('img/slide{0}.jpg'.format(1+d//i))}} style=float:right;height:465px>
+	<img src={{static_url('img/slide{0}.jpg'.format(1+d//i))}} style="float:right;height:465px">
 	<div class="carousel-caption text-left" style="font-size:1.5rem;">
 	{% end %}
 		{% set d += 1 %}
@@ -54,17 +58,18 @@
 	{% end %}
 	{% end %}
 	{% if d % i != 0 %}
-		</div></div>
+		</div>
 	{% end %}
+	</div>
 	<a class="carousel-control-prev" href="#slide-1" role="button" data-slide="prev">
 		<span class="carousel-control-prev-icon" aria-hidden="true"></span>
 		<span class="sr-only">Previouse</span>
-	</a>	
+	</a>
 	<a class="carousel-control-next" href="#slide-1" role="button" data-slide="next">
 		<span class="carousel-control-next-icon" aria-hidden="true"></span>
 		<span class="sr-only">Next</span>
 	</a>
-	</div>	
+	</div>
 </div>
 <p>
 <p>　<em style="background-color:aqua">　　　　</em>・・・new!
