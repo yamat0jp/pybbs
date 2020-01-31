@@ -40,7 +40,8 @@
 		{% else %}
 			<div class="carousel-item">
 		{% end %}
-	<img src={{static_url('img/slide{0}.jpg'.format(1+d//i))}} style="float:right;height:465px">
+	<img class="d-sm-block d-none" src={{static_url('img/slide{0}.jpg'.format(1+d//i))}} style="float:right;height:465px">
+	<div style="height:465px"></div>
 	<div class="carousel-caption text-left" style="font-size:1.5rem;">
 	{% end %}
 		{% set d += 1 %}
