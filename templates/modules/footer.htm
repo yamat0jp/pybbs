@@ -1,19 +1,18 @@
-<div style=text-align:center><b>[</b>
-{% if index == 0 %}
-	 <<
-	{% for x in range(10) %}
-		<a href={{url}}/{{x+1}}/{{link}}> {{x+1}}</a>
-	{% end %}
-	>> <b>]</b>  recent
-{% else %}
-	 <a href={{url}}/{{index-1}}/{{link}}><<</a>
-	{% for x in range(10) %}
-		{% if index == x+1 %}
-		{{x+1}}
+<nav aria-label="Page navigation">
+	<ul class="pagination pagination-sm justify-content-center">	
+	{% for x in range(10) %}		
+		{% if index == x+1 %}		
+		<li class="page-item active">
 		{% else %}
-		<a href={{url}}/{{x+1}}/{{link}}> {{x+1}}</a>
+		<li class="page-item">			
 		{% end %}
+		<a class="page-link" href="{{url}}/{{x+1}}{{link}}">{{x+1}}</a></li>
 	{% end %}
-	<a href={{url}}/{{index+1}}/{{link}}>>></a> <b>]</b>  <a href={{url}}/0/{{link}}>recent</a>
-{% end %}
-</div>
+		{% if index == 0 %}
+		{% set s = ' active' %}
+		{% else %}
+		{% set s = '' %}
+		{% end %}
+		<li class="page-item{{s}}"><a class="page-link" href={{url}}/0{{link}}>さいご</a></li>
+	</ul>
+</nav>

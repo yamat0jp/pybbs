@@ -11,13 +11,17 @@
     {% block style %}
     <link rel="stylesheet" href={{static_url('css/main.css')}}>
 	{% end %}
-	<script src=//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js></script>
-	<script src={{static_url('js/jquery-live-preview.js')}}></script>
-	<link href={{static_url('css/livepreview-demo.css')}} rel=stylesheet type=text/css>
-	<script src={{static_url('js/sub.js')}}></script>
-	<script src=//cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js></script>
+	<script type=text/javascript src=//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js></script>
+	<script type=text/javascript src={{static_url('js/jquery-live-preview.js')}}></script>
+	<link rel=stylesheet href={{static_url('css/livepreview-demo.css')}}>
+	<script type=text/javascript src={{static_url('js/sub.js')}}></script>
+  <script src=//cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   </head> 
   <body>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
   {% block header %}
     <a href=/ style=text-decoration:none>{% raw data['title2'] %}</a>
     <header>
@@ -27,15 +31,16 @@
       <table>
         <tr><td>
           <label><p>お名前</p><input name="name" class=name value={{username}}></label>
-          <label><p>タイトル</p><input name="title" value="{{title}}" class=title placeholder="タイトルなし."></label>
+          <label><p>タイトル</p><input name="title" class=title value="{{title}}" placeholder="タイトルなし."></label>
           <input type="submit" value="送信">
         </td></tr>
         <tr><td>
           <label><p>本文<span>必須</span><br></p>
-            <textarea style="font-size:1.75em" name="comment" cols=30 required placeholder="コメントなどを入力してください.">{{comment}}</textarea></label>
+            <textarea style="font-size:1.75em" name="comment" cols=30
+                      required placeholder="コメントなどを入力してください.">{{comment}}</textarea></label>
         </td></tr>
         <tr><td>
-          <label><p>パスワード</p><input name="password" class=password type="password" placeholder="削除用">
+          <label><p>パスワード</p><input name="password" type="password" placeholder="削除用">
           </label> / <input type="checkbox" name="show" value="true" {{check}}><p>プレビュー</p>
         <tr><td>
           <label><p>合言葉をひらがなで入力してください: genki <input name=aikotoba type=text value={{aikotoba}}></label>
@@ -53,40 +58,42 @@
       {% module xsrf_form_html() %}
       <label><p>記事No</p><input name="number"></label>
       <label><p>Pass</p><input type="password" name="password"></label>
-      <p><input type="submit" value="削除">
+      <input type="submit" value="削除">
     </form>
     <form action=/{{db}}/userdel method=post id=search>
-    	  {% module xsrf_form_html() %} 
-    	  <label><p>記事No</p><input name=number></label>
-      <p><input type=submit value=表示>
+      {% module xsrf_form_html() %}
+      <label><p>記事No</p><input name=number></label>
+      <input type=submit value=移動>
     </form>
-    <p><a href=/{{db}}/search>検索ページ</a></p>   
-    <p style=text-align:right><a href=#article>下へ移動</a></p>
+    <p><a href=/{{db}}/search>検索ページ</a></p>
     <p style=text-align:center>{{db}}</p>
   {% module Footer(position,'/'+db,'#article') %}
   {% end %}
   {% block body %}
     {% for record in records %}
       {% if db == '' %}
-        {% set text = record['dbname']+'-' %}
-        {% set link = '/'+record['dbname']+'/userdel?job='+str(record['number']) %}
+        {% set link = record['dbname'] %}
+        {% set text = record['dbname']+'-'+str(record['number']) %}
       {% else %}
-        {% set text = '' %}
-        {% set link = '/'+db+'/userdel?job='+str(record['number']) %}
+        {% set link = db %}
+        {% set text = record['number'] %}
       {% end %}
     <hr size=1>
-	<section id=number><a href={{link}} style=text-decoration:none>
-		{{text}}[{{record['number']}}]</a><a name={{record['number']}}></a></section>
+	<section id=number><a name={{record['number']}}></a><a href=/{{link}}/userdel?job={{record['number']}} style=text-decoration:none>
+		[{{text}}]</a></section>
 	<section id=title>{{record['title']}}</section>
 	<section id=name>　Name:<h1>{{record['name']}}</h1></section>
 	<section id=date>　Date:<h1>{{record['date']}}</h1></section>
-	<p>▽▲▽▲▽▲▽▲▽</p>
+	<p>▽▲▽▲▽▲▽
 	<section id=comment>{% raw record['comment'] %}</section>
-	<section id=master style=text-align:right><a href=/alert?db={{db}}&num={{record['number']}}>報告</a></section>
-	<p>△▼△▼△▼△▼△</p>
-	{% end %}
+        <section id=master style=text-align:right><a href=/alert?db={{db}}&num={{record['number']}}>報告</a></section>
+	<p>△▼△▼△▼△
+    {% end %}
 	<a name=article></a>
-	<p style=text-align:right><a href=#top>Topへ移動</a></p>
+  <div style="position:fixed;right:30px;bottom:40px">
+  <p><a class="btn btn-outline-info rounded-pill" href=#article>下へ</a>
+  <p><a class="btn btn-outline-info rounded-pill" href="#top" >上へ</a>
+  </div>
   {% end %}
   {% block footer %}
     {% module Footer(position,'/'+db,'#article') %}
