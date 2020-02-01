@@ -6,13 +6,13 @@
 		{% else %}
 		<li class="page-item">			
 		{% end %}
-		<a class="page-link" href="{{url}}/{{x+1}}{{link}}">{{x+1}}</a></li>
+		<a class="page-link" href="{{url}}/{{x+1}}/{{link}}">{{x+1}}</a></li>
 	{% end %}
 		{% if index == 0 %}
 		{% set s = ' active' %}
 		{% else %}
 		{% set s = '' %}
 		{% end %}
-		<li class="page-item{{s}}"><a class="page-link" href={{url}}/0{{link}}>さいご</a></li>
+		<li class="page-item{{s}}"><a class="page-link" href={{url}}/0/{{link}}>さいご</a></li>
 	</ul>
 </nav>

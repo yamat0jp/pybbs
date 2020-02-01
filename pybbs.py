@@ -589,7 +589,7 @@ class Application(web.Application):
         if pos <= 0:
             pos = 0
         elif (pos-1)*params['count'] >= len(self.db.table(dbname)):
-            pos = 0
+            pos = len(self.db.table(dbname)) // params['count'] +1
         return pos
 
     def page(self, dbname, number):
