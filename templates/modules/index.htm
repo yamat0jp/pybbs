@@ -15,9 +15,13 @@
 	<script type=text/javascript src={{static_url('js/jquery-live-preview.js')}}></script>
 	<link rel=stylesheet href={{static_url('css/livepreview-demo.css')}}>
 	<script type=text/javascript src={{static_url('js/sub.js')}}></script>
-	<script src=//cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js></script>
+  <script src=//cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   </head> 
   <body>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
   {% block header %}
     <a href=/ style=text-decoration:none>{% raw data['title2'] %}</a>
     <header>
@@ -62,7 +66,6 @@
       <input type=submit value=移動>
     </form>
     <p><a href=/{{db}}/search>検索ページ</a></p>
-    <p style=text-align:right><a href=#article>下へ移動</a></p>
     <p style=text-align:center>{{db}}</p>
   {% module Footer(position,'/'+db,'#article') %}
   {% end %}
@@ -85,9 +88,12 @@
 	<section id=comment>{% raw record['comment'] %}</section>
         <section id=master style=text-align:right><a href=/alert?db={{db}}&num={{record['number']}}>報告</a></section>
 	<p>△▼△▼△▼△
-	{% end %}
+    {% end %}
 	<a name=article></a>
-	<p style=text-align:right><a href=#top>Topへ移動</a></p>
+  <div style="position:fixed;right:30px;bottom:40px">
+  <p><a class="btn btn-outline-info rounded-pill" href=#article>下へ</a>
+  <p><a class="btn btn-outline-info rounded-pill" href="#top" >上へ</a>
+  </div>
   {% end %}
   {% block footer %}
     {% module Footer(position,'/'+db,'#article') %}
