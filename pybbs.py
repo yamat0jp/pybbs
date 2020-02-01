@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*-
+﻿# -*- coding:utf-8 -*-
 import os,re,glob
 from tornado import escape,web,ioloop,httpserver,httpclient
 import pymongo, urllib
@@ -760,7 +760,7 @@ class Application(web.Application):
         if pos <= 0:
             pos = 0
         elif (pos-1)*params['count'] >= self.db[dbname].count():
-            pos = 0
+            pos = self.db[dbname].count() // params['count'] + 1
         return pos
 
     def page(self,dbname,number):
