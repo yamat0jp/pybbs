@@ -47,31 +47,6 @@ header p {
     display:inline
 }
 
-@media only screen and (min-width:900px){
-header textarea {
-    width:100%;
-    height:150px;
-	}
-}
-@media only screen and (max-width:899px){
-header textarea {
-	width:70%;
-	height:90px
-	}
-}
-
-button {
-	position:absolute;
-	width:80px;
-	height:30px;
-	right:20px
-}
-
-button.sticky {
-	position:fixed;
-	top:0
-}
-
 input[type=password] {
     width:55px
 }

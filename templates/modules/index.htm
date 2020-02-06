@@ -11,11 +11,9 @@
     {% block style %}
     <link rel="stylesheet" href={{static_url('css/main.css')}}>
 	{% end %}
-	<script type=text/javascript src=//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js></script>
-	<script type=text/javascript src={{static_url('js/jquery-live-preview.js')}}></script>
+		<script type=text/javascript src={{static_url('js/jquery-live-preview.js')}}></script>
 	<link rel=stylesheet href={{static_url('css/livepreview-demo.css')}}>
-	<script type=text/javascript src={{static_url('js/sub.js')}}></script>
-  <script src=//cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js></script>
+	<script src=//cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js></script>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   </head> 
   <body>
@@ -50,7 +48,6 @@
         </td></tr>
       </table>
     </form>
-    <button>open</button>
     </header>
     {% raw error %}
     <hr size="1" width="100%">
@@ -67,7 +64,7 @@
     </form>
     <p><a href=/{{db}}/search>検索ページ</a></p>
     <p style=text-align:center>{{db}}</p>
-  {% module Footer(position,'/'+db,'#article') %}
+  {% module Footer(position,'/'+db,'#top') %}
   {% end %}
   {% block body %}
     {% for record in records %}
