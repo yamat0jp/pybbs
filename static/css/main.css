@@ -39,10 +39,6 @@ header {
     width:100%
 }
 
-header table {
-    margin:auto
-}
-
 header p {
     display:inline
 }
@@ -67,11 +63,6 @@ p {
 
 body {
 	line-height:1.5
-}
-
-table {
-	margin:auto;
-	border:0
 }
 
 .prettyprint ol.linenums > li {
