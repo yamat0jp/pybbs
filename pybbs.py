@@ -72,15 +72,15 @@ class IndexHandler(BaseHandler):
         else:
             self.render_admin(dbname)
 
-    def render_admin(self,dbname,title='',com='',ch='checked',er='',img=''):
-        params = self.application.db.get(where('app') == 'bbs')
+    def render_admin(self,dbname,title='',com='',ch='checked',er='',img='',pw=''):
+        params = self.application.db.get(where('app') == 'bbs')        
         t = self.get_argument('img','')
         if self.current_user == b'admin':
             s = '<label>URL <input name=img type=text placeholder="src=http://～" value=' + t + '></lbael>'
         else:
             s = '<input type=hidden value=' + t + '>'
         self.render('modules/index.htm',position=self.pos,records=self.rec,data=params,title=title,
-            username=self.na,comment=com,db=dbname,aikotoba=self.rule,error=er+img,check=ch,admin=s)
+            username=self.na,comment=com,db=dbname,aikotoba=self.rule,error=er+img,ch=ch,admin=s,pw=pw)
 
 class LoginHandler(BaseHandler):
     def get(self):
@@ -281,7 +281,7 @@ class RegistHandler(IndexHandler):
         else:
             self.na = na
             self.pos = 0
-            self.render_admin(dbname,com=com,title=sub,ch=ch,er=error,img=img)
+            self.render_admin(dbname,com=com,title=sub,ch=ch,er=error,img=img,pw=pw)
     
     def link(self,command,database):
         i = 0
@@ -308,7 +308,7 @@ class AdminHandler(BaseHandler):
         table = self.application.db.table(dbname) 
         rec = sorted(table.all(),key=lambda x: x['number'])
         if params['mentenance'] is True:
-            check = 'checked=checked'
+            check = 'checked'
         else:
             check = ''
         pos = self.application.gpos(dbname,page)
