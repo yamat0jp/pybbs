@@ -43,15 +43,6 @@ header p {
     display:inline
 }
 
-input[type=password] {
-    width:55px
-}
-
-form#search input {
-    height:22px;
-    width:55px
-}
-
 span {
     color:#ff0000
 }

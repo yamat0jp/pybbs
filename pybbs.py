@@ -73,7 +73,7 @@ class IndexHandler(BaseHandler):
         else:
             self.render_admin(dbname)
 
-    def render_admin(self,dbname,title='',com='',er='',img='',ch='checked'):
+    def render_admin(self,dbname,title='',com='',er='',img='',ch='checked',pw=''):
         t = self.get_argument('img','')
         params = self.application.db['params'].find_one({'app':'bbs'})
         if self.current_user == b'admin':
@@ -81,7 +81,7 @@ class IndexHandler(BaseHandler):
         else:
             s = '<input type=hidden>'
         self.render('modules/index.htm',position=self.pos,records=self.rec,data=params,username=self.na,title=title,
-            comment=com,db=dbname,aikotoba=self.rule,error=er+img,check=ch,admin=s)
+            comment=com,db=dbname,aikotoba=self.rule,error=er+img,ch=ch,admin=s,pw=pw)
 
 class LoginHandler(BaseHandler):
     def get(self):
@@ -290,7 +290,7 @@ class RegistHandler(IndexHandler):
         self.na = na
         self.rule = rule
         self.pos = 0
-        self.render_admin(dbname,title=sub,com=com,er=error,ch=ch,img=img)
+        self.render_admin(dbname,title=sub,com=com,er=error,ch=ch,img=img,pw=pw)
 
     def link(self,command,database):
         i = 0
