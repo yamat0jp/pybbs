@@ -23,7 +23,7 @@ section#date h1 {
 }
 
 section h1 {
-    display:inline;
+    display:inline
 }
 
 header {
@@ -39,17 +39,8 @@ header {
     width:100%
 }
 
-header p {
-    display:inline
-}
-
 span {
     color:#ff0000
-}
-
-p {
-	text-indent:0;
-	margin:0
 }
 
 body {
