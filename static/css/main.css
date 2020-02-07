@@ -47,6 +47,11 @@ body {
 	line-height:1.5
 }
 
+p {
+    margin:0px;
+    padding:0px
+}
+
 .prettyprint ol.linenums > li {
 	list-style-type:decimal
 }
