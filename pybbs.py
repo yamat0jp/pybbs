@@ -229,7 +229,7 @@ class RegistHandler(IndexHandler):
         for x in url:
             s += '<tr><td><a class=livepreview target=_blank href={0}>{0}</a></td></tr>'.format(x)
         if s:
-            text += '<table><tr><td>検出URL:</td></tr>'+s+'</table>'
+            text += '<table align=center><tr><td>検出URL:</td></tr>'+s+'</table>'
         pw = self.get_argument('password')
         if i == 0:
             error = error + u'本文がありません.<br>'
