@@ -240,7 +240,7 @@ class RegistHandler(IndexHandler):
         for x in url:
             s = s+'<tr><td><a href={0} class=livepreview target=_blank>{0}</a></td></tr>'.format(x)
         if s != '':
-            text = text+'<table><tr><td>検出url:</td></tr>'+s+'</table>'
+            text = text+'<table align=center><tr><td>検出url:</td></tr>'+s+'</table>'
         pw = self.get_argument('password')
         if i > 1000:
             error += u'文字数が1,000をこえました.<br>'
