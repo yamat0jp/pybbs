@@ -572,7 +572,7 @@ class BackUp(web.RequestHandler):
         for dbname in self.application.coll():
             table = []
             for item in self.application.db[dbname].find().sort('number'):
-                del item['_id']
+                del item['_id'], item['password'], item['comment']
                 table.append(item)
             response[dbname] = table
         self.write(json.dumps(response,ensure_ascii=False))
