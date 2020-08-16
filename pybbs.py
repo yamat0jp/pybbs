@@ -566,6 +566,17 @@ class ListApi(web.RequestHandler):
             response = {}
         self.write(json.dumps(response,ensure_ascii=False))
 
+class BackUp(web.RequestHandler):
+    def get(self):
+        response = {}
+        for dbname in self.application.coll():
+            temp = self.application.db[dbname].find()
+            table = []
+            for item in temp:
+                table.append(item)
+            response[dbname] = table
+        self.write(json.dumps(response,ensure_ascii=False))
+
 class WebHookHandler(web.RequestHandler):
     def main(self, no):
         table, na = self.users()
