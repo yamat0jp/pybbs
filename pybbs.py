@@ -573,7 +573,8 @@ class BackUp(web.RequestHandler):
             temp = self.application.db[dbname].find()
             table = []
             for item in temp:
-                table.append(item)
+                if item.key != '_id': 
+                    table.append(item)
             response[dbname] = table
         self.write(json.dumps(response,ensure_ascii=False))
 
