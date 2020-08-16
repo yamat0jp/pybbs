@@ -747,7 +747,7 @@ class Application(web.Application):
     tk = os.environ['Access_Token']
     db = pymongo.MongoClient(uri)[ac]
     def __init__(self):
-        handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),
+        handlers = [(r'/',NaviHandler),(r'/login',LoginHandler),(r'/logout',LogoutHandler),(r'/title',TitleHandler),(r'/backup',BackUp),
                     (r'/headline/api',HeadlineApi),(r'/read/api/([a-zA-Z0-9_%]+)/([0-9]+)',ArticleApi),
                     (r'/write/api/([a-zA-Z0-9_%]+)/()/()/()',ArticleApi),(r'/list/api/([a-zA-Z0-9_%]+)',ListApi),
                     (r'/help',HelpHandler),(r'/master',MasterHandler),(r'/alert',AlertHandler),(r'/jump',JumpHandler),
