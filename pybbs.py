@@ -570,9 +570,8 @@ class BackUp(web.RequestHandler):
     def get(self):
         response = {}
         for dbname in self.application.coll():
-            temp = self.application.db[dbname].find().sort('number')
             table = []
-            for item in temp:
+            for item in self.application.db[dbname].find().sort('number'):
                 del item['_id']
                 table.append(item)
             response[dbname] = table
